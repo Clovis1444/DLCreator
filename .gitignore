@@ -1,0 +1,5 @@
+/build
+/.cache
+/CMakeFiles
+*.pro.user*
+CMakeLists.txt.user*
