@@ -50,6 +50,45 @@
       <property name="frameShadow">
        <enum>QFrame::Shadow::Raised</enum>
       </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QStackedWidget" name="files_widget">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="page">
+          <widget class="QLabel" name="label">
+           <property name="geometry">
+            <rect>
+             <x>300</x>
+             <y>250</y>
+             <width>58</width>
+             <height>15</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>tab 1</string>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="page_2">
+          <widget class="QLabel" name="label_2">
+           <property name="geometry">
+            <rect>
+             <x>320</x>
+             <y>250</y>
+             <width>58</width>
+             <height>15</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>tab 2</string>
+           </property>
+          </widget>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
     <item row="0" column="1">
@@ -92,14 +131,14 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="tabButton1">
          <property name="text">
           <string>Tab1</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="tabButton2">
          <property name="text">
           <string>Tab2</string>
          </property>

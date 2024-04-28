@@ -17,13 +17,18 @@ class MainWindow : public QMainWindow {
     ~MainWindow();
 
    private:
-    void init_connect();
+    void initConnect();
+    void addNewTab(QString &name);
 
    public slots:
     void onActionTools();
     void onActionWorkingArea();
     void onActionTabs();
     static void onActionExit();
+    void tab1();
+    void tab2();
+    void tab();
+    void onActionNew();
 
    private:
     Ui::MainWindow *ui_;
