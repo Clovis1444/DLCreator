@@ -1,14 +1,18 @@
 #include "mainwindow.h"
 
+#include <qaction.h>
 #include <qboxlayout.h>
 #include <qdebug.h>
 #include <qlabel.h>
+#include <qlogging.h>
+#include <qnamespace.h>
 #include <qobject.h>
 #include <qpushbutton.h>
 #include <qstringview.h>
 #include <qwidget.h>
 
 #include "./ui_mainwindow.h"
+#include "file.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow) {
@@ -48,8 +52,6 @@ void MainWindow::initConnect() {
     //
     QObject::connect(ui_->tabButton1, &QPushButton::clicked, this,
                      &MainWindow::tab1);
-    QObject::connect(ui_->tabButton2, &QPushButton::clicked, this,
-                     &MainWindow::tab2);
 }
 
 void MainWindow::onActionTools() {
@@ -70,47 +72,43 @@ void MainWindow::onActionWorkingArea() {
 
 void MainWindow::onActionTabs() {
     if (ui_->actionTabs->isChecked()) {
-        ui_->tabs_frame->show();
+        ui_->tabs_scrollArea->show();
     } else {
-        ui_->tabs_frame->hide();
+        ui_->tabs_scrollArea->hide();
     }
 }
 
 void MainWindow::onActionExit() { QApplication::quit(); }
 
 void MainWindow::tab1() { ui_->files_widget->setCurrentIndex(0); }
-void MainWindow::tab2() { ui_->files_widget->setCurrentIndex(1); }
 
-void MainWindow::onActionNew() {
-    QString name{"Tab"};
-    addNewTab(name);
+void MainWindow::onActionNew() { createNewFile(); }
+
+void MainWindow::onTabClicked() {
+    auto* tab{qobject_cast<QPushButton*>(sender())};
+
+    for (File* i : files_) {
+        if (i->tab() == tab) {
+            ui_->files_widget->setCurrentWidget(i->content());
+            break;
+        }
+    }
 }
 
-// TODO(clovis): create class "File" with fields: QWidget*, QPushButton*
-void MainWindow::addNewTab(QString& name) {
-    int tab_index{ui_->files_widget->count()};
-    name.append(QString::number(tab_index + 1));
+void MainWindow::createNewFile() {
+    auto* file{new File{ui_->tabs_scrollArea, ui_->files_widget}};
+    files_.push_back(file);
 
-    // Tab button
-    auto* tab_button{new QPushButton(name, ui_->tabs_frame)};
-    tab_button->setObjectName(name);
-    qobject_cast<QBoxLayout*>(ui_->tabs_frame->layout())
-        ->insertWidget(tab_index, tab_button);
+    // Tab
+    auto* tabs_layout{qobject_cast<QHBoxLayout*>(
+        ui_->tabs_scrollAreaWidgetContents->layout())};
+    tabs_layout->insertWidget(tabs_layout->count() - 1, file->tab());
 
-    // Tab widget
-    auto* widget{new QWidget{ui_->files_widget}};
-    auto* widget_layout{new QBoxLayout{QBoxLayout::LeftToRight, widget}};
-    widget->setLayout(widget_layout);
-    auto* label{new QLabel{name}};
-    widget->layout()->addWidget(label);
+    // Content
+    ui_->files_widget->addWidget(file->content());
 
-    ui_->files_widget->addWidget(widget);
+    ui_->files_widget->setCurrentWidget(file->content());
 
-    QObject::connect(tab_button, &QPushButton::clicked, this, &MainWindow::tab);
-}
-
-void MainWindow::tab() {
-    QString prefix{"Tab"};
-    int tab_index{sender()->objectName().mid(prefix.length()).toInt() - 1};
-    ui_->files_widget->setCurrentIndex(tab_index);
+    QObject::connect(file->tab(), &QPushButton::clicked, this,
+                     &MainWindow::onTabClicked);
 }

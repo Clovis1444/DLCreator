@@ -1,7 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <qhash.h>
+#include <qlist.h>
+#include <qpushbutton.h>
+#include <qwidget.h>
+
 #include <QMainWindow>
+
+class File;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -18,7 +25,7 @@ class MainWindow : public QMainWindow {
 
    private:
     void initConnect();
-    void addNewTab(QString &name);
+    void createNewFile();
 
    public slots:
     void onActionTools();
@@ -26,11 +33,11 @@ class MainWindow : public QMainWindow {
     void onActionTabs();
     static void onActionExit();
     void tab1();
-    void tab2();
-    void tab();
     void onActionNew();
+    void onTabClicked();
 
    private:
     Ui::MainWindow *ui_;
+    QList<File *> files_;
 };
 #endif  // MAINWINDOW_H
