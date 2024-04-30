@@ -6,12 +6,16 @@
 #include <qmenu.h>
 #include <qpushbutton.h>
 #include <qstackedwidget.h>
+#include <qtmetamacros.h>
 #include <qwidget.h>
+
+#include "tabbutton.h"
+
 class File {
    public:
     File(QWidget* tab_parent, QStackedWidget* content_parent,
          const QString& name = "New file")
-        : tab_{new QPushButton{name, tab_parent}},
+        : tab_{new TabButton{tab_parent, name}},
           content_{new QWidget{content_parent}} {
         // Content
         content_->setLayout(new QHBoxLayout{});
@@ -22,10 +26,10 @@ class File {
         delete tab_;
         delete content_;
     }
-    QPushButton* tab() { return tab_; }
+    TabButton* tab() { return tab_; }
     QWidget* content() { return content_; }
 
    private:
-    QPushButton* tab_;
+    TabButton* tab_;
     QWidget* content_;
 };

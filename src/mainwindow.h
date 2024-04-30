@@ -35,6 +35,7 @@ class MainWindow : public QMainWindow {
     void tab1();
     void onActionNew();
     void onTabClicked();
+    void onTabClose();
 
    private:
     Ui::MainWindow *ui_;
