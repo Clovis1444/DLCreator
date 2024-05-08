@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget* parent)
     ui_->setupUi(this);
 
     initConnect();
+
+    createNewFile();
 }
 
 MainWindow::~MainWindow() { delete ui_; }
@@ -46,12 +48,6 @@ void MainWindow::initConnect() {
     //  View -> Tabs
     QObject::connect(ui_->actionTabs, &QAction::toggled, this,
                      &MainWindow::onActionTabs);
-
-    //
-    // Tabs
-    //
-    QObject::connect(ui_->tabButton1, &QPushButton::clicked, this,
-                     &MainWindow::tab1);
 }
 
 void MainWindow::createNewFile() {
@@ -105,12 +101,11 @@ void MainWindow::onActionTabs() {
 
 void MainWindow::onActionExit() { QApplication::quit(); }
 
-void MainWindow::tab1() { ui_->files_widget->setCurrentIndex(0); }
-
 void MainWindow::onActionNew() { createNewFile(); }
 
+// TODO(clovis): implement change active tab color
 void MainWindow::onTabClicked() {
-    auto* tab{qobject_cast<QPushButton*>(sender())};
+    auto* tab{qobject_cast<TabButton*>(sender())};
 
     for (File* i : files_) {
         if (i->tab() == tab) {

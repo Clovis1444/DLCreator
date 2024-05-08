@@ -1,3 +1,5 @@
+#pragma once
+
 #include <qboxlayout.h>
 #include <qcoreevent.h>
 #include <qlogging.h>
