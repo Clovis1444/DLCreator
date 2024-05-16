@@ -9,8 +9,7 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
-// #include "../widgets/contentwidget.h"
-#include "../widgets/contentview.h"
+#include "../widgets/contentwidget.h"
 #include "../widgets/tabbutton.h"
 
 class File {
@@ -18,8 +17,7 @@ class File {
     File(QWidget* tab_parent, QStackedWidget* content_parent,
          const QString& name = "New file")
         : tab_{new TabButton{tab_parent, name}},
-          //   content_{new ContentWidget{content_parent}} {}
-          content_{new ContentView{content_parent}} {}
+          content_{new ContentWidget{content_parent}} {}
 
     ~File() {
         delete tab_;
@@ -30,6 +28,5 @@ class File {
 
    private:
     TabButton* tab_;
-    // ContentWidget* content_;
-    ContentView* content_;
+    ContentWidget* content_;
 };

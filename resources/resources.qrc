@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="deactive.png">teal50.png</file>
+    <file alias="active.png">aqua50.png</file>
+    <file alias="water.png">water50.png</file>
+    <file alias="oil.png">oil50.png</file>
+    <file alias="smoke.png">smoke50.png</file>
+    <file alias="poison.png">poison50.png</file>
+</qresource>
+</RCC>

@@ -1,3 +1,3 @@
 - Place `contentwidget.h` and `tabbutton.h` into "src/file/"?
-- Delete `contentwiev.h` - useless class. All needed can be recreate in `graphicsscene.h`
-- Rename `graphicsscene.h` to `scene.h`
+- Split `Cell` and `ContentWidget` int 2 headers
+- Refactor `Cell` class, `Liquid` and `Gaz` enums
