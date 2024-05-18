@@ -12,7 +12,6 @@
 #include <qwidget.h>
 
 #include "./ui_mainwindow.h"
-#include "file/file.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow) {

@@ -25,6 +25,7 @@ set(PROJECT_SOURCES
         src/mainwindow.ui
         src/widgets/tabbutton.h
         src/widgets/contentwidget.h
+        src/widgets/cell/cell.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

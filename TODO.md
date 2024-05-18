@@ -1,3 +1,2 @@
-- Place `contentwidget.h` and `tabbutton.h` into "src/file/"?
-- Split `Cell` and `ContentWidget` int 2 headers
-- Refactor `Cell` class, `Liquid` and `Gaz` enums
+- Create more namespaces
+- Reduce amount of code duplication in `celllayer.h`

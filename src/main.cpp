@@ -1,12 +1,12 @@
 #include <QApplication>
 
 #include "mainwindow.h"
-#include "widgets/contentwidget.h"
+#include "widgets/cell/celllayer.h"
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    Cell::init_resources();
+    initCellLayersFromJson();
 
     MainWindow w;
     w.setWindowTitle("Hello, world!");

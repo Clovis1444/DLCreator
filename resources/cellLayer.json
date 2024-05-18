@@ -1,0 +1,22 @@
+{
+    "Liquid": [
+        {
+            "name": "Water",
+            "file_name": "water50.png"
+        },
+        {
+            "name": "Oil",
+            "file_name": "oil50.png"
+        }
+    ],
+    "Gaz": [
+        {
+            "name": "Smoke",
+            "file_name": "smoke50.png"
+        },
+        {
+            "name": "Poison",
+            "file_name": "poison50.png"
+        }
+    ]
+}

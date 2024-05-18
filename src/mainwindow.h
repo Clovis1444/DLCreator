@@ -8,6 +8,8 @@
 
 #include <QMainWindow>
 
+#include "file.h"
+
 class File;
 
 QT_BEGIN_NAMESPACE
