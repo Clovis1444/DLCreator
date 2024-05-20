@@ -28,6 +28,8 @@ class MainWindow : public QMainWindow {
    private:
     void initConnect();
     void createNewFile();
+    void addToolWidget(QWidget *widget);
+    void setupToolWidgets();
 
    public slots:
     void onActionTools();

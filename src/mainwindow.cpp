@@ -12,12 +12,16 @@
 #include <qwidget.h>
 
 #include "./ui_mainwindow.h"
+#include "widgets/collapsiblesection.h"
+#include "widgets/toolwidget.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow) {
     ui_->setupUi(this);
 
     initConnect();
+
+    setupToolWidgets();
 
     createNewFile();
 }
@@ -69,6 +73,37 @@ void MainWindow::createNewFile() {
     QObject::connect(file->tab(), &TabButton::closePressed, this,
                      &MainWindow::onTabClose);
 }
+
+void MainWindow::addToolWidget(QWidget* widget) {
+    int widgets_count{ui_->tools_frame->layout()->count()};
+    QVBoxLayout* layout{qobject_cast<QVBoxLayout*>(ui_->tools_frame->layout())};
+
+    layout->insertWidget(widgets_count - 1, widget);
+}
+
+void MainWindow::setupToolWidgets() {
+    auto* parent{ui_->tools_frame};
+
+    // None tool
+    auto* clear_tool{new ToolWidget{"None tool", parent}};
+    addToolWidget(clear_tool);
+
+    // Liquids
+    auto* liquids{new CollapsibleSection{"Liquids", parent}};
+    for (Liquid* i : Liquid::list()) {
+        auto* widget{new ToolWidget{i, i->name(), liquids}};
+        liquids->addContent(widget);
+    }
+    addToolWidget(liquids);
+
+    // Gazes
+    auto* gazes{new CollapsibleSection{"Gazes", parent}};
+    for (Gaz* i : Gaz::list()) {
+        auto* widget{new ToolWidget{i, i->name(), gazes}};
+        gazes->addContent(widget);
+    }
+    addToolWidget(gazes);
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////Slots/////////////////////////////////////

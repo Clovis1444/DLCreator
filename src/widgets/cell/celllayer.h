@@ -19,7 +19,9 @@
 
 class CellLayer {
    public:
-    const QPixmap* pixmap() { return pixmap_; }
+    const QPixmap* pixmap() const { return pixmap_; }
+
+    QString name() const { return name_; }
 
     CellLayer(CellLayer&&) = delete;
 
@@ -33,6 +35,7 @@ class CellLayer {
         }
         pixmap_ = new QPixmap{file_path_};
     }
+    explicit CellLayer(QString name) : name_{std::move(name)} {}
     ~CellLayer() { delete pixmap_; }
 
     QString name_;
@@ -43,7 +46,7 @@ class CellLayer {
 
 class Liquid : public CellLayer {
    public:
-    static Liquid* getLiquid(const QString& name) {
+    static const Liquid* getLiquid(const QString& name) {
         for (Liquid* i : k_liquids_) {
             if (i->name_ == name) {
                 return i;
@@ -53,9 +56,16 @@ class Liquid : public CellLayer {
         return nullptr;
     };
 
+    // TODO(clovis): fix clang-tidy warning
+    // NOLINTNEXTLINE
+    static const QList<Liquid*> list() { return k_liquids_; };
+
    protected:
     Liquid(QString name, QString file_path)
-        : CellLayer{std::move(name), std::move(file_path)} {}
+        : CellLayer{std::move(name), std::move(file_path)} {
+        k_liquids_.push_back(this);
+    }
+    Liquid() : CellLayer("No liquid") { k_liquids_.push_back(this); }
 
     inline static QList<Liquid*> k_liquids_{};
     inline static const QString kJsonName{"Liquid"};
@@ -65,7 +75,7 @@ class Liquid : public CellLayer {
 
 class Gaz : public CellLayer {
    public:
-    static Gaz* getGaz(const QString& name) {
+    static const Gaz* getGaz(const QString& name) {
         for (Gaz* i : k_gazes_) {
             if (i->name_ == name) {
                 return i;
@@ -75,9 +85,16 @@ class Gaz : public CellLayer {
         return nullptr;
     };
 
+    // TODO(clovis): fix clang-tidy warning
+    // NOLINTNEXTLINE
+    static const QList<Gaz*> list() { return k_gazes_; };
+
    protected:
     Gaz(QString name, QString file_path)
-        : CellLayer{std::move(name), std::move(file_path)} {}
+        : CellLayer{std::move(name), std::move(file_path)} {
+        k_gazes_.push_back(this);
+    }
+    Gaz() : CellLayer("No Gaz") { k_gazes_.push_back(this); }
 
     inline static QList<Gaz*> k_gazes_{};
     inline static const QString kJsonName{"Gaz"};
@@ -105,6 +122,8 @@ inline void initCellLayersFromJson() {
             QJsonObject json{doc.object()};
 
             // Liquid
+            // TODO(clovis): refactor this
+            new Liquid{};
             for (QJsonValue i : json[Liquid::kJsonName].toArray()) {
                 QString name{i["name"].toString()};
                 QString file_name{i["file_name"].toString()};
@@ -117,10 +136,11 @@ inline void initCellLayersFromJson() {
                     continue;
                 }
 
-                auto* liquid{new Liquid{name, file.fileName()}};
-                Liquid::k_liquids_.push_back(liquid);
+                new Liquid{name, file.fileName()};
             }
             // Gaz
+            // TODO(clovis): refactor this
+            new Gaz{};
             for (QJsonValue i : json[Gaz::kJsonName].toArray()) {
                 QString name{i["name"].toString()};
                 QString file_name{i["file_name"].toString()};
@@ -133,8 +153,7 @@ inline void initCellLayersFromJson() {
                     continue;
                 }
 
-                auto* gaz{new Gaz{name, file.fileName()}};
-                Gaz::k_gazes_.push_back(gaz);
+                new Gaz{name, file.fileName()};
             }
         }
     } else {

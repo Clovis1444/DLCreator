@@ -26,6 +26,8 @@ set(PROJECT_SOURCES
         src/widgets/tabbutton.h
         src/widgets/contentwidget.h
         src/widgets/cell/cell.h
+        src/widgets/collapsiblesection.h
+        src/widgets/toolwidget.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
