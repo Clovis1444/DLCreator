@@ -23,6 +23,8 @@ class CellLayer {
 
     QString name() const { return name_; }
 
+    bool isEmpty() const { return pixmap_ == nullptr; }
+
     CellLayer(CellLayer&&) = delete;
 
    protected:

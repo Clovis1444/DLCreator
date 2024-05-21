@@ -3,3 +3,4 @@
 - Mark getters as `const`
 - Const qualifiers for pointers!!!
 - Create `frame_` and `background_` member variables in `Cell`
+- Tile texture generation algorithm

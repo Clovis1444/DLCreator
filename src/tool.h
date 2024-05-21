@@ -2,7 +2,7 @@
 
 #include <qdebug.h>
 
-#include "widgets/cell/celllayer.h"
+#include "widgets/cell/cellLayer.h"
 
 class Tool {
    public:
@@ -18,10 +18,6 @@ class Tool {
         kEnumLength,
     };
 
-    // static void setClearTool() {
-    //     tool_type_ = kClear;
-    //     cell_layer_ = nullptr;
-    // }
     static void setTool(bool set_clear = false) {
         if (set_clear) {
             tool_type_ = kClear;

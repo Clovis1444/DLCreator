@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "mainWindow.h"
 
 #include <qaction.h>
 #include <qboxlayout.h>
@@ -11,10 +11,10 @@
 #include <qstringview.h>
 #include <qwidget.h>
 
-#include "./ui_mainwindow.h"
+#include "./ui_mainWindow.h"
 #include "settings.h"
-#include "widgets/collapsiblesection.h"
-#include "widgets/toolwidget.h"
+#include "widgets/collapsibleSection.h"
+#include "widgets/toolWidget.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow) {

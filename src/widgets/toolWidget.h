@@ -4,7 +4,7 @@
 #include <qtmetamacros.h>
 
 #include "../tool.h"
-#include "cell/celllayer.h"
+#include "cell/cellLayer.h"
 
 class ToolWidget : public QPushButton {
     Q_OBJECT

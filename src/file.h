@@ -9,8 +9,8 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
-#include "widgets/contentwidget.h"
-#include "widgets/tabbutton.h"
+#include "widgets/contentWidget.h"
+#include "widgets/tabButton.h"
 
 class File {
    public:

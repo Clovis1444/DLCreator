@@ -5,7 +5,7 @@
 #include <qpixmap.h>
 
 #include "../../tool.h"
-#include "celllayer.h"
+#include "cellLayer.h"
 
 class Cell : public QLabel {
     Q_OBJECT
@@ -123,11 +123,12 @@ class Cell : public QLabel {
         }
 
         // Liquid
-        if (liquid_ != nullptr && liquid_->pixmap() != nullptr) {
+        if (liquid_ != nullptr && !liquid_->isEmpty()) {
             pntr.drawPixmap(0, 0, liquid_->pixmap()->scaled(size_, size_));
         }
+
         // Gaz
-        if (gaz_ != nullptr && gaz_->pixmap() != nullptr) {
+        if (gaz_ != nullptr && !gaz_->isEmpty()) {
             pntr.drawPixmap(0, 0, gaz_->pixmap()->scaled(size_, size_));
         }
 

@@ -20,14 +20,14 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 set(PROJECT_SOURCES
         resources/resources.qrc
         src/main.cpp
-        src/mainwindow.cpp
-        src/mainwindow.h
-        src/mainwindow.ui
-        src/widgets/tabbutton.h
-        src/widgets/contentwidget.h
+        src/mainWindow.cpp
+        src/mainWindow.h
+        src/mainWindow.ui
+        src/widgets/tabButton.h
+        src/widgets/contentWidget.h
         src/widgets/cell/cell.h
-        src/widgets/collapsiblesection.h
-        src/widgets/toolwidget.h
+        src/widgets/collapsibleSection.h
+        src/widgets/toolWidget.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
