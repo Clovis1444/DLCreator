@@ -28,7 +28,7 @@ class CollapsibleSection : public QFrame {
         button_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
         content_ = new QFrame{this};
-        // content_->setFrameShape(Shape::Box);
+        content_->setFrameShape(Shape::Box);
         auto* content_layout = new QHBoxLayout{content_};
         content_->setLayout(content_layout);
 

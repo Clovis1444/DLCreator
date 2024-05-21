@@ -10,9 +10,13 @@ class ToolWidget : public QPushButton {
     Q_OBJECT
 
    public:
-    ToolWidget(const QString& name, QWidget* parent)
+    ToolWidget(const QString& name, QWidget* parent, bool clear_tool = false)
         : QPushButton{name, parent} {
-        tool_type_ = Tool::kNone;
+        if (clear_tool) {
+            tool_type_ = Tool::kClear;
+        } else {
+            tool_type_ = Tool::kNone;
+        }
         QObject::connect(this, &QPushButton::clicked, this,
                          &ToolWidget::onClicked);
     }
@@ -40,6 +44,9 @@ class ToolWidget : public QPushButton {
                 break;
             case Tool::kGaz:
                 Tool::setTool(static_cast<const Gaz*>(cell_layer_));
+                break;
+            case Tool::kClear:
+                Tool::setTool(true);
                 break;
             case Tool::kEnumLength:
                 break;

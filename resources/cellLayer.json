@@ -17,6 +17,10 @@
         {
             "name": "Poison",
             "file_name": "poison50.png"
+        },
+        {
+            "name": "Vapor",
+            "file_name": "vapor50.png"
         }
     ]
 }

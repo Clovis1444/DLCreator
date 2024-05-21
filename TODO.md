@@ -2,4 +2,4 @@
 - Reduce amount of code duplication in `celllayer.h`
 - Mark getters as `const`
 - Const qualifiers for pointers!!!
-- Add `QPixmap* frame_` member variable to `Cell`
+- Create `frame_` and `background_` member variables in `Cell`

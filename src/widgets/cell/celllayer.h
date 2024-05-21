@@ -70,7 +70,7 @@ class Liquid : public CellLayer {
     inline static QList<Liquid*> k_liquids_{};
     inline static const QString kJsonName{"Liquid"};
 
-    friend void initCellLayersFromJson();
+    friend void loadCellLayersFromJson();
 };
 
 class Gaz : public CellLayer {
@@ -99,11 +99,11 @@ class Gaz : public CellLayer {
     inline static QList<Gaz*> k_gazes_{};
     inline static const QString kJsonName{"Gaz"};
 
-    friend void initCellLayersFromJson();
+    friend void loadCellLayersFromJson();
 };
 
 // Parse json and appends its objects to associated QList.
-inline void initCellLayersFromJson() {
+inline void loadCellLayersFromJson() {
     QFile res{Settings::kCellLayerResourcesFilePath};
     if (!res.exists()) {
         qDebug() << res.fileName() << "does not exists";

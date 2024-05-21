@@ -13,12 +13,21 @@ class Tool {
         kNone,
         kLiquid,
         kGaz,
+        kClear,
         // Insert new entries here
         kEnumLength,
     };
 
-    static void setTool() {
-        tool_type_ = kNone;
+    // static void setClearTool() {
+    //     tool_type_ = kClear;
+    //     cell_layer_ = nullptr;
+    // }
+    static void setTool(bool set_clear = false) {
+        if (set_clear) {
+            tool_type_ = kClear;
+        } else {
+            tool_type_ = kNone;
+        }
         cell_layer_ = nullptr;
     }
     static void setTool(const Liquid* liquid) {

@@ -12,12 +12,15 @@
 #include <qwidget.h>
 
 #include "./ui_mainwindow.h"
+#include "settings.h"
 #include "widgets/collapsiblesection.h"
 #include "widgets/toolwidget.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui_(new Ui::MainWindow) {
     ui_->setupUi(this);
+
+    setWindowTitle(Settings::kProgramName);
 
     initConnect();
 
@@ -84,9 +87,13 @@ void MainWindow::addToolWidget(QWidget* widget) {
 void MainWindow::setupToolWidgets() {
     auto* parent{ui_->tools_frame};
 
-    // None tool
-    auto* clear_tool{new ToolWidget{"None tool", parent}};
-    addToolWidget(clear_tool);
+    // Generic tools
+    auto* tools{new CollapsibleSection{"Tools", parent}};
+    auto* no_tool{new ToolWidget{"No tool", parent}};
+    auto* clear_tool{new ToolWidget{"Clear tool", parent, true}};
+    tools->addContent(no_tool);
+    tools->addContent(clear_tool);
+    addToolWidget(tools);
 
     // Liquids
     auto* liquids{new CollapsibleSection{"Liquids", parent}};
