@@ -95,6 +95,14 @@ void MainWindow::setupToolWidgets() {
     tools->addContent(clear_tool);
     addToolWidget(tools);
 
+    // Backgrounds
+    auto* backgrounds{new CollapsibleSection{"Backgrounds", parent}};
+    for (Background* i : Background::list()) {
+        auto* widget{new ToolWidget{i, i->name(), backgrounds}};
+        backgrounds->addContent(widget);
+    }
+    addToolWidget(backgrounds);
+
     // Liquids
     auto* liquids{new CollapsibleSection{"Liquids", parent}};
     for (Liquid* i : Liquid::list()) {

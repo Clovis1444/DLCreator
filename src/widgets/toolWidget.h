@@ -32,6 +32,13 @@ class ToolWidget : public QPushButton {
         QObject::connect(this, &QPushButton::clicked, this,
                          &ToolWidget::onClicked);
     }
+    ToolWidget(const Background* cell_layer, const QString& name,
+               QWidget* parent)
+        : QPushButton{name, parent}, cell_layer_{cell_layer} {
+        tool_type_ = Tool::kBackground;
+        QObject::connect(this, &QPushButton::clicked, this,
+                         &ToolWidget::onClicked);
+    }
 
    private slots:
     void onClicked() {
@@ -47,6 +54,9 @@ class ToolWidget : public QPushButton {
                 break;
             case Tool::kClear:
                 Tool::setTool(true);
+                break;
+            case Tool::kBackground:
+                Tool::setTool(static_cast<const Background*>(cell_layer_));
                 break;
             case Tool::kEnumLength:
                 break;

@@ -14,6 +14,7 @@ class Tool {
         kLiquid,
         kGaz,
         kClear,
+        kBackground,
         // Insert new entries here
         kEnumLength,
     };
@@ -33,6 +34,10 @@ class Tool {
     static void setTool(const Gaz* gaz) {
         tool_type_ = kGaz;
         cell_layer_ = gaz;
+    }
+    static void setTool(const Background* background) {
+        tool_type_ = kBackground;
+        cell_layer_ = background;
     }
 
     static ToolType toolType() { return tool_type_; }

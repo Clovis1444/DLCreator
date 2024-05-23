@@ -78,7 +78,7 @@ class Liquid : public CellLayer {
 class Gaz : public CellLayer {
    public:
     static const Gaz* getGaz(const QString& name) {
-        for (Gaz* i : k_gazes_) {
+        for (Gaz* i : k_gasses_) {
             if (i->name_ == name) {
                 return i;
             }
@@ -89,17 +89,48 @@ class Gaz : public CellLayer {
 
     // TODO(clovis): fix clang-tidy warning
     // NOLINTNEXTLINE
-    static const QList<Gaz*> list() { return k_gazes_; };
+    static const QList<Gaz*> list() { return k_gasses_; };
 
    protected:
     Gaz(QString name, QString file_path)
         : CellLayer{std::move(name), std::move(file_path)} {
-        k_gazes_.push_back(this);
+        k_gasses_.push_back(this);
     }
-    Gaz() : CellLayer("No Gaz") { k_gazes_.push_back(this); }
+    Gaz() : CellLayer("No Gaz") { k_gasses_.push_back(this); }
 
-    inline static QList<Gaz*> k_gazes_{};
+    inline static QList<Gaz*> k_gasses_{};
     inline static const QString kJsonName{"Gaz"};
+
+    friend void loadCellLayersFromJson();
+};
+
+class Background : public CellLayer {
+   public:
+    static const Background* getGaz(const QString& name) {
+        for (Background* i : k_backgrounds_) {
+            if (i->name_ == name) {
+                return i;
+            }
+        }
+
+        return nullptr;
+    };
+
+    // TODO(clovis): fix clang-tidy warning
+    // NOLINTNEXTLINE
+    static const QList<Background*> list() { return k_backgrounds_; };
+
+   protected:
+    Background(QString name, QString file_path)
+        : CellLayer{std::move(name), std::move(file_path)} {
+        k_backgrounds_.push_back(this);
+    }
+    Background() : CellLayer("No Background") {
+        k_backgrounds_.push_back(this);
+    }
+
+    inline static QList<Background*> k_backgrounds_{};
+    inline static const QString kJsonName{"Background"};
 
     friend void loadCellLayersFromJson();
 };
@@ -123,12 +154,29 @@ inline void loadCellLayersFromJson() {
         if (doc.isObject()) {
             QJsonObject json{doc.object()};
 
+            // Background
+            new Background{};
+            for (QJsonValue i : json[Background::kJsonName].toArray()) {
+                QString name{i[Settings::JSON::CellLayer::kNameKey].toString()};
+                QString file_name{
+                    i[Settings::JSON::CellLayer::kFileKey].toString()};
+
+                if (name.isEmpty() || file_name.isEmpty()) {
+                    continue;
+                }
+                QFile file{Settings::kCellLayerResourcesDirPath + file_name};
+                if (!file.exists()) {
+                    continue;
+                }
+
+                new Background{name, file.fileName()};
+            }
             // Liquid
-            // TODO(clovis): refactor this
             new Liquid{};
             for (QJsonValue i : json[Liquid::kJsonName].toArray()) {
-                QString name{i["name"].toString()};
-                QString file_name{i["file_name"].toString()};
+                QString name{i[Settings::JSON::CellLayer::kNameKey].toString()};
+                QString file_name{
+                    i[Settings::JSON::CellLayer::kFileKey].toString()};
 
                 if (name.isEmpty() || file_name.isEmpty()) {
                     continue;
@@ -141,11 +189,11 @@ inline void loadCellLayersFromJson() {
                 new Liquid{name, file.fileName()};
             }
             // Gaz
-            // TODO(clovis): refactor this
             new Gaz{};
             for (QJsonValue i : json[Gaz::kJsonName].toArray()) {
-                QString name{i["name"].toString()};
-                QString file_name{i["file_name"].toString()};
+                QString name{i[Settings::JSON::CellLayer::kNameKey].toString()};
+                QString file_name{
+                    i[Settings::JSON::CellLayer::kFileKey].toString()};
 
                 if (name.isEmpty() || file_name.isEmpty()) {
                     continue;

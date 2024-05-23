@@ -12,9 +12,9 @@ class Cell : public QLabel {
 
    public:
     explicit Cell(QWidget* parent, int cell_size = kCellSize,
-                  QColor background_color = kCellBackgroundColor)
+                  QColor background_color = kDefaultBackgroundColor)
         : QLabel{parent},
-          no_background_color_{background_color},
+          background_color_{background_color},
           size_{cell_size},
           pixmap_{new QPixmap{size_, size_}} {
         setFixedSize(kCellSize, kCellSize);
@@ -24,7 +24,6 @@ class Cell : public QLabel {
     }
 
     static void loadResourcesFromJson() {
-        // delete kCellFrame;
         QFile res{Settings::kCellResourcesFilePath};
         if (!res.exists()) {
             qDebug() << res.fileName() << "does not exists";
@@ -43,30 +42,41 @@ class Cell : public QLabel {
                 QJsonObject json{doc.object()};
 
                 QString background{
-                    json["cell_background_file_name"].toString()};
-                QString frame{json["cell_frame_file_name"].toString()};
+                    json[Settings::JSON::Cell::kBackgroundFileKey].toString()};
+                QString frame{
+                    json[Settings::JSON::Cell::kFrameFileKey].toString()};
 
-                if (background.isEmpty() || frame.isEmpty()) {
-                    qDebug()
-                        << "Failed to read" << Settings::kCellResourcesFilePath;
-                    return;
+                // Background
+                if (background.isEmpty()) {
+                    qDebug() << "Failed to find value of"
+                             << Settings::JSON::Cell::kBackgroundFileKey << "in"
+                             << Settings::kCellResourcesFilePath;
+                } else {
+                    QString background_path{Settings::kCellResourcesDirPath +
+                                            background};
+
+                    if (QFile::exists(background_path)) {
+                        delete k_default_background_;
+                        k_default_background_ = new QPixmap{background_path};
+                    } else {
+                        qDebug() << background_path << "not found";
+                    }
                 }
 
-                QString background_path{Settings::kCellResourcesDirPath +
-                                        background};
-                QString frame_path{Settings::kCellResourcesDirPath + frame};
+                // Frame
+                if (frame.isEmpty()) {
+                    qDebug() << "Failed to find value of"
+                             << Settings::JSON::Cell::kFrameFileKey << "in"
+                             << Settings::kCellResourcesFilePath;
+                } else {
+                    QString frame_path{Settings::kCellResourcesDirPath + frame};
 
-                if (QFile::exists(background_path)) {
-                    delete k_cell_background_;
-                    k_cell_background_ = new QPixmap{background_path};
-                } else {
-                    qDebug() << background_path << "not found";
-                }
-                if (QFile::exists(frame_path)) {
-                    delete k_cell_frame_;
-                    k_cell_frame_ = new QPixmap{frame_path};
-                } else {
-                    qDebug() << frame_path << "not found";
+                    if (QFile::exists(frame_path)) {
+                        delete k_cell_frame_;
+                        k_cell_frame_ = new QPixmap{frame_path};
+                    } else {
+                        qDebug() << frame_path << "not found";
+                    }
                 }
             }
         } else {
@@ -92,6 +102,10 @@ class Cell : public QLabel {
                 clearAllLayers();
                 drawCell();
                 break;
+            case Tool::kBackground:
+                setLayer(static_cast<const Background*>(Tool::cell_layer()));
+                drawCell();
+                break;
             case Tool::kNone:
             case Tool::kEnumLength:
                 break;
@@ -105,14 +119,18 @@ class Cell : public QLabel {
     }
     void setLayer(const Liquid* liquid) { liquid_ = liquid; }
     void setLayer(const Gaz* gaz) { gaz_ = gaz; }
+    void setLayer(const Background* background) { background_ = background; }
 
     // Draws cells depending on its member variables.
     void drawCell() {
         // Background
-        if (k_cell_background_ == nullptr) {
-            pixmap_->fill(no_background_color_);
+        if (background_ == nullptr || background_->isEmpty()) {
+            if (k_use_default_background_ && k_default_background_ != nullptr)
+                *pixmap_ = k_default_background_->scaled(size_, size_);
+            else
+                pixmap_->fill(background_color_);
         } else {
-            *pixmap_ = k_cell_background_->scaled(size_, size_);
+            *pixmap_ = background_->pixmap()->scaled(size_, size_);
         }
 
         QPainter pntr{pixmap_};
@@ -136,14 +154,16 @@ class Cell : public QLabel {
     }
     void mousePressEvent(QMouseEvent* /*e*/) override { emit clicked(); }
 
-    QColor no_background_color_;
+    QColor background_color_;
     int size_{};
     QPixmap* pixmap_;
+    const Background* background_{nullptr};
     const Liquid* liquid_{nullptr};
     const Gaz* gaz_{nullptr};
 
-    inline static QPixmap* k_cell_background_{nullptr};
+    inline static QPixmap* k_default_background_{nullptr};
     inline static QPixmap* k_cell_frame_{nullptr};
     inline static constexpr int kCellSize{50};
-    inline static constexpr QColor kCellBackgroundColor{200, 200, 200};
+    inline static constexpr QColor kDefaultBackgroundColor{200, 200, 200};
+    inline static bool k_use_default_background_{};
 };

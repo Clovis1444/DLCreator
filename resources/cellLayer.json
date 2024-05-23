@@ -1,4 +1,14 @@
 {
+    "Background": [
+        {
+            "name": "Dirt",
+            "file_name": "dirt50.png"
+        },
+        {
+            "name": "Grass",
+            "file_name": "grass50.png"
+        }
+    ],
     "Liquid": [
         {
             "name": "Water",
