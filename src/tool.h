@@ -15,7 +15,7 @@ class Tool {
         kGaz,
         kClear,
         kBackground,
-        // Insert new entries here
+        // Add new entries here
         kEnumLength,
     };
 

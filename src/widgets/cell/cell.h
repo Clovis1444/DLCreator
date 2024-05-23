@@ -99,7 +99,7 @@ class Cell : public QLabel {
                 drawCell();
                 break;
             case Tool::kClear:
-                clearAllLayers();
+                clearLayers();
                 drawCell();
                 break;
             case Tool::kBackground:
@@ -113,7 +113,7 @@ class Cell : public QLabel {
     }
 
    private:
-    void clearAllLayers() {
+    void clearLayers() {
         liquid_ = nullptr;
         gaz_ = nullptr;
     }

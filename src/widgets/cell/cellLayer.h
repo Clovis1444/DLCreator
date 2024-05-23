@@ -106,7 +106,7 @@ class Gaz : public CellLayer {
 
 class Background : public CellLayer {
    public:
-    static const Background* getGaz(const QString& name) {
+    static const Background* getBackground(const QString& name) {
         for (Background* i : k_backgrounds_) {
             if (i->name_ == name) {
                 return i;
