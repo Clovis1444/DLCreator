@@ -1,5 +1,7 @@
 #pragma once
 
+#include <qcoreevent.h>
+#include <qevent.h>
 #include <qlabel.h>
 #include <qpainter.h>
 #include <qpixmap.h>
@@ -152,7 +154,12 @@ class Cell : public QLabel {
 
         setPixmap(*pixmap_);
     }
-    void mousePressEvent(QMouseEvent* /*e*/) override { emit clicked(); }
+
+    void mousePressEvent(QMouseEvent* e) override {
+        emit clicked();
+
+        QLabel::mousePressEvent(e);
+    }
 
     QColor background_color_;
     int size_{};

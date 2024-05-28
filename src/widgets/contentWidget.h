@@ -16,6 +16,7 @@
 #include <qwidget.h>
 
 #include "cell/cell.h"
+#include "cellCollection.h"
 
 inline constexpr int kDefaultContentWidgetSize{10};
 
@@ -29,7 +30,8 @@ class ContentWidget : public QScrollArea {
         // Scroll widget alignment
         setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
         // Content widget
-        auto* content = new QWidget{this};
+        auto* content = new CellCollection{this};
+        content_ = content;
 
         auto* layout = new QGridLayout{content};
         layout->setContentsMargins(0, 0, 0, 0);
@@ -51,4 +53,5 @@ class ContentWidget : public QScrollArea {
 
    private:
     QList<Cell*> cells_;
+    CellCollection* content_;
 };

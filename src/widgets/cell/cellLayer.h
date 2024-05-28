@@ -48,7 +48,7 @@ class CellLayer {
 
 class Liquid : public CellLayer {
    public:
-    static const Liquid* getLiquid(const QString& name) {
+    static const Liquid* get(const QString& name) {
         for (Liquid* i : k_liquids_) {
             if (i->name_ == name) {
                 return i;
@@ -77,7 +77,7 @@ class Liquid : public CellLayer {
 
 class Gaz : public CellLayer {
    public:
-    static const Gaz* getGaz(const QString& name) {
+    static const Gaz* get(const QString& name) {
         for (Gaz* i : k_gasses_) {
             if (i->name_ == name) {
                 return i;
@@ -106,7 +106,7 @@ class Gaz : public CellLayer {
 
 class Background : public CellLayer {
    public:
-    static const Background* getBackground(const QString& name) {
+    static const Background* get(const QString& name) {
         for (Background* i : k_backgrounds_) {
             if (i->name_ == name) {
                 return i;

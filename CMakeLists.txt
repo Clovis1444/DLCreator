@@ -28,6 +28,7 @@ set(PROJECT_SOURCES
         src/widgets/cell/cell.h
         src/widgets/collapsibleSection.h
         src/widgets/toolWidget.h
+        src/widgets/cellCollection.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
