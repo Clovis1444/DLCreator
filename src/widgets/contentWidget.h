@@ -18,43 +18,50 @@
 #include "cell/cell.h"
 #include "cellCollection.h"
 
-inline constexpr int kDefaultContentWidgetSize{10};
-
 class ContentWidget : public QScrollArea {
     Q_OBJECT
 
    public:
     explicit ContentWidget(QWidget* parent,
                            unsigned int size = kDefaultContentWidgetSize)
-        : QScrollArea(parent)
-    // , cells_{size * size}
-    {
-        // Scroll widget alignment
+        : QScrollArea(parent) {
+        // CellColection widget alignment
         setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
         // Content widget
         auto* content = new CellCollection{this};
         content_ = content;
 
-        // auto* layout = new QGridLayout{content};
-        // layout->setContentsMargins(0, 0, 0, 0);
-        // layout->setSpacing(0);
-        // layout->setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
-        // content->setLayout(layout);
-
         for (int i{}; i < size; ++i) {
             for (int j{}; j < size; ++j) {
                 auto* cell = new Cell{content};
                 content->addCell(cell, i, j);
-                // layout->addWidget(cell, i, j);
-
-                // cells_.push_back(cell);
             }
         }
 
         setWidget(content);
     }
 
+    inline static constexpr int kDefaultContentWidgetSize{10};
+
+   protected:
+    void keyPressEvent(QKeyEvent* e) override {
+        switch (e->key()) {
+            case Qt::Key_Escape:
+                content_->unselectCells();
+                break;
+            case Qt::Key_Delete:
+                content_->clearSelectedCells();
+                break;
+            default:
+                break;
+        }
+        if (e->key() == Qt::Key_Escape) {
+            content_->unselectCells();
+        };
+
+        QAbstractScrollArea::keyPressEvent(e);
+    }
+
    private:
-    // QList<Cell*> cells_;
     CellCollection* content_;
 };

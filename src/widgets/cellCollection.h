@@ -6,6 +6,7 @@
 #include <qgridlayout.h>
 #include <qlayout.h>
 #include <qlist.h>
+#include <qnamespace.h>
 #include <qobject.h>
 #include <qpainter.h>
 #include <qrubberband.h>
@@ -28,11 +29,27 @@ class CellCollection : public QWidget {
         layout_->setSpacing(0);
         layout_->setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
         setLayout(layout_);
+
+        QObject::connect(this, &CellCollection::mouseReleased, this,
+                         &CellCollection::onMouseRelease);
     }
 
     void addCell(Cell* cell, int row, int column) {
         layout_->addWidget(cell, row, column);
         cells_.push_back(cell);
+    }
+
+    void unselectCells() {
+        for (auto* i : selected_cells_) {
+            i->setSelected(false);
+        }
+
+        selected_cells_.clear();
+    }
+    void clearSelectedCells() {
+        for (auto* i : selected_cells_) {
+            i->clearLayers();
+        }
     }
 
    protected:
@@ -51,33 +68,34 @@ class CellCollection : public QWidget {
     };
 
     void mousePressEvent(QMouseEvent* e) override {
-        if (Tool::toolType() == Tool::ToolType::kNone) {
-            selection_begin_ = e->pos();
+        selection_begin_ = e->pos();
 
-            selection_->setGeometry(QRect(selection_begin_, QSize()));
-            selection_->show();
-        }
+        selection_->setGeometry(QRect(selection_begin_, QSize()));
+        selection_->show();
+
+        QWidget::mousePressEvent(e);
     }
     void mouseMoveEvent(QMouseEvent* e) override {
-        if (Tool::toolType() == Tool::ToolType::kNone) {
-            selection_->setGeometry(
-                QRect(selection_begin_, e->pos()).normalized());
-        }
+        selection_->setGeometry(QRect(selection_begin_, e->pos()).normalized());
+
+        QWidget::mouseMoveEvent(e);
     }
-    void mouseReleaseEvent(QMouseEvent* /*e*/) override {
-        if (Tool::toolType() == Tool::ToolType::kNone) {
-            selection_->hide();
+    void mouseReleaseEvent(QMouseEvent* e) override {
+        selection_->hide();
 
-            unselectActiveCells();
-            active_cells_ = IntersectsCells(selection_->geometry());
+        unselectCells();
+        selected_cells_ = intersectsCells(selection_->geometry());
 
-            for (auto* i : active_cells_) {
-                i->setSelected();
-            }
+        for (auto* i : selected_cells_) {
+            i->setSelected();
         }
+
+        emit mouseReleased();
+
+        QWidget::mouseReleaseEvent(e);
     }
 
-    QList<Cell*> IntersectsCells(QRect rect) {
+    QList<Cell*> intersectsCells(QRect rect) {
         QList<Cell*> intersects{};
 
         for (Cell* i : cells_) {
@@ -89,19 +107,45 @@ class CellCollection : public QWidget {
         return intersects;
     }
 
-    void unselectActiveCells() {
-        for (auto* i : active_cells_) {
-            i->setSelected(false);
-        }
+   signals:
+    void mouseReleased();
 
-        active_cells_.clear();
+   protected slots:
+    void onMouseRelease() {
+        switch (Tool::toolType()) {
+            case Tool::kLiquid:
+                for (auto* i : selected_cells_) {
+                    i->setLayer(static_cast<const Liquid*>(Tool::cell_layer()));
+                }
+                break;
+            case Tool::kGaz:
+                for (auto* i : selected_cells_) {
+                    i->setLayer(static_cast<const Gaz*>(Tool::cell_layer()));
+                }
+
+                break;
+            case Tool::kClear:
+                for (auto* i : selected_cells_) {
+                    i->clearLayers();
+                }
+                break;
+            case Tool::kBackground:
+                for (auto* i : selected_cells_) {
+                    i->setLayer(
+                        static_cast<const Background*>(Tool::cell_layer()));
+                }
+                break;
+            case Tool::kNone:
+            case Tool::kEnumLength:
+                break;
+        }
     }
 
    private:
     int scale_{1};
     QGridLayout* layout_{new QGridLayout{}};
     QList<Cell*> cells_;
-    QList<Cell*> active_cells_;
+    QList<Cell*> selected_cells_;
 
     QRubberBand* selection_{new QRubberBand(QRubberBand::Rectangle, this)};
     QPoint selection_begin_;

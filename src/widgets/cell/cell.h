@@ -110,6 +110,24 @@ class Cell : public QLabel {
         drawCell();
     }
 
+    void setLayer(const Liquid* liquid) {
+        liquid_ = liquid;
+        drawCell();
+    }
+    void setLayer(const Gaz* gaz) {
+        gaz_ = gaz;
+        drawCell();
+    }
+    void setLayer(const Background* background) {
+        background_ = background;
+        drawCell();
+    }
+    void clearLayers() {
+        liquid_ = nullptr;
+        gaz_ = nullptr;
+        drawCell();
+    }
+
    signals:
     void clicked();
 
@@ -118,19 +136,15 @@ class Cell : public QLabel {
         switch (Tool::toolType()) {
             case Tool::kLiquid:
                 setLayer(static_cast<const Liquid*>(Tool::cell_layer()));
-                drawCell();
                 break;
             case Tool::kGaz:
                 setLayer(static_cast<const Gaz*>(Tool::cell_layer()));
-                drawCell();
                 break;
             case Tool::kClear:
                 clearLayers();
-                drawCell();
                 break;
             case Tool::kBackground:
                 setLayer(static_cast<const Background*>(Tool::cell_layer()));
-                drawCell();
                 break;
             case Tool::kNone:
             case Tool::kEnumLength:
@@ -139,14 +153,6 @@ class Cell : public QLabel {
     }
 
    private:
-    void clearLayers() {
-        liquid_ = nullptr;
-        gaz_ = nullptr;
-    }
-    void setLayer(const Liquid* liquid) { liquid_ = liquid; }
-    void setLayer(const Gaz* gaz) { gaz_ = gaz; }
-    void setLayer(const Background* background) { background_ = background; }
-
     // Draws cells depending on its member variables.
     void drawCell() {
         // Background
