@@ -5,3 +5,4 @@
 - Create `frame_` and `background_` member variables in `Cell`
 - Tile texture generation algorithm
 - Implement zoom
+- add destructors

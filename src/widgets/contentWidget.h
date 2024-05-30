@@ -26,25 +26,28 @@ class ContentWidget : public QScrollArea {
    public:
     explicit ContentWidget(QWidget* parent,
                            unsigned int size = kDefaultContentWidgetSize)
-        : QScrollArea(parent), cells_{size * size} {
+        : QScrollArea(parent)
+    // , cells_{size * size}
+    {
         // Scroll widget alignment
         setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
         // Content widget
         auto* content = new CellCollection{this};
         content_ = content;
 
-        auto* layout = new QGridLayout{content};
-        layout->setContentsMargins(0, 0, 0, 0);
-        layout->setSpacing(0);
-        layout->setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
-        content->setLayout(layout);
+        // auto* layout = new QGridLayout{content};
+        // layout->setContentsMargins(0, 0, 0, 0);
+        // layout->setSpacing(0);
+        // layout->setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
+        // content->setLayout(layout);
 
         for (int i{}; i < size; ++i) {
             for (int j{}; j < size; ++j) {
                 auto* cell = new Cell{content};
-                layout->addWidget(cell, i, j);
+                content->addCell(cell, i, j);
+                // layout->addWidget(cell, i, j);
 
-                cells_.push_back(cell);
+                // cells_.push_back(cell);
             }
         }
 
@@ -52,6 +55,6 @@ class ContentWidget : public QScrollArea {
     }
 
    private:
-    QList<Cell*> cells_;
+    // QList<Cell*> cells_;
     CellCollection* content_;
 };

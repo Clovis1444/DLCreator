@@ -1,4 +1,5 @@
 {
     "default_cell_background_file_name": "grass50.png",
-    "default_cell_frame_file_name": "frame50.png"
+    "default_cell_frame_file_name": "frame50.png",
+    "active_cell_frame_file_name": "active_frame50.png"
 }

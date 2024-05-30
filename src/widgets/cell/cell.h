@@ -3,6 +3,7 @@
 #include <qcoreevent.h>
 #include <qevent.h>
 #include <qlabel.h>
+#include <qlist.h>
 #include <qpainter.h>
 #include <qpixmap.h>
 
@@ -47,6 +48,8 @@ class Cell : public QLabel {
                     json[Settings::JSON::Cell::kBackgroundFileKey].toString()};
                 QString frame{
                     json[Settings::JSON::Cell::kFrameFileKey].toString()};
+                QString active_frame{
+                    json[Settings::JSON::Cell::kActiveFrameFileKey].toString()};
 
                 // Background
                 if (background.isEmpty()) {
@@ -80,11 +83,32 @@ class Cell : public QLabel {
                         qDebug() << frame_path << "not found";
                     }
                 }
+                // Active Frame
+                if (active_frame.isEmpty()) {
+                    qDebug() << "Failed to find value of"
+                             << Settings::JSON::Cell::kActiveFrameFileKey
+                             << "in" << Settings::kCellResourcesFilePath;
+                } else {
+                    QString active_frame_path{Settings::kCellResourcesDirPath +
+                                              active_frame};
+
+                    if (QFile::exists(active_frame_path)) {
+                        delete k_active_cell_frame_;
+                        k_active_cell_frame_ = new QPixmap{active_frame_path};
+                    } else {
+                        qDebug() << active_frame_path << "not found";
+                    }
+                }
             }
         } else {
             qDebug() << res.fileName() << "Error: " << res.errorString();
         }
     };
+
+    void setSelected(bool selected = true) {
+        selected_ = selected;
+        drawCell();
+    }
 
    signals:
     void clicked();
@@ -138,8 +162,15 @@ class Cell : public QLabel {
         QPainter pntr{pixmap_};
 
         // Frame
-        if (k_cell_frame_ != nullptr) {
-            pntr.drawPixmap(0, 0, k_cell_frame_->scaled(size_, size_));
+        if (selected_) {
+            if (k_active_cell_frame_ != nullptr) {
+                pntr.drawPixmap(0, 0,
+                                k_active_cell_frame_->scaled(size_, size_));
+            }
+        } else {
+            if (k_cell_frame_ != nullptr) {
+                pntr.drawPixmap(0, 0, k_cell_frame_->scaled(size_, size_));
+            }
         }
 
         // Liquid
@@ -167,9 +198,11 @@ class Cell : public QLabel {
     const Background* background_{nullptr};
     const Liquid* liquid_{nullptr};
     const Gaz* gaz_{nullptr};
+    bool selected_{false};
 
     inline static QPixmap* k_default_background_{nullptr};
     inline static QPixmap* k_cell_frame_{nullptr};
+    inline static QPixmap* k_active_cell_frame_{nullptr};
     inline static constexpr int kCellSize{50};
     inline static constexpr QColor kDefaultBackgroundColor{200, 200, 200};
     inline static bool k_use_default_background_{};

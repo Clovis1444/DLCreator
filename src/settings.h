@@ -20,6 +20,7 @@ namespace Cell {
 inline static const QString kBackgroundFileKey{
     "default_cell_background_file_name"};
 inline static const QString kFrameFileKey{"default_cell_frame_file_name"};
+inline static const QString kActiveFrameFileKey{"active_cell_frame_file_name"};
 }  // namespace Cell
 namespace CellLayer {
 inline static const QString kNameKey{"name"};
