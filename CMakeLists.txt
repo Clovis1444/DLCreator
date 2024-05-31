@@ -29,6 +29,7 @@ set(PROJECT_SOURCES
         src/widgets/contentWidget/contentWidget.h
         src/widgets/contentWidget/cellCollection.h
         src/widgets/contentWidget/cell/cell.h
+        src/tool.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

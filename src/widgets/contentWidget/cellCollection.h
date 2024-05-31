@@ -37,8 +37,8 @@ class CellCollection : public QWidget {
             }
         }
 
-        QObject::connect(this, &CellCollection::mouseReleased, this,
-                         &CellCollection::onMouseRelease);
+        QObject::connect(this, &CellCollection::mouseMoved, this,
+                         &CellCollection::onMouseMove);
     }
 
     void unselectCells() {
@@ -53,6 +53,8 @@ class CellCollection : public QWidget {
             i->clearLayers();
         }
     }
+
+    bool hasSelection() { return !selected_cells_.isEmpty(); }
 
    protected:
     // TODO(clovis): implement zoom
@@ -80,11 +82,6 @@ class CellCollection : public QWidget {
     void mouseMoveEvent(QMouseEvent* e) override {
         selection_->setGeometry(QRect(selection_begin_, e->pos()).normalized());
 
-        QWidget::mouseMoveEvent(e);
-    }
-    void mouseReleaseEvent(QMouseEvent* e) override {
-        selection_->hide();
-
         unselectCells();
         selected_cells_ = intersectsCells(selection_->geometry());
 
@@ -92,7 +89,12 @@ class CellCollection : public QWidget {
             i->setSelected();
         }
 
-        emit mouseReleased();
+        emit mouseMoved();
+
+        QWidget::mouseMoveEvent(e);
+    }
+    void mouseReleaseEvent(QMouseEvent* e) override {
+        selection_->hide();
 
         QWidget::mouseReleaseEvent(e);
     }
@@ -115,10 +117,10 @@ class CellCollection : public QWidget {
     }
 
    signals:
-    void mouseReleased();
+    void mouseMoved();
 
    protected slots:
-    void onMouseRelease() {
+    void onMouseMove() {
         switch (Tool::toolType()) {
             case Tool::kLiquid:
                 for (auto* i : selected_cells_) {

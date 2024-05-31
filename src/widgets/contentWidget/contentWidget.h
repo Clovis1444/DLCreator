@@ -37,7 +37,11 @@ class ContentWidget : public QScrollArea {
     void keyPressEvent(QKeyEvent* e) override {
         switch (e->key()) {
             case Qt::Key_Escape:
-                content_->unselectCells();
+                if (content_->hasSelection()) {
+                    content_->unselectCells();
+                } else {
+                    Tool::setTool();
+                }
                 break;
             case Qt::Key_Delete:
                 content_->clearSelectedCells();

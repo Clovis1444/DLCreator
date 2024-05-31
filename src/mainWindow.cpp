@@ -54,6 +54,14 @@ void MainWindow::initConnect() {
     //  View -> Tabs
     QObject::connect(ui_->actionTabs, &QAction::toggled, this,
                      &MainWindow::onActionTabs);
+
+    //
+    // Change status bar on Tool::toolChanged()
+    //
+    QObject::connect(Tool::obj(), &Tool::toolChanged, this,
+                     &MainWindow::onToolChanged);
+    // Initial set
+    onToolChanged();
 }
 
 void MainWindow::createNewDocument() {
@@ -118,6 +126,12 @@ void MainWindow::setupToolWidgets() {
         gazes->addContent(widget);
     }
     addToolWidget(gazes);
+};
+
+void MainWindow::onToolChanged() {
+    QString msg{"Tool: "};
+    msg.append(Tool::toolName());
+    ui_->statusbar->showMessage(msg);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
