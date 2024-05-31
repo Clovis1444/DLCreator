@@ -67,7 +67,7 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <widget class="QStackedWidget" name="files_widget">
+        <widget class="QStackedWidget" name="documents_widget">
          <property name="currentIndex">
           <number>-1</number>
          </property>

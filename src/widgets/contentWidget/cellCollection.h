@@ -16,27 +16,29 @@
 
 #include <QWheelEvent>
 
-#include "../tool.h"
+#include "../../tool.h"
 #include "cell/cell.h"
 
 class CellCollection : public QWidget {
     Q_OBJECT
 
    public:
-    explicit CellCollection(QWidget* parent) : QWidget{parent} {
+    CellCollection(QWidget* parent, unsigned int size) : QWidget{parent} {
         // Grid layout
         layout_->setContentsMargins(0, 0, 0, 0);
         layout_->setSpacing(0);
         layout_->setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
         setLayout(layout_);
 
+        for (int i{}; i < size; ++i) {
+            for (int j{}; j < size; ++j) {
+                auto* cell = new Cell{this};
+                addCell(cell, i, j);
+            }
+        }
+
         QObject::connect(this, &CellCollection::mouseReleased, this,
                          &CellCollection::onMouseRelease);
-    }
-
-    void addCell(Cell* cell, int row, int column) {
-        layout_->addWidget(cell, row, column);
-        cells_.push_back(cell);
     }
 
     void unselectCells() {
@@ -105,6 +107,11 @@ class CellCollection : public QWidget {
         }
 
         return intersects;
+    }
+
+    void addCell(Cell* cell, int row, int column) {
+        layout_->addWidget(cell, row, column);
+        cells_.push_back(cell);
     }
 
    signals:

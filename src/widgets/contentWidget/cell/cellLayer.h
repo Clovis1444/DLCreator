@@ -15,7 +15,7 @@
 #include <cassert>
 #include <utility>
 
-#include "../../settings.h"
+#include "../../../settings.h"
 
 class CellLayer {
    public:

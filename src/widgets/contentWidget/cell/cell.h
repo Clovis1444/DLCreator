@@ -7,7 +7,7 @@
 #include <qpainter.h>
 #include <qpixmap.h>
 
-#include "../../tool.h"
+#include "../../../tool.h"
 #include "cellLayer.h"
 
 class Cell : public QLabel {

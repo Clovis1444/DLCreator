@@ -2,7 +2,7 @@
 
 #include <qdebug.h>
 
-#include "widgets/cell/cellLayer.h"
+#include "widgets/contentWidget/cell/cellLayer.h"
 
 class Tool {
    public:

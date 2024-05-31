@@ -15,7 +15,6 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
-#include "cell/cell.h"
 #include "cellCollection.h"
 
 class ContentWidget : public QScrollArea {
@@ -28,20 +27,11 @@ class ContentWidget : public QScrollArea {
         // CellColection widget alignment
         setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
         // Content widget
-        auto* content = new CellCollection{this};
+        auto* content = new CellCollection{this, size};
         content_ = content;
-
-        for (int i{}; i < size; ++i) {
-            for (int j{}; j < size; ++j) {
-                auto* cell = new Cell{content};
-                content->addCell(cell, i, j);
-            }
-        }
 
         setWidget(content);
     }
-
-    inline static constexpr int kDefaultContentWidgetSize{10};
 
    protected:
     void keyPressEvent(QKeyEvent* e) override {
@@ -64,4 +54,6 @@ class ContentWidget : public QScrollArea {
 
    private:
     CellCollection* content_;
+
+    inline static constexpr int kDefaultContentWidgetSize{10};
 };

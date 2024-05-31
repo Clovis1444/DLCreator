@@ -24,11 +24,11 @@ set(PROJECT_SOURCES
         src/mainWindow.h
         src/mainWindow.ui
         src/widgets/tabButton.h
-        src/widgets/contentWidget.h
-        src/widgets/cell/cell.h
         src/widgets/collapsibleSection.h
         src/widgets/toolWidget.h
-        src/widgets/cellCollection.h
+        src/widgets/contentWidget/contentWidget.h
+        src/widgets/contentWidget/cellCollection.h
+        src/widgets/contentWidget/cell/cell.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

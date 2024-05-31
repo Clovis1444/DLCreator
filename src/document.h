@@ -9,17 +9,17 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
-#include "widgets/contentWidget.h"
+#include "widgets/contentWidget/contentWidget.h"
 #include "widgets/tabButton.h"
 
-class File {
+class Document {
    public:
-    File(QWidget* tab_parent, QStackedWidget* content_parent,
-         const QString& name = "New file")
+    Document(QWidget* tab_parent, QStackedWidget* content_parent,
+             const QString& name = "New document")
         : tab_{new TabButton{tab_parent, name}},
           content_{new ContentWidget{content_parent}} {}
 
-    ~File() {
+    ~Document() {
         delete tab_;
         delete content_;
     }

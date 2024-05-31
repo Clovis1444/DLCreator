@@ -8,9 +8,7 @@
 
 #include <QMainWindow>
 
-#include "file.h"
-
-class File;
+#include "document.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -27,7 +25,7 @@ class MainWindow : public QMainWindow {
 
    private:
     void initConnect();
-    void createNewFile();
+    void createNewDocument();
     void addToolWidget(QWidget *widget);
     void setupToolWidgets();
 
@@ -42,6 +40,6 @@ class MainWindow : public QMainWindow {
 
    private:
     Ui::MainWindow *ui_;
-    QList<File *> files_;
+    QList<Document *> documents_;
 };
 #endif  // MAINWINDOW_H
