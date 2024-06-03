@@ -24,41 +24,41 @@ class Tool : public QObject {
 
     static void setTool(bool set_clear = false) {
         if (set_clear) {
-            tool_->tool_type_ = kClear;
+            tool_type_ = kClear;
         } else {
-            tool_->tool_type_ = kNone;
+            tool_type_ = kNone;
         }
-        tool_->cell_layer_ = nullptr;
+        cell_layer_ = nullptr;
 
         emit tool_->toolChanged();
     }
     static void setTool(const Liquid* liquid) {
-        tool_->tool_type_ = kLiquid;
-        tool_->cell_layer_ = liquid;
+        tool_type_ = kLiquid;
+        cell_layer_ = liquid;
 
         emit tool_->toolChanged();
     }
     static void setTool(const Gaz* gaz) {
-        tool_->tool_type_ = kGaz;
-        tool_->cell_layer_ = gaz;
+        tool_type_ = kGaz;
+        cell_layer_ = gaz;
 
         emit tool_->toolChanged();
     }
     static void setTool(const Background* background) {
-        tool_->tool_type_ = kBackground;
-        tool_->cell_layer_ = background;
+        tool_type_ = kBackground;
+        cell_layer_ = background;
 
         emit tool_->toolChanged();
     }
 
-    static ToolType toolType() { return tool_->tool_type_; }
-    static const CellLayer* cell_layer() { return tool_->cell_layer_; }
+    static ToolType toolType() { return tool_type_; }
+    static const CellLayer* cell_layer() { return cell_layer_; }
     static QString toolName() {
-        switch (tool_->tool_type_) {
+        switch (tool_type_) {
             case kLiquid:
             case kGaz:
             case kBackground:
-                return tool_->cell_layer_->name();
+                return cell_layer_->name();
             case kNone:
                 return "No tool";
             case kClear:
@@ -68,12 +68,11 @@ class Tool : public QObject {
         }
     }
 
-    static Tool* obj() { return tool_; }
-
-    static void init() {
+    static Tool* signalSender() {
         if (tool_ == nullptr) {
             tool_ = new Tool{};
         }
+        return tool_;
     }
 
    signals:
@@ -82,9 +81,9 @@ class Tool : public QObject {
    protected:
     Tool() = default;
 
-    // TODO(clovis): not cool. fix it?
+    // TODO(clovis): hack. not cool. fix it?
     inline static Tool* tool_{nullptr};
 
-    ToolType tool_type_{};
-    const CellLayer* cell_layer_{nullptr};
+    inline static ToolType tool_type_{};
+    inline static const CellLayer* cell_layer_{nullptr};
 };

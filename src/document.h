@@ -4,6 +4,7 @@
 #include <qcontainerfwd.h>
 #include <qlabel.h>
 #include <qmenu.h>
+#include <qobject.h>
 #include <qpushbutton.h>
 #include <qstackedwidget.h>
 #include <qtmetamacros.h>
@@ -12,7 +13,9 @@
 #include "widgets/contentWidget/contentWidget.h"
 #include "widgets/tabButton.h"
 
-class Document {
+class Document : public QObject {
+    Q_OBJECT
+
    public:
     Document(QWidget* tab_parent, QStackedWidget* content_parent,
              const QString& name = "New document")

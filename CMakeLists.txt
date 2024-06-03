@@ -30,6 +30,10 @@ set(PROJECT_SOURCES
         src/widgets/contentWidget/cellCollection.h
         src/widgets/contentWidget/cell/cell.h
         src/tool.h
+        src/document.h
+        src/widgets/tabWidget/tabWidget.h
+        src/widgets/tabWidget/tabScrollArea.h
+        src/widgets/tabWidget/stackedContentWidget.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

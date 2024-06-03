@@ -58,7 +58,7 @@ void MainWindow::initConnect() {
     //
     // Change status bar on Tool::toolChanged()
     //
-    QObject::connect(Tool::obj(), &Tool::toolChanged, this,
+    QObject::connect(Tool::signalSender(), &Tool::toolChanged, this,
                      &MainWindow::onToolChanged);
     // Initial set
     onToolChanged();
