@@ -17,10 +17,16 @@
 #include "widgets/toolWidget.h"
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), ui_(new Ui::MainWindow) {
+    : QMainWindow(parent),
+      ui_(new Ui::MainWindow),
+      tabWidget_{new TabWidget{this}} {
     ui_->setupUi(this);
 
     setWindowTitle(Settings::kProgramName);
+
+    // Add TabWidget
+    ui_->centralwidget->layout()->addWidget(tabWidget_);
+    //
 
     initConnect();
 
@@ -64,26 +70,7 @@ void MainWindow::initConnect() {
     onToolChanged();
 }
 
-void MainWindow::createNewDocument() {
-    auto* doc{new Document{ui_->tabs_scrollArea, ui_->documents_widget}};
-    documents_.push_back(doc);
-
-    // Tab
-    auto* tabs_layout{qobject_cast<QHBoxLayout*>(
-        ui_->tabs_scrollAreaWidgetContents->layout())};
-    tabs_layout->insertWidget(tabs_layout->count() - 1, doc->tab());
-
-    // Content
-    ui_->documents_widget->addWidget(doc->content());
-
-    ui_->documents_widget->setCurrentWidget(doc->content());
-
-    QObject::connect(doc->tab(), &QPushButton::clicked, this,
-                     &MainWindow::onTabClicked);
-
-    QObject::connect(doc->tab(), &TabButton::closePressed, this,
-                     &MainWindow::onTabClose);
-}
+void MainWindow::createNewDocument() { tabWidget_->createTab(); }
 
 void MainWindow::addToolWidget(QWidget* widget) {
     int widgets_count{ui_->tools_frame->layout()->count()};
@@ -147,52 +134,13 @@ void MainWindow::onActionTools() {
 }
 
 void MainWindow::onActionWorkingArea() {
-    if (ui_->actionWorkingArea->isChecked()) {
-        ui_->workingArea_frame->show();
-    } else {
-        ui_->workingArea_frame->hide();
-    }
+    tabWidget_->setContentVisible(ui_->actionWorkingArea->isChecked());
 }
 
 void MainWindow::onActionTabs() {
-    if (ui_->actionTabs->isChecked()) {
-        ui_->tabs_scrollArea->show();
-    } else {
-        ui_->tabs_scrollArea->hide();
-    }
+    tabWidget_->setTabsVisible(ui_->actionTabs->isChecked());
 }
 
 void MainWindow::onActionExit() { QApplication::quit(); }
 
 void MainWindow::onActionNew() { createNewDocument(); }
-
-// TODO(clovis): implement change active tab color
-void MainWindow::onTabClicked() {
-    auto* tab{qobject_cast<TabButton*>(sender())};
-
-    for (auto* i : documents_) {
-        if (i->tab() == tab) {
-            ui_->documents_widget->setCurrentWidget(i->content());
-            break;
-        }
-    }
-}
-
-// This function will delete File if sender is a TabButton
-// and there is a File in documents_ associated with the sender.
-// Otherwise, this function will do nothing.
-void MainWindow::onTabClose() {
-    auto* tab{qobject_cast<TabButton*>(sender())};
-    // If sender is a TabButton*
-    if (tab) {
-        for (auto* i : documents_) {
-            // If tab is an item in documents_ -> delete TabButton and content
-            // widget
-            if (i->tab() == tab) {
-                documents_.removeOne(i);
-                delete i;
-                break;
-            }
-        }
-    }
-}

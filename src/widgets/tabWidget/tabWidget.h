@@ -4,13 +4,13 @@
 #include <qlist.h>
 #include <qobject.h>
 #include <qscrollarea.h>
+#include <qsizepolicy.h>
 #include <qstackedwidget.h>
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
-// #include "../../document.h"
-#include "../contentWidget/contentWidget.h"
-#include "stackedContentWidget.h"
+#include "stackedContentWidget/contentWidget/contentWidget.h"
+#include "stackedContentWidget/stackedContentWidget.h"
 #include "tabScrollArea.h"
 
 class TabWidget : public QWidget {
@@ -29,9 +29,13 @@ class TabWidget : public QWidget {
 
         // Tabs
         layout_->addWidget(tabs_widget_);
+        tabs_widget_->setSizePolicy(QSizePolicy::Expanding,
+                                    QSizePolicy::Minimum);
 
         // Content
         layout_->addWidget(content_widget_);
+        content_widget_->setSizePolicy(QSizePolicy::Expanding,
+                                       QSizePolicy::Expanding);
     }
     ~TabWidget() {
         delete content_widget_;
@@ -45,12 +49,19 @@ class TabWidget : public QWidget {
         TabWidgetItem item{tab_button, content};
         items_.push_back(item);
 
+        // Set new tab as active tab
+        content_widget_->setCurrentWidget(content);
+
         QObject::connect(tab_button, &TabButton::clicked, this,
                          &TabWidget::onTabClicked);
         QObject::connect(tab_button, &TabButton::closePressed, this,
                          &TabWidget::onTabClose);
     }
-    void deleteTab() {}
+
+    void setTabsVisible(bool visible) { tabs_widget_->setVisible(visible); }
+    void setContentVisible(bool visible) {
+        content_widget_->setVisible(visible);
+    }
 
    protected slots:
     void onTabClicked() {

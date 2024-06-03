@@ -2,20 +2,26 @@
 
 #include <qboxlayout.h>
 #include <qlist.h>
+#include <qnamespace.h>
+#include <qpushbutton.h>
 #include <qscrollarea.h>
 #include <qtmetamacros.h>
 
 #include "../tabButton.h"
 
+// TODO(clovis): fix TabScroll area size
 class TabScrollArea : public QScrollArea {
     Q_OBJECT
 
    public:
     explicit TabScrollArea(QWidget* parent)
-        : QScrollArea{parent}, layout_{new QHBoxLayout{this}} {
-        setLayout(layout_);
+        : QScrollArea{parent}, widget_{new QWidget{this}} {
+        setWidget(widget_);
+        setWidgetResizable(true);
 
-        layout_->setAlignment(Qt::AlignLeft);
+        auto* layout{new QHBoxLayout{widget_}};
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setAlignment(Qt::AlignLeft);
     }
     ~TabScrollArea() {
         for (auto* i : buttons_) {
@@ -27,11 +33,11 @@ class TabScrollArea : public QScrollArea {
     // void InsertWidget() = delete;
 
     TabButton* createButton(const QString& name = "New button") {
-        auto* tab_button{new TabButton{this, name}};
+        auto* tab_button{new TabButton{widget_, name}};
 
         buttons_.push_back(tab_button);
 
-        layout_->addWidget(tab_button);
+        widget_->layout()->addWidget(tab_button);
 
         return tab_button;
     }
@@ -48,4 +54,5 @@ class TabScrollArea : public QScrollArea {
    protected:
     QList<TabButton*> buttons_;
     QHBoxLayout* layout_;
+    QWidget* widget_;
 };

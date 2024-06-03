@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <qboxlayout.h>
 #include <qhash.h>
 #include <qlist.h>
 #include <qpushbutton.h>
@@ -8,7 +9,7 @@
 
 #include <QMainWindow>
 
-#include "document.h"
+#include "widgets/tabWidget/tabWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -35,12 +36,10 @@ class MainWindow : public QMainWindow {
     void onActionTabs();
     static void onActionExit();
     void onActionNew();
-    void onTabClicked();
-    void onTabClose();
     void onToolChanged();
 
    private:
     Ui::MainWindow *ui_;
-    QList<Document *> documents_;
+    TabWidget *tabWidget_;
 };
 #endif  // MAINWINDOW_H

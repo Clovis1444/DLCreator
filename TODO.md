@@ -6,3 +6,4 @@
 - Tile texture generation algorithm
 - Implement zoom
 - add destructors
+- REFACTOR: create ToolCollection class

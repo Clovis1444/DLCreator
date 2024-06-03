@@ -26,14 +26,13 @@ set(PROJECT_SOURCES
         src/widgets/tabButton.h
         src/widgets/collapsibleSection.h
         src/widgets/toolWidget.h
-        src/widgets/contentWidget/contentWidget.h
-        src/widgets/contentWidget/cellCollection.h
-        src/widgets/contentWidget/cell/cell.h
         src/tool.h
-        src/document.h
         src/widgets/tabWidget/tabWidget.h
         src/widgets/tabWidget/tabScrollArea.h
-        src/widgets/tabWidget/stackedContentWidget.h
+        src/widgets/tabWidget/stackedContentWidget/stackedContentWidget.h
+        src/widgets/tabWidget/stackedContentWidget/contentWidget/contentWidget.h
+        src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h
+        src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

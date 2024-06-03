@@ -4,7 +4,7 @@
 #include <qobject.h>
 #include <qtmetamacros.h>
 
-#include "widgets/contentWidget/cell/cellLayer.h"
+#include "widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellLayer.h"
 
 class Tool : public QObject {
     Q_OBJECT

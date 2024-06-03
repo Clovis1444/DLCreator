@@ -5,7 +5,7 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
-#include "../contentWidget/contentWidget.h"
+#include "contentWidget/contentWidget.h"
 
 class StackedContentWidget : public QStackedWidget {
     Q_OBJECT

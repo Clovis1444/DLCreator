@@ -16,7 +16,7 @@
 
 #include <QWheelEvent>
 
-#include "../../tool.h"
+#include "../../../../tool.h"
 #include "cell/cell.h"
 
 class CellCollection : public QWidget {
@@ -152,7 +152,7 @@ class CellCollection : public QWidget {
 
    private:
     int scale_{1};
-    QGridLayout* layout_{new QGridLayout{}};
+    QGridLayout* layout_{new QGridLayout{this}};
     QList<Cell*> cells_;
     QList<Cell*> selected_cells_;
 
