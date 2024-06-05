@@ -3,14 +3,14 @@
 #include <qpushbutton.h>
 #include <qtmetamacros.h>
 
-#include "../tool.h"
-#include "tabWidget/stackedContentWidget/contentWidget/cell/cellLayer.h"
+#include "../../tool.h"
+#include "../tabWidget/stackedContentWidget/contentWidget/cell/cellLayer.h"
 
-class ToolWidget : public QPushButton {
+class ToolButton : public QPushButton {
     Q_OBJECT
 
    public:
-    ToolWidget(const QString& name, QWidget* parent, bool clear_tool = false)
+    ToolButton(const QString& name, QWidget* parent, bool clear_tool = false)
         : QPushButton{name, parent} {
         if (clear_tool) {
             tool_type_ = Tool::kClear;
@@ -18,26 +18,26 @@ class ToolWidget : public QPushButton {
             tool_type_ = Tool::kNone;
         }
         QObject::connect(this, &QPushButton::clicked, this,
-                         &ToolWidget::onClicked);
+                         &ToolButton::onClicked);
     }
-    ToolWidget(const Liquid* cell_layer, const QString& name, QWidget* parent)
+    ToolButton(const Liquid* cell_layer, const QString& name, QWidget* parent)
         : QPushButton{name, parent}, cell_layer_{cell_layer} {
         tool_type_ = Tool::kLiquid;
         QObject::connect(this, &QPushButton::clicked, this,
-                         &ToolWidget::onClicked);
+                         &ToolButton::onClicked);
     }
-    ToolWidget(const Gaz* cell_layer, const QString& name, QWidget* parent)
+    ToolButton(const Gaz* cell_layer, const QString& name, QWidget* parent)
         : QPushButton{name, parent}, cell_layer_{cell_layer} {
         tool_type_ = Tool::kGaz;
         QObject::connect(this, &QPushButton::clicked, this,
-                         &ToolWidget::onClicked);
+                         &ToolButton::onClicked);
     }
-    ToolWidget(const Background* cell_layer, const QString& name,
+    ToolButton(const Background* cell_layer, const QString& name,
                QWidget* parent)
         : QPushButton{name, parent}, cell_layer_{cell_layer} {
         tool_type_ = Tool::kBackground;
         QObject::connect(this, &QPushButton::clicked, this,
-                         &ToolWidget::onClicked);
+                         &ToolButton::onClicked);
     }
 
    private slots:

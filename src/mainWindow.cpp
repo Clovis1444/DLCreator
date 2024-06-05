@@ -13,24 +13,28 @@
 
 #include "./ui_mainWindow.h"
 #include "settings.h"
-#include "widgets/collapsibleSection.h"
-#include "widgets/toolWidget.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
       ui_(new Ui::MainWindow),
-      tabWidget_{new TabWidget{this}} {
+      tabWidget_{new TabWidget{this}},
+      toolWidget_{new ToolWidget{this}} {
+    // Setup from .ui file
     ui_->setupUi(this);
 
     setWindowTitle(Settings::kProgramName);
 
+    // Add ToolWidget
+    ui_->centralwidget->layout()->addWidget(toolWidget_);
+
     // Add TabWidget
     ui_->centralwidget->layout()->addWidget(tabWidget_);
+
     //
 
     initConnect();
 
-    setupToolWidgets();
+    // setupToolWidgets();
 
     createNewDocument();
 }
@@ -72,49 +76,6 @@ void MainWindow::initConnect() {
 
 void MainWindow::createNewDocument() { tabWidget_->createTab(); }
 
-void MainWindow::addToolWidget(QWidget* widget) {
-    int widgets_count{ui_->tools_frame->layout()->count()};
-    QVBoxLayout* layout{qobject_cast<QVBoxLayout*>(ui_->tools_frame->layout())};
-
-    layout->insertWidget(widgets_count - 1, widget);
-}
-
-void MainWindow::setupToolWidgets() {
-    auto* parent{ui_->tools_frame};
-
-    // Generic tools
-    auto* tools{new CollapsibleSection{"Tools", parent}};
-    auto* no_tool{new ToolWidget{"No tool", parent}};
-    auto* clear_tool{new ToolWidget{"Clear tool", parent, true}};
-    tools->addContent(no_tool);
-    tools->addContent(clear_tool);
-    addToolWidget(tools);
-
-    // Backgrounds
-    auto* backgrounds{new CollapsibleSection{"Backgrounds", parent}};
-    for (Background* i : Background::list()) {
-        auto* widget{new ToolWidget{i, i->name(), backgrounds}};
-        backgrounds->addContent(widget);
-    }
-    addToolWidget(backgrounds);
-
-    // Liquids
-    auto* liquids{new CollapsibleSection{"Liquids", parent}};
-    for (Liquid* i : Liquid::list()) {
-        auto* widget{new ToolWidget{i, i->name(), liquids}};
-        liquids->addContent(widget);
-    }
-    addToolWidget(liquids);
-
-    // Gazes
-    auto* gazes{new CollapsibleSection{"Gazes", parent}};
-    for (Gaz* i : Gaz::list()) {
-        auto* widget{new ToolWidget{i, i->name(), gazes}};
-        gazes->addContent(widget);
-    }
-    addToolWidget(gazes);
-};
-
 void MainWindow::onToolChanged() {
     QString msg{"Tool: "};
     msg.append(Tool::toolName());
@@ -126,11 +87,7 @@ void MainWindow::onToolChanged() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void MainWindow::onActionTools() {
-    if (ui_->actionTools->isChecked()) {
-        ui_->tools_frame->show();
-    } else {
-        ui_->tools_frame->hide();
-    }
+    toolWidget_->setVisible(ui_->actionTools->isChecked());
 }
 
 void MainWindow::onActionWorkingArea() {

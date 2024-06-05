@@ -81,7 +81,6 @@ class Tool : public QObject {
    protected:
     Tool() = default;
 
-    // TODO(clovis): hack. not cool. fix it?
     inline static Tool* tool_{nullptr};
 
     inline static ToolType tool_type_{};

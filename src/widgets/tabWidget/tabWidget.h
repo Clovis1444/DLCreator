@@ -11,7 +11,7 @@
 
 #include "stackedContentWidget/contentWidget/contentWidget.h"
 #include "stackedContentWidget/stackedContentWidget.h"
-#include "tabScrollArea.h"
+#include "tabScrollArea/tabScrollArea.h"
 
 class TabWidget : public QWidget {
     Q_OBJECT

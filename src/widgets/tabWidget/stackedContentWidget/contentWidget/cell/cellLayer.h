@@ -40,6 +40,19 @@ class CellLayer {
     explicit CellLayer(QString name) : name_{std::move(name)} {}
     ~CellLayer() { delete pixmap_; }
 
+    CellLayer& operator=(const CellLayer& other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        name_ = other.name_;
+        file_path_ = other.file_path_;
+        *pixmap_ = *other.pixmap_;
+
+        return *this;
+    }
+    bool operator==(const CellLayer& other) const = default;
+
     QString name_;
     // TODO(clovis): delete this member variable?
     QString file_path_;
@@ -65,9 +78,38 @@ class Liquid : public CellLayer {
    protected:
     Liquid(QString name, QString file_path)
         : CellLayer{std::move(name), std::move(file_path)} {
+        // Copy assign if already exists and delete this
+        auto* existed{exists()};
+        if (existed) {
+            *existed = *this;
+            Liquid::~Liquid();
+            return;
+        }
+
+        // Otherwise - add this to the list
         k_liquids_.push_back(this);
     }
-    Liquid() : CellLayer("No liquid") { k_liquids_.push_back(this); }
+    Liquid() : CellLayer("No liquid") {
+        // Delete this if already exists
+        auto* existed{exists()};
+        if (existed) {
+            Liquid::~Liquid();
+            return;
+        }
+
+        k_liquids_.push_back(this);
+    }
+
+    // If object with the same name is already exists in the list - return this
+    // object, otherwise return nullptr
+    Liquid* exists() {
+        for (auto* i : k_liquids_) {
+            if (i->name() == name()) {
+                return i;
+            }
+        }
+        return nullptr;
+    }
 
     inline static QList<Liquid*> k_liquids_{};
     inline static const QString kJsonName{"Liquid"};
@@ -94,9 +136,38 @@ class Gaz : public CellLayer {
    protected:
     Gaz(QString name, QString file_path)
         : CellLayer{std::move(name), std::move(file_path)} {
+        // Copy assign if already exists and delete this
+        auto* existed{exists()};
+        if (existed) {
+            *existed = *this;
+            Gaz::~Gaz();
+            return;
+        }
+
+        // Otherwise - add this to the list
         k_gasses_.push_back(this);
     }
-    Gaz() : CellLayer("No Gaz") { k_gasses_.push_back(this); }
+    Gaz() : CellLayer("No Gaz") {
+        // Delete this if already exists
+        auto* existed{exists()};
+        if (existed) {
+            Gaz::~Gaz();
+            return;
+        }
+
+        k_gasses_.push_back(this);
+    }
+
+    // If object with the same name is already exists in the list - return this
+    // object, otherwise return nullptr
+    Gaz* exists() {
+        for (auto* i : k_gasses_) {
+            if (i->name() == name()) {
+                return i;
+            }
+        }
+        return nullptr;
+    }
 
     inline static QList<Gaz*> k_gasses_{};
     inline static const QString kJsonName{"Gaz"};
@@ -123,10 +194,37 @@ class Background : public CellLayer {
    protected:
     Background(QString name, QString file_path)
         : CellLayer{std::move(name), std::move(file_path)} {
+        // Copy assign if already exists and delete this
+        auto* existed{exists()};
+        if (existed) {
+            *existed = *this;
+            Background::~Background();
+            return;
+        }
+
+        // Otherwise - add this to the list
         k_backgrounds_.push_back(this);
     }
     Background() : CellLayer("No Background") {
+        // Delete this if already exists
+        auto* existed{exists()};
+        if (existed) {
+            Background::~Background();
+            return;
+        }
+
         k_backgrounds_.push_back(this);
+    }
+
+    // If object with the same name is already exists in the list - return this
+    // object, otherwise return nullptr
+    Background* exists() {
+        for (auto* i : k_backgrounds_) {
+            if (i->name() == name()) {
+                return i;
+            }
+        }
+        return nullptr;
     }
 
     inline static QList<Background*> k_backgrounds_{};
@@ -135,7 +233,9 @@ class Background : public CellLayer {
     friend void loadCellLayersFromJson();
 };
 
-// Parse json and appends its objects to associated QList.
+// TODO(clovis): implement removing of layers deleted from json?(May cause
+// troubles with drawing cells with these layers) Parse json and appends its)
+// objects to associated QList.
 inline void loadCellLayersFromJson() {
     QFile res{Settings::kCellLayerResourcesFilePath};
     if (!res.exists()) {

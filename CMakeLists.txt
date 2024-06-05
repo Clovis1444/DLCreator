@@ -23,12 +23,13 @@ set(PROJECT_SOURCES
         src/mainWindow.cpp
         src/mainWindow.h
         src/mainWindow.ui
-        src/widgets/tabButton.h
-        src/widgets/collapsibleSection.h
-        src/widgets/toolWidget.h
         src/tool.h
+        src/widgets/toolWidget/collapsibleSection.h
+        src/widgets/toolWidget/toolButton.h
+        src/widgets/toolWidget/toolWidget.h
         src/widgets/tabWidget/tabWidget.h
-        src/widgets/tabWidget/tabScrollArea.h
+        src/widgets/tabWidget/tabScrollArea/tabScrollArea.h
+        src/widgets/tabWidget/tabScrollArea/tabButton.h
         src/widgets/tabWidget/stackedContentWidget/stackedContentWidget.h
         src/widgets/tabWidget/stackedContentWidget/contentWidget/contentWidget.h
         src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h

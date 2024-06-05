@@ -10,6 +10,7 @@
 #include <QMainWindow>
 
 #include "widgets/tabWidget/tabWidget.h"
+#include "widgets/toolWidget/toolWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -27,8 +28,6 @@ class MainWindow : public QMainWindow {
    private:
     void initConnect();
     void createNewDocument();
-    void addToolWidget(QWidget *widget);
-    void setupToolWidgets();
 
    public slots:
     void onActionTools();
@@ -41,5 +40,6 @@ class MainWindow : public QMainWindow {
    private:
     Ui::MainWindow *ui_;
     TabWidget *tabWidget_;
+    ToolWidget *toolWidget_;
 };
 #endif  // MAINWINDOW_H

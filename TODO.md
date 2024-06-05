@@ -6,4 +6,5 @@
 - Tile texture generation algorithm
 - Implement zoom
 - add destructors
-- REFACTOR: create ToolCollection class
+
+- Change layers in `Cell` from ptr to LayerName(String)?.This will fix the problem with deleted Layers objects. Also this may be useful in future for implementing loading `Cells` from file.

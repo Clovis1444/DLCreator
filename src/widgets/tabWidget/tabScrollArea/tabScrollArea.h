@@ -7,7 +7,7 @@
 #include <qscrollarea.h>
 #include <qtmetamacros.h>
 
-#include "../tabButton.h"
+#include "tabButton.h"
 
 // TODO(clovis): fix TabScroll area size
 class TabScrollArea : public QScrollArea {
