@@ -111,20 +111,26 @@ class Cell : public QLabel {
     }
 
     void setLayer(const Liquid* liquid) {
-        liquid_ = liquid;
-        drawCell();
+        if (liquid) {
+            liquid_ = liquid->name();
+            drawCell();
+        }
     }
     void setLayer(const Gaz* gaz) {
-        gaz_ = gaz;
-        drawCell();
+        if (gaz) {
+            gaz_ = gaz->name();
+            drawCell();
+        }
     }
     void setLayer(const Background* background) {
-        background_ = background;
-        drawCell();
+        if (background) {
+            background_ = background->name();
+            drawCell();
+        }
     }
     void clearLayers() {
-        liquid_ = nullptr;
-        gaz_ = nullptr;
+        liquid_.clear();
+        gaz_.clear();
         drawCell();
     }
 
@@ -156,13 +162,14 @@ class Cell : public QLabel {
     // Draws cells depending on its member variables.
     void drawCell() {
         // Background
-        if (background_ == nullptr || background_->isEmpty()) {
+        const auto* background{Background::get(background_)};
+        if (background == nullptr || background->isEmpty()) {
             if (k_use_default_background_ && k_default_background_ != nullptr)
                 *pixmap_ = k_default_background_->scaled(size_, size_);
             else
                 pixmap_->fill(background_color_);
         } else {
-            *pixmap_ = background_->pixmap()->scaled(size_, size_);
+            *pixmap_ = background->pixmap()->scaled(size_, size_);
         }
 
         QPainter pntr{pixmap_};
@@ -180,13 +187,15 @@ class Cell : public QLabel {
         }
 
         // Liquid
-        if (liquid_ != nullptr && !liquid_->isEmpty()) {
-            pntr.drawPixmap(0, 0, liquid_->pixmap()->scaled(size_, size_));
+        const auto* liquid{Liquid::get(liquid_)};
+        if (liquid != nullptr && !liquid->isEmpty()) {
+            pntr.drawPixmap(0, 0, liquid->pixmap()->scaled(size_, size_));
         }
 
         // Gaz
-        if (gaz_ != nullptr && !gaz_->isEmpty()) {
-            pntr.drawPixmap(0, 0, gaz_->pixmap()->scaled(size_, size_));
+        const auto* gaz{Gaz::get(gaz_)};
+        if (gaz != nullptr && !gaz->isEmpty()) {
+            pntr.drawPixmap(0, 0, gaz->pixmap()->scaled(size_, size_));
         }
 
         setPixmap(*pixmap_);
@@ -201,9 +210,9 @@ class Cell : public QLabel {
     QColor background_color_;
     int size_{};
     QPixmap* pixmap_;
-    const Background* background_{nullptr};
-    const Liquid* liquid_{nullptr};
-    const Gaz* gaz_{nullptr};
+    QString background_;
+    QString liquid_;
+    QString gaz_;
     bool selected_{false};
 
     inline static QPixmap* k_default_background_{nullptr};

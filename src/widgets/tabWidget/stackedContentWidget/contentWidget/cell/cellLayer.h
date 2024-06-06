@@ -85,7 +85,7 @@ class Liquid : public CellLayer {
         // If does not exists
         static int id{0};
 
-        insert_new(++id, new Liquid{name, file_path});
+        insert_item(++id, new Liquid{name, file_path});
     }
     static void add() {
         // If exists
@@ -94,7 +94,15 @@ class Liquid : public CellLayer {
         }
 
         // If does not exists
-        insert_new(0, new Liquid{});
+        insert_item(0, new Liquid{});
+    }
+    static void clear() {
+        for (auto* i : k_liquids_) {
+            delete i;
+        }
+
+        k_liquids_.clear();
+        k_liquids_sorted_.clear();
     }
 
    protected:
@@ -102,9 +110,18 @@ class Liquid : public CellLayer {
         : CellLayer{std::move(name), std::move(file_path)} {}
     Liquid() : CellLayer(kNoLiquidName) {}
 
-    static void insert_new(int id, Liquid* liquid) {
+    static void insert_item(int id, Liquid* liquid) {
         k_liquids_sorted_.insert(id, liquid);
         k_liquids_.insert(liquid->name(), liquid);
+    }
+    static void remove_item(const QString& name) {
+        if (k_liquids_.contains(name)) {
+            k_liquids_sorted_.remove(k_liquids_sorted_.key(k_liquids_[name]));
+
+            delete k_liquids_[name];
+
+            k_liquids_.remove(name);
+        }
     }
 
     inline static QHash<QString, Liquid*> k_liquids_{};
@@ -144,7 +161,7 @@ class Gaz : public CellLayer {
         // If does not exists
         static int id{0};
 
-        insert_new(++id, new Gaz{name, file_path});
+        insert_item(++id, new Gaz{name, file_path});
     }
     static void add() {
         // If exists
@@ -153,7 +170,15 @@ class Gaz : public CellLayer {
         }
 
         // If does not exists
-        insert_new(0, new Gaz{});
+        insert_item(0, new Gaz{});
+    }
+    static void clear() {
+        for (auto* i : k_gasses_) {
+            delete i;
+        }
+
+        k_gasses_.clear();
+        k_gasses_sorted_.clear();
     }
 
    protected:
@@ -161,9 +186,18 @@ class Gaz : public CellLayer {
         : CellLayer{std::move(name), std::move(file_path)} {}
     Gaz() : CellLayer(kNoGazName) {}
 
-    static void insert_new(int id, Gaz* gaz) {
+    static void insert_item(int id, Gaz* gaz) {
         k_gasses_sorted_.insert(id, gaz);
         k_gasses_.insert(gaz->name(), gaz);
+    }
+    static void remove_item(const QString& name) {
+        if (k_gasses_.contains(name)) {
+            k_gasses_sorted_.remove(k_gasses_sorted_.key(k_gasses_[name]));
+
+            delete k_gasses_[name];
+
+            k_gasses_.remove(name);
+        }
     }
 
     inline static QHash<QString, Gaz*> k_gasses_{};
@@ -205,7 +239,7 @@ class Background : public CellLayer {
         // If does not exists
         static int id{0};
 
-        insert_new(++id, new Background{name, file_path});
+        insert_item(++id, new Background{name, file_path});
     }
     static void add() {
         // If exists
@@ -214,7 +248,15 @@ class Background : public CellLayer {
         }
 
         // If does not exists
-        insert_new(0, new Background{});
+        insert_item(0, new Background{});
+    }
+    static void clear() {
+        for (auto* i : k_backgrounds_) {
+            delete i;
+        }
+
+        k_backgrounds_.clear();
+        k_backgrounds_sorted_.clear();
     }
 
    protected:
@@ -222,9 +264,19 @@ class Background : public CellLayer {
         : CellLayer{std::move(name), std::move(file_path)} {}
     Background() : CellLayer(kNoBackgroundName) {}
 
-    static void insert_new(int id, Background* background) {
+    static void insert_item(int id, Background* background) {
         k_backgrounds_sorted_.insert(id, background);
         k_backgrounds_.insert(background->name(), background);
+    }
+    static void remove_item(const QString& name) {
+        if (k_backgrounds_.contains(name)) {
+            k_backgrounds_sorted_.remove(
+                k_backgrounds_sorted_.key(k_backgrounds_[name]));
+
+            delete k_backgrounds_[name];
+
+            k_backgrounds_.remove(name);
+        }
     }
 
     inline static QHash<QString, Background*> k_backgrounds_{};
@@ -235,9 +287,6 @@ class Background : public CellLayer {
     inline static const QString kJsonName{"Background"};
 };
 
-// TODO(clovis): implement removing of layers deleted from json?(May cause
-// troubles with drawing cells with these layers) Parse json and appends its)
-// objects to associated QList.
 inline void loadCellLayersFromJson() {
     QFile res{Settings::kCellLayerResourcesFilePath};
     if (!res.exists()) {
@@ -257,6 +306,8 @@ inline void loadCellLayersFromJson() {
             QJsonObject json{doc.object()};
 
             // Background
+            Background::clear();
+
             Background::add();
             for (QJsonValue i : json[Background::kJsonName].toArray()) {
                 QString name{i[Settings::JSON::CellLayer::kNameKey].toString()};
@@ -273,7 +324,10 @@ inline void loadCellLayersFromJson() {
 
                 Background::add(name, file.fileName());
             }
+
             // Liquid
+            Liquid::clear();
+
             Liquid::add();
             for (QJsonValue i : json[Liquid::kJsonName].toArray()) {
                 QString name{i[Settings::JSON::CellLayer::kNameKey].toString()};
@@ -291,6 +345,8 @@ inline void loadCellLayersFromJson() {
                 Liquid::add(name, file.fileName());
             }
             // Gaz
+            Gaz::clear();
+
             Gaz::add();
             for (QJsonValue i : json[Gaz::kJsonName].toArray()) {
                 QString name{i[Settings::JSON::CellLayer::kNameKey].toString()};
