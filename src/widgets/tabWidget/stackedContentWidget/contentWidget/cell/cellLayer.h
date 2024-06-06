@@ -3,11 +3,13 @@
 #include <qassert.h>
 #include <qdebug.h>
 #include <qfile.h>
+#include <qhash.h>
 #include <qjsonarray.h>
 #include <qjsondocument.h>
 #include <qjsonobject.h>
 #include <qjsonvalue.h>
 #include <qlist.h>
+#include <qmap.h>
 #include <qobject.h>
 #include <qpixmap.h>
 #include <qstringview.h>
@@ -30,11 +32,6 @@ class CellLayer {
    protected:
     CellLayer(QString name, QString file_path)
         : name_{std::move(name)}, file_path_{std::move(file_path)} {
-        // If file exists - create pixmap
-        if (!QFile::exists(file_path_)) {
-            qDebug() << "Failed to create pixmap: file does not exists";
-            static_assert(true);
-        }
         pixmap_ = new QPixmap{file_path_};
     }
     explicit CellLayer(QString name) : name_{std::move(name)} {}
@@ -62,10 +59,8 @@ class CellLayer {
 class Liquid : public CellLayer {
    public:
     static const Liquid* get(const QString& name) {
-        for (Liquid* i : k_liquids_) {
-            if (i->name_ == name) {
-                return i;
-            }
+        if (k_liquids_.contains(name)) {
+            return k_liquids_[name];
         }
 
         return nullptr;
@@ -73,57 +68,58 @@ class Liquid : public CellLayer {
 
     // TODO(clovis): fix clang-tidy warning
     // NOLINTNEXTLINE
-    static const QList<Liquid*> list() { return k_liquids_; };
+    static const QMap<int, Liquid*> list() { return k_liquids_sorted_; };
+
+    static void add(const QString& name, const QString& file_path) {
+        if (!QFile::exists(file_path)) {
+            qDebug() << "Failed to create pixmap: file does not exists";
+            return;
+        }
+
+        // If exists
+        if (k_liquids_.contains(name)) {
+            *k_liquids_[name] = Liquid{name, file_path};
+            return;
+        }
+
+        // If does not exists
+        static int id{0};
+
+        insert_new(++id, new Liquid{name, file_path});
+    }
+    static void add() {
+        // If exists
+        if (k_liquids_.contains(kNoLiquidName)) {
+            return;
+        }
+
+        // If does not exists
+        insert_new(0, new Liquid{});
+    }
 
    protected:
     Liquid(QString name, QString file_path)
-        : CellLayer{std::move(name), std::move(file_path)} {
-        // Copy assign if already exists and delete this
-        auto* existed{exists()};
-        if (existed) {
-            *existed = *this;
-            Liquid::~Liquid();
-            return;
-        }
+        : CellLayer{std::move(name), std::move(file_path)} {}
+    Liquid() : CellLayer(kNoLiquidName) {}
 
-        // Otherwise - add this to the list
-        k_liquids_.push_back(this);
-    }
-    Liquid() : CellLayer("No liquid") {
-        // Delete this if already exists
-        auto* existed{exists()};
-        if (existed) {
-            Liquid::~Liquid();
-            return;
-        }
-
-        k_liquids_.push_back(this);
+    static void insert_new(int id, Liquid* liquid) {
+        k_liquids_sorted_.insert(id, liquid);
+        k_liquids_.insert(liquid->name(), liquid);
     }
 
-    // If object with the same name is already exists in the list - return this
-    // object, otherwise return nullptr
-    Liquid* exists() {
-        for (auto* i : k_liquids_) {
-            if (i->name() == name()) {
-                return i;
-            }
-        }
-        return nullptr;
-    }
+    inline static QHash<QString, Liquid*> k_liquids_{};
+    inline static QMap<int, Liquid*> k_liquids_sorted_{};
+    inline static const QString kNoLiquidName{"No liquid"};
 
-    inline static QList<Liquid*> k_liquids_{};
+   public:
     inline static const QString kJsonName{"Liquid"};
-
-    friend void loadCellLayersFromJson();
 };
 
 class Gaz : public CellLayer {
    public:
     static const Gaz* get(const QString& name) {
-        for (Gaz* i : k_gasses_) {
-            if (i->name_ == name) {
-                return i;
-            }
+        if (k_gasses_.contains(name)) {
+            return k_gasses_[name];
         }
 
         return nullptr;
@@ -131,57 +127,58 @@ class Gaz : public CellLayer {
 
     // TODO(clovis): fix clang-tidy warning
     // NOLINTNEXTLINE
-    static const QList<Gaz*> list() { return k_gasses_; };
+    static const QMap<int, Gaz*> list() { return k_gasses_sorted_; };
+
+    static void add(const QString& name, const QString& file_path) {
+        if (!QFile::exists(file_path)) {
+            qDebug() << "Failed to create pixmap: file does not exists";
+            return;
+        }
+
+        // If exists
+        if (k_gasses_.contains(name)) {
+            *k_gasses_[name] = Gaz{name, file_path};
+            return;
+        }
+
+        // If does not exists
+        static int id{0};
+
+        insert_new(++id, new Gaz{name, file_path});
+    }
+    static void add() {
+        // If exists
+        if (k_gasses_.contains(kNoGazName)) {
+            return;
+        }
+
+        // If does not exists
+        insert_new(0, new Gaz{});
+    }
 
    protected:
     Gaz(QString name, QString file_path)
-        : CellLayer{std::move(name), std::move(file_path)} {
-        // Copy assign if already exists and delete this
-        auto* existed{exists()};
-        if (existed) {
-            *existed = *this;
-            Gaz::~Gaz();
-            return;
-        }
+        : CellLayer{std::move(name), std::move(file_path)} {}
+    Gaz() : CellLayer(kNoGazName) {}
 
-        // Otherwise - add this to the list
-        k_gasses_.push_back(this);
-    }
-    Gaz() : CellLayer("No Gaz") {
-        // Delete this if already exists
-        auto* existed{exists()};
-        if (existed) {
-            Gaz::~Gaz();
-            return;
-        }
-
-        k_gasses_.push_back(this);
+    static void insert_new(int id, Gaz* gaz) {
+        k_gasses_sorted_.insert(id, gaz);
+        k_gasses_.insert(gaz->name(), gaz);
     }
 
-    // If object with the same name is already exists in the list - return this
-    // object, otherwise return nullptr
-    Gaz* exists() {
-        for (auto* i : k_gasses_) {
-            if (i->name() == name()) {
-                return i;
-            }
-        }
-        return nullptr;
-    }
+    inline static QHash<QString, Gaz*> k_gasses_{};
+    inline static QMap<int, Gaz*> k_gasses_sorted_{};
+    inline static const QString kNoGazName{"No gaz"};
 
-    inline static QList<Gaz*> k_gasses_{};
+   public:
     inline static const QString kJsonName{"Gaz"};
-
-    friend void loadCellLayersFromJson();
 };
 
 class Background : public CellLayer {
    public:
     static const Background* get(const QString& name) {
-        for (Background* i : k_backgrounds_) {
-            if (i->name_ == name) {
-                return i;
-            }
+        if (k_backgrounds_.contains(name)) {
+            return k_backgrounds_[name];
         }
 
         return nullptr;
@@ -189,48 +186,53 @@ class Background : public CellLayer {
 
     // TODO(clovis): fix clang-tidy warning
     // NOLINTNEXTLINE
-    static const QList<Background*> list() { return k_backgrounds_; };
+    static const QMap<int, Background*> list() {
+        return k_backgrounds_sorted_;
+    };
+
+    static void add(const QString& name, const QString& file_path) {
+        if (!QFile::exists(file_path)) {
+            qDebug() << "Failed to create pixmap: file does not exists";
+            return;
+        }
+
+        // If exists
+        if (k_backgrounds_.contains(name)) {
+            *k_backgrounds_[name] = Background{name, file_path};
+            return;
+        }
+
+        // If does not exists
+        static int id{0};
+
+        insert_new(++id, new Background{name, file_path});
+    }
+    static void add() {
+        // If exists
+        if (k_backgrounds_.contains(kNoBackgroundName)) {
+            return;
+        }
+
+        // If does not exists
+        insert_new(0, new Background{});
+    }
 
    protected:
     Background(QString name, QString file_path)
-        : CellLayer{std::move(name), std::move(file_path)} {
-        // Copy assign if already exists and delete this
-        auto* existed{exists()};
-        if (existed) {
-            *existed = *this;
-            Background::~Background();
-            return;
-        }
+        : CellLayer{std::move(name), std::move(file_path)} {}
+    Background() : CellLayer(kNoBackgroundName) {}
 
-        // Otherwise - add this to the list
-        k_backgrounds_.push_back(this);
-    }
-    Background() : CellLayer("No Background") {
-        // Delete this if already exists
-        auto* existed{exists()};
-        if (existed) {
-            Background::~Background();
-            return;
-        }
-
-        k_backgrounds_.push_back(this);
+    static void insert_new(int id, Background* background) {
+        k_backgrounds_sorted_.insert(id, background);
+        k_backgrounds_.insert(background->name(), background);
     }
 
-    // If object with the same name is already exists in the list - return this
-    // object, otherwise return nullptr
-    Background* exists() {
-        for (auto* i : k_backgrounds_) {
-            if (i->name() == name()) {
-                return i;
-            }
-        }
-        return nullptr;
-    }
+    inline static QHash<QString, Background*> k_backgrounds_{};
+    inline static QMap<int, Background*> k_backgrounds_sorted_{};
+    inline static const QString kNoBackgroundName{"No background"};
 
-    inline static QList<Background*> k_backgrounds_{};
+   public:
     inline static const QString kJsonName{"Background"};
-
-    friend void loadCellLayersFromJson();
 };
 
 // TODO(clovis): implement removing of layers deleted from json?(May cause
@@ -255,7 +257,7 @@ inline void loadCellLayersFromJson() {
             QJsonObject json{doc.object()};
 
             // Background
-            new Background{};
+            Background::add();
             for (QJsonValue i : json[Background::kJsonName].toArray()) {
                 QString name{i[Settings::JSON::CellLayer::kNameKey].toString()};
                 QString file_name{
@@ -269,10 +271,10 @@ inline void loadCellLayersFromJson() {
                     continue;
                 }
 
-                new Background{name, file.fileName()};
+                Background::add(name, file.fileName());
             }
             // Liquid
-            new Liquid{};
+            Liquid::add();
             for (QJsonValue i : json[Liquid::kJsonName].toArray()) {
                 QString name{i[Settings::JSON::CellLayer::kNameKey].toString()};
                 QString file_name{
@@ -286,10 +288,10 @@ inline void loadCellLayersFromJson() {
                     continue;
                 }
 
-                new Liquid{name, file.fileName()};
+                Liquid::add(name, file.fileName());
             }
             // Gaz
-            new Gaz{};
+            Gaz::add();
             for (QJsonValue i : json[Gaz::kJsonName].toArray()) {
                 QString name{i[Settings::JSON::CellLayer::kNameKey].toString()};
                 QString file_name{
@@ -303,7 +305,7 @@ inline void loadCellLayersFromJson() {
                     continue;
                 }
 
-                new Gaz{name, file.fileName()};
+                Gaz::add(name, file.fileName());
             }
         }
     } else {
