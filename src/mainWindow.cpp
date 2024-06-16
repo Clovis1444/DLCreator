@@ -13,12 +13,14 @@
 
 #include "./ui_mainWindow.h"
 #include "settings.h"
+#include "widgets/historyWidget/historyWidget.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
       ui_(new Ui::MainWindow),
       tabWidget_{new TabWidget{this}},
-      toolWidget_{new ToolWidget{this}} {
+      toolWidget_{new ToolWidget{this}},
+      historyWidget_{new HistoryWidget{this}} {
     // Setup from .ui file
     ui_->setupUi(this);
 
@@ -29,6 +31,9 @@ MainWindow::MainWindow(QWidget* parent)
 
     // Add TabWidget
     ui_->centralwidget->layout()->addWidget(tabWidget_);
+
+    // Add HistoryWidget
+    ui_->centralwidget->layout()->addWidget(historyWidget_);
 
     //
 
@@ -64,6 +69,9 @@ void MainWindow::initConnect() {
     //  View -> Tabs
     QObject::connect(ui_->actionTabs, &QAction::toggled, this,
                      &MainWindow::onActionTabs);
+    //  View -> History
+    QObject::connect(ui_->actionHistory, &QAction::toggled, this,
+                     &MainWindow::onActionHistory);
 
     //
     // Change status bar on Tool::toolChanged()
@@ -96,6 +104,10 @@ void MainWindow::onActionWorkingArea() {
 
 void MainWindow::onActionTabs() {
     tabWidget_->setTabsVisible(ui_->actionTabs->isChecked());
+}
+
+void MainWindow::onActionHistory() {
+    historyWidget_->setVisible(ui_->actionHistory->isChecked());
 }
 
 void MainWindow::onActionExit() { QApplication::quit(); }

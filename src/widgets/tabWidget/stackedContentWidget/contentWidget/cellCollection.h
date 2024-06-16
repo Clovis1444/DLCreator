@@ -1,9 +1,11 @@
 #pragma once
 
 #include <qapplication.h>
+#include <qcontainerfwd.h>
 #include <qevent.h>
 #include <qgraphicsview.h>
 #include <qgridlayout.h>
+#include <qhash.h>
 #include <qlayout.h>
 #include <qlist.h>
 #include <qnamespace.h>
@@ -16,8 +18,10 @@
 
 #include <QWheelEvent>
 
+#include "../../../../history.h"
 #include "../../../../tool.h"
 #include "cell/cell.h"
+#include "cell/cellAction.h"
 
 class CellCollection : public QWidget {
     Q_OBJECT
@@ -34,6 +38,9 @@ class CellCollection : public QWidget {
             for (int j{}; j < size; ++j) {
                 auto* cell = new Cell{this};
                 addCell(cell, i, j);
+
+                QObject::connect(cell, &Cell::clicked, this,
+                                 [this, cell] { onCellClicked(cell); });
             }
         }
 
@@ -96,6 +103,13 @@ class CellCollection : public QWidget {
     void mouseReleaseEvent(QMouseEvent* e) override {
         selection_->hide();
 
+        if (selection_begin_ != e->pos()) {
+            // Create history action
+            pushToHistory();
+        }
+
+        changed_cells_.clear();
+
         QWidget::mouseReleaseEvent(e);
     }
 
@@ -116,37 +130,71 @@ class CellCollection : public QWidget {
         cells_.push_back(cell);
     }
 
+    // This function MUST be called only in mouseReleaseEvent and before
+    // changed_cells_.clear()
+    void pushToHistory() {
+        QList<CellAction> list{};
+        for (auto* i : selected_cells_) {
+            list.append(changed_cells_.value(i));
+        }
+        auto action{CellAction{list}};
+
+        if (action.changed()) {
+            History::History::push(action);
+        }
+    }
+
    signals:
     void mouseMoved();
+    void cellClicked();
+
+   public slots:
+    void onCellClicked(Cell* cell) {
+        // TODO(clovis): implement CellPos here
+        // qDebug() << layout_->indexOf(cell);
+        emit cellClicked();
+    }
 
    protected slots:
     void onMouseMove() {
-        switch (Tool::toolType()) {
-            case Tool::kLiquid:
-                for (auto* i : selected_cells_) {
-                    i->setLayer(static_cast<const Liquid*>(Tool::cell_layer()));
-                }
-                break;
-            case Tool::kGaz:
-                for (auto* i : selected_cells_) {
-                    i->setLayer(static_cast<const Gaz*>(Tool::cell_layer()));
-                }
+        if (Tool::toolType() == Tool::kNone ||
+            Tool::toolType() == Tool::kEnumLength) {
+            return;
+        }
 
-                break;
-            case Tool::kClear:
-                for (auto* i : selected_cells_) {
-                    i->clearLayers();
-                }
-                break;
-            case Tool::kBackground:
-                for (auto* i : selected_cells_) {
+        for (auto i : changed_cells_) {
+            i.undo();
+        }
+
+        for (auto* i : selected_cells_) {
+            CellAction action{i};
+
+            switch (Tool::toolType()) {
+                case Tool::kBackground:
                     i->setLayer(
-                        static_cast<const Background*>(Tool::cell_layer()));
-                }
-                break;
-            case Tool::kNone:
-            case Tool::kEnumLength:
-                break;
+                        static_cast<const Background*>(Tool::cell_layer()),
+                        false);
+                    break;
+                case Tool::kLiquid:
+                    i->setLayer(static_cast<const Liquid*>(Tool::cell_layer()),
+                                false);
+                    break;
+                case Tool::kGaz:
+                    i->setLayer(static_cast<const Gaz*>(Tool::cell_layer()),
+                                false);
+                    break;
+                case Tool::kClear:
+                    i->clearLayers(false);
+                    break;
+                case Tool::kNone:
+                case Tool::kEnumLength:
+                    break;
+            }
+
+            action.registerAction();
+            if (!changed_cells_.contains(i)) {
+                changed_cells_.insert(i, action);
+            }
         }
     }
 
@@ -158,6 +206,7 @@ class CellCollection : public QWidget {
 
     QRubberBand* selection_{new QRubberBand(QRubberBand::Rectangle, this)};
     QPoint selection_begin_;
+    QHash<Cell*, CellAction> changed_cells_;
 
     inline static constexpr int kMaxScale{10};
     inline static constexpr int kMinScale{-10};

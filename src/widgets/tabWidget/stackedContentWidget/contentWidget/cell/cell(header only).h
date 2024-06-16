@@ -6,8 +6,8 @@
 #include <qlist.h>
 #include <qpainter.h>
 #include <qpixmap.h>
-#include <qpoint.h>
 
+#include "../../../../../tool.h"
 #include "cellLayer.h"
 
 class Cell : public QLabel {
@@ -15,7 +15,16 @@ class Cell : public QLabel {
 
    public:
     explicit Cell(QWidget* parent, int cell_size = kCellSize,
-                  QColor background_color = kDefaultBackgroundColor);
+                  QColor background_color = kDefaultBackgroundColor)
+        : QLabel{parent},
+          background_color_{background_color},
+          size_{cell_size},
+          pixmap_{new QPixmap{size_, size_}} {
+        setFixedSize(kCellSize, kCellSize);
+        drawCell();
+
+        QObject::connect(this, &Cell::clicked, this, &Cell::onClicked);
+    }
 
     struct CellInfo {
         QString background;
@@ -105,31 +114,140 @@ class Cell : public QLabel {
         }
     };
 
-    void setSelected(bool selected = true);
+    void setSelected(bool selected = true) {
+        selected_ = selected;
+        drawCell();
+    }
 
-    void setLayer(const Liquid* liquid, bool track_history = true);
-    void setLayer(const Gaz* gaz, bool track_history = true);
-    void setLayer(const Background* background, bool track_history = true);
-    void setLayer(const CellInfo& i);
-    void clearLayers(bool track_history = true);
-    CellInfo info();
+    void setLayer(const Liquid* liquid, bool track_history = true) {
+        if (liquid) {
+            liquid_ = liquid->name();
+            drawCell();
+        }
 
-    QString background() const;
-    QString liquid() const;
-    QString gaz() const;
+        if (track_history) {
+            // TODO(clovis): implement history action here
+        }
+    }
+    void setLayer(const Gaz* gaz, bool track_history = true) {
+        if (gaz) {
+            gaz_ = gaz->name();
+            drawCell();
+        }
+
+        if (track_history) {
+            // TODO(clovis): implement history action here
+        }
+    }
+    void setLayer(const Background* background, bool track_history = true) {
+        if (background) {
+            background_ = background->name();
+            drawCell();
+        }
+
+        if (track_history) {
+            // TODO(clovis): implement history action here
+        }
+    }
+    void setLayer(const CellInfo& i) {
+        if (i == info()) {
+            return;
+        }
+
+        background_ = i.background;
+        liquid_ = i.liquid;
+        gaz_ = i.gaz;
+
+        drawCell();
+    }
+    void clearLayers(bool track_history = true) {
+        liquid_.clear();
+        gaz_.clear();
+        drawCell();
+
+        if (track_history) {
+            // TODO(clovis): implement history action here
+        }
+    }
+
+    CellInfo info() { return CellInfo{background_, liquid_, gaz_}; }
+
+    QString background() { return background_; }
+    QString liquid() { return liquid_; }
+    QString gaz() { return gaz_; }
 
    signals:
     void clicked();
 
    private slots:
-    void onClicked();
+    void onClicked() {
+        switch (Tool::toolType()) {
+            case Tool::kLiquid:
+                setLayer(static_cast<const Liquid*>(Tool::cell_layer()));
+                break;
+            case Tool::kGaz:
+                setLayer(static_cast<const Gaz*>(Tool::cell_layer()));
+                break;
+            case Tool::kClear:
+                clearLayers();
+                break;
+            case Tool::kBackground:
+                setLayer(static_cast<const Background*>(Tool::cell_layer()));
+                break;
+            case Tool::kNone:
+            case Tool::kEnumLength:
+                break;
+        }
+    }
 
    private:
     // Draws cells depending on its member variables.
-    void drawCell();
+    void drawCell() {
+        // Background
+        const auto* background{Background::get(background_)};
+        if (background == nullptr || background->isEmpty()) {
+            if (k_use_default_background_ && k_default_background_ != nullptr)
+                *pixmap_ = k_default_background_->scaled(size_, size_);
+            else
+                pixmap_->fill(background_color_);
+        } else {
+            *pixmap_ = background->pixmap()->scaled(size_, size_);
+        }
 
-    void mousePressEvent(QMouseEvent* e) override;
-    void mouseReleaseEvent(QMouseEvent* e) override;
+        QPainter pntr{pixmap_};
+
+        // Frame
+        if (selected_) {
+            if (k_active_cell_frame_ != nullptr) {
+                pntr.drawPixmap(0, 0,
+                                k_active_cell_frame_->scaled(size_, size_));
+            }
+        } else {
+            if (k_cell_frame_ != nullptr) {
+                pntr.drawPixmap(0, 0, k_cell_frame_->scaled(size_, size_));
+            }
+        }
+
+        // Liquid
+        const auto* liquid{Liquid::get(liquid_)};
+        if (liquid != nullptr && !liquid->isEmpty()) {
+            pntr.drawPixmap(0, 0, liquid->pixmap()->scaled(size_, size_));
+        }
+
+        // Gaz
+        const auto* gaz{Gaz::get(gaz_)};
+        if (gaz != nullptr && !gaz->isEmpty()) {
+            pntr.drawPixmap(0, 0, gaz->pixmap()->scaled(size_, size_));
+        }
+
+        setPixmap(*pixmap_);
+    }
+
+    void mousePressEvent(QMouseEvent* e) override {
+        emit clicked();
+
+        QLabel::mousePressEvent(e);
+    }
 
     QColor background_color_;
     int size_{};
@@ -138,8 +256,6 @@ class Cell : public QLabel {
     QString liquid_;
     QString gaz_;
     bool selected_{false};
-
-    QPoint click_pos_;
 
     inline static QPixmap* k_default_background_{nullptr};
     inline static QPixmap* k_cell_frame_{nullptr};

@@ -34,6 +34,11 @@ set(PROJECT_SOURCES
         src/widgets/tabWidget/stackedContentWidget/contentWidget/contentWidget.h
         src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h
         src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.h
+        src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.cpp
+        src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellAction.h
+        src/widgets/historyWidget/historyWidget.h
+        src/widgets/historyWidget/cellActionWidget.h
+        src/history.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

@@ -30,25 +30,25 @@ class Tool : public QObject {
         }
         cell_layer_ = nullptr;
 
-        emit tool_->toolChanged();
+        emit sender_->toolChanged();
     }
     static void setTool(const Liquid* liquid) {
         tool_type_ = kLiquid;
         cell_layer_ = liquid;
 
-        emit tool_->toolChanged();
+        emit sender_->toolChanged();
     }
     static void setTool(const Gaz* gaz) {
         tool_type_ = kGaz;
         cell_layer_ = gaz;
 
-        emit tool_->toolChanged();
+        emit sender_->toolChanged();
     }
     static void setTool(const Background* background) {
         tool_type_ = kBackground;
         cell_layer_ = background;
 
-        emit tool_->toolChanged();
+        emit sender_->toolChanged();
     }
 
     static ToolType toolType() { return tool_type_; }
@@ -69,10 +69,10 @@ class Tool : public QObject {
     }
 
     static Tool* signalSender() {
-        if (tool_ == nullptr) {
-            tool_ = new Tool{};
+        if (sender_ == nullptr) {
+            sender_ = new Tool{};
         }
-        return tool_;
+        return sender_;
     }
 
    signals:
@@ -81,7 +81,7 @@ class Tool : public QObject {
    protected:
     Tool() = default;
 
-    inline static Tool* tool_{nullptr};
+    inline static Tool* sender_{nullptr};
 
     inline static ToolType tool_type_{};
     inline static const CellLayer* cell_layer_{nullptr};

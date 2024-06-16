@@ -63,6 +63,7 @@
     <addaction name="actionTools"/>
     <addaction name="actionTabs"/>
     <addaction name="actionWorkingArea"/>
+    <addaction name="actionHistory"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -125,6 +126,17 @@
    </property>
    <property name="text">
     <string>Tabs</string>
+   </property>
+  </action>
+  <action name="actionHistory">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>History</string>
    </property>
   </action>
  </widget>
