@@ -20,22 +20,23 @@ class ToolButton : public QPushButton {
         QObject::connect(this, &QPushButton::clicked, this,
                          &ToolButton::onClicked);
     }
-    ToolButton(const Liquid* cell_layer, const QString& name, QWidget* parent)
-        : QPushButton{name, parent}, cell_layer_{cell_layer} {
-        tool_type_ = Tool::kLiquid;
-        QObject::connect(this, &QPushButton::clicked, this,
-                         &ToolButton::onClicked);
-    }
-    ToolButton(const Gaz* cell_layer, const QString& name, QWidget* parent)
-        : QPushButton{name, parent}, cell_layer_{cell_layer} {
-        tool_type_ = Tool::kGaz;
-        QObject::connect(this, &QPushButton::clicked, this,
-                         &ToolButton::onClicked);
-    }
-    ToolButton(const Background* cell_layer, const QString& name,
+    ToolButton(const CellLayer* cell_layer, const QString& name,
                QWidget* parent)
         : QPushButton{name, parent}, cell_layer_{cell_layer} {
-        tool_type_ = Tool::kBackground;
+        switch (cell_layer->type()) {
+            case CellLayer::kBackground:
+                tool_type_ = Tool::kBackground;
+                break;
+            case CellLayer::kLiquid:
+                tool_type_ = Tool::kLiquid;
+                break;
+            case CellLayer::kGaz:
+                tool_type_ = Tool::kGaz;
+                break;
+            case CellLayer::kEnumLength:
+                break;
+        }
+
         QObject::connect(this, &QPushButton::clicked, this,
                          &ToolButton::onClicked);
     }
@@ -46,17 +47,13 @@ class ToolButton : public QPushButton {
             case Tool::kNone:
                 Tool::setTool();
                 break;
+            case Tool::kBackground:
             case Tool::kLiquid:
-                Tool::setTool(static_cast<const Liquid*>(cell_layer_));
-                break;
             case Tool::kGaz:
-                Tool::setTool(static_cast<const Gaz*>(cell_layer_));
+                Tool::setTool(cell_layer_);
                 break;
             case Tool::kClear:
                 Tool::setTool(true);
-                break;
-            case Tool::kBackground:
-                Tool::setTool(static_cast<const Background*>(cell_layer_));
                 break;
             case Tool::kEnumLength:
                 break;

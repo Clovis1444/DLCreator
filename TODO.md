@@ -1,5 +1,4 @@
 - Create more namespaces
-- Reduce amount of code duplication in `celllayer.h`
 - Mark getters as `const`
 - Const qualifiers for pointers!!!
 - Create `frame_` and `background_` member variables in `Cell`

@@ -5,7 +5,7 @@
 
 namespace Resources {
 inline void init_resources() {
-    loadCellLayersFromJson();
+    CellLayer::loadCellLayersFromJson();
     Cell::loadResourcesFromJson();
 }
 }  // namespace Resources

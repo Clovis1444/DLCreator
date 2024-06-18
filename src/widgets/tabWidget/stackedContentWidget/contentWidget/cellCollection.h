@@ -171,17 +171,9 @@ class CellCollection : public QWidget {
 
             switch (Tool::toolType()) {
                 case Tool::kBackground:
-                    i->setLayer(
-                        static_cast<const Background*>(Tool::cell_layer()),
-                        false);
-                    break;
                 case Tool::kLiquid:
-                    i->setLayer(static_cast<const Liquid*>(Tool::cell_layer()),
-                                false);
-                    break;
                 case Tool::kGaz:
-                    i->setLayer(static_cast<const Gaz*>(Tool::cell_layer()),
-                                false);
+                    i->setLayer(Tool::cell_layer(), false);
                     break;
                 case Tool::kClear:
                     i->clearLayers(false);

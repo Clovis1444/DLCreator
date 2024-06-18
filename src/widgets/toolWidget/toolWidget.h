@@ -56,7 +56,7 @@ class ToolWidget : public QFrame {
    protected:
     void loadTools() {
         deleteAllTools();
-        loadCellLayersFromJson();
+        CellLayer::loadCellLayersFromJson();
 
         // Basic tools
         auto* basic{new CollapsibleSection{"Basic tools", this}};
@@ -67,7 +67,7 @@ class ToolWidget : public QFrame {
 
         // Backgrounds
         auto* backgrounds{new CollapsibleSection{"Backgrounds", this}};
-        for (auto* i : Background::list()) {
+        for (auto* i : CellLayer::list(CellLayer::Type::kBackground)) {
             backgrounds->addContent(new ToolButton{i, i->name(), backgrounds});
         }
         layout_tools_->insertWidget(layout_tools_->count(), backgrounds);
@@ -75,7 +75,7 @@ class ToolWidget : public QFrame {
 
         // Liquids
         auto* liquids{new CollapsibleSection{"Liquids", this}};
-        for (auto* i : Liquid::list()) {
+        for (auto* i : CellLayer::list(CellLayer::Type::kLiquid)) {
             liquids->addContent(new ToolButton{i, i->name(), liquids});
         }
         layout_tools_->insertWidget(layout_tools_->count(), liquids);
@@ -83,7 +83,7 @@ class ToolWidget : public QFrame {
 
         // Gasses
         auto* gasses{new CollapsibleSection{"Gasses", this}};
-        for (auto* i : Gaz::list()) {
+        for (auto* i : CellLayer::list(CellLayer::Type::kGaz)) {
             gasses->addContent(new ToolButton{i, i->name(), gasses});
         }
         layout_tools_->insertWidget(layout_tools_->count(), gasses);

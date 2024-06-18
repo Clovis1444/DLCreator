@@ -20,51 +20,37 @@ void Cell::setSelected(bool selected) {
     drawCell();
 }
 
-void Cell::setLayer(const Liquid* liquid, bool track_history) {
-    if (liquid->name() == liquid_) {
+void Cell::setLayer(const CellLayer* layer, bool track_history) {
+    if (layer == nullptr) {
         return;
     }
 
     CellAction a{this};
 
-    if (liquid) {
-        liquid_ = liquid->name();
-        drawCell();
+    switch (layer->type()) {
+        case CellLayer::kBackground:
+            if (background_ == layer->name()) {
+                return;
+            }
+            background_ = layer->name();
+            break;
+        case CellLayer::kLiquid:
+            if (liquid_ == layer->name()) {
+                return;
+            }
+            liquid_ = layer->name();
+            break;
+        case CellLayer::kGaz:
+            if (gaz_ == layer->name()) {
+                return;
+            }
+            gaz_ = layer->name();
+            break;
+        case CellLayer::kEnumLength:
+            return;
     }
 
-    if (track_history) {
-        a.registerAction();
-        History::History::push(a);
-    }
-}
-void Cell::setLayer(const Gaz* gaz, bool track_history) {
-    if (gaz->name() == gaz_) {
-        return;
-    }
-
-    CellAction a{this};
-
-    if (gaz) {
-        gaz_ = gaz->name();
-        drawCell();
-    }
-
-    if (track_history) {
-        a.registerAction();
-        History::History::push(a);
-    }
-}
-void Cell::setLayer(const Background* background, bool track_history) {
-    if (background->name() == background_) {
-        return;
-    }
-
-    CellAction a{this};
-
-    if (background) {
-        background_ = background->name();
-        drawCell();
-    }
+    drawCell();
 
     if (track_history) {
         a.registerAction();
@@ -110,17 +96,13 @@ QString Cell::gaz() const { return gaz_; }
 //
 void Cell::onClicked() {
     switch (Tool::toolType()) {
+        case Tool::kBackground:
         case Tool::kLiquid:
-            setLayer(static_cast<const Liquid*>(Tool::cell_layer()));
-            break;
         case Tool::kGaz:
-            setLayer(static_cast<const Gaz*>(Tool::cell_layer()));
+            setLayer(Tool::cell_layer());
             break;
         case Tool::kClear:
             clearLayers();
-            break;
-        case Tool::kBackground:
-            setLayer(static_cast<const Background*>(Tool::cell_layer()));
             break;
         case Tool::kNone:
         case Tool::kEnumLength:
@@ -131,7 +113,8 @@ void Cell::onClicked() {
 // Draws cells depending on its member variables.
 void Cell::drawCell() {
     // Background
-    const auto* background{Background::get(background_)};
+    const auto* background{
+        CellLayer::get(CellLayer::Type::kBackground, background_)};
     if (background == nullptr || background->isEmpty()) {
         if (k_use_default_background_ && k_default_background_ != nullptr)
             *pixmap_ = k_default_background_->scaled(size_, size_);
@@ -155,13 +138,13 @@ void Cell::drawCell() {
     }
 
     // Liquid
-    const auto* liquid{Liquid::get(liquid_)};
+    const auto* liquid{CellLayer::get(CellLayer::Type::kLiquid, liquid_)};
     if (liquid != nullptr && !liquid->isEmpty()) {
         pntr.drawPixmap(0, 0, liquid->pixmap()->scaled(size_, size_));
     }
 
     // Gaz
-    const auto* gaz{Gaz::get(gaz_)};
+    const auto* gaz{CellLayer::get(CellLayer::Type::kGaz, gaz_)};
     if (gaz != nullptr && !gaz->isEmpty()) {
         pntr.drawPixmap(0, 0, gaz->pixmap()->scaled(size_, size_));
     }

@@ -32,21 +32,21 @@ class Tool : public QObject {
 
         emit sender_->toolChanged();
     }
-    static void setTool(const Liquid* liquid) {
-        tool_type_ = kLiquid;
-        cell_layer_ = liquid;
-
-        emit sender_->toolChanged();
-    }
-    static void setTool(const Gaz* gaz) {
-        tool_type_ = kGaz;
-        cell_layer_ = gaz;
-
-        emit sender_->toolChanged();
-    }
-    static void setTool(const Background* background) {
-        tool_type_ = kBackground;
-        cell_layer_ = background;
+    static void setTool(const CellLayer* layer) {
+        switch (layer->type()) {
+            case CellLayer::kBackground:
+                tool_type_ = kBackground;
+                break;
+            case CellLayer::kLiquid:
+                tool_type_ = kLiquid;
+                break;
+            case CellLayer::kGaz:
+                tool_type_ = kGaz;
+                break;
+            case CellLayer::kEnumLength:
+                return;
+        }
+        cell_layer_ = layer;
 
         emit sender_->toolChanged();
     }

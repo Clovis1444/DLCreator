@@ -1,4 +1,4 @@
-# How to add new Cell Layer
+# How to add new Cell Layer(outdated)
 
 ## [1] Create new class
 

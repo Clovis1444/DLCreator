@@ -107,9 +107,7 @@ class Cell : public QLabel {
 
     void setSelected(bool selected = true);
 
-    void setLayer(const Liquid* liquid, bool track_history = true);
-    void setLayer(const Gaz* gaz, bool track_history = true);
-    void setLayer(const Background* background, bool track_history = true);
+    void setLayer(const CellLayer* layer, bool track_history = true);
     void setLayer(const CellInfo& i);
     void clearLayers(bool track_history = true);
     CellInfo info();
