@@ -9,6 +9,7 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
+#include "../components/nameFrame.h"
 #include "collapsibleSection.h"
 #include "toolButton.h"
 
@@ -19,15 +20,23 @@ class ToolWidget : public QFrame {
     explicit ToolWidget(QWidget* parent)
         : QFrame{parent},
           layout_{new QVBoxLayout{this}},
+          layout_name_frame_{new QHBoxLayout{}},
+          name_frame_{new NameFrame{kName, this}},
           layout_refresh_{new QHBoxLayout{}},
           refresh_button_{new QPushButton{"Refresh", this}},
           layout_tools_{new QVBoxLayout{}} {
-        // setFixedWidth(300);
+        setFixedWidth(kWidth);
 
         // Main layout
         layout_->setContentsMargins(0, 0, 0, 0);
         layout_->setSpacing(10);
         setLayout(layout_);
+
+        // Name frame layout
+        layout_->addLayout(layout_name_frame_);
+        layout_name_frame_->setContentsMargins(0, 0, 0, 0);
+        layout_name_frame_->setSpacing(0);
+        layout_name_frame_->addWidget(name_frame_);
 
         // Refresh button layout
         layout_->addLayout(layout_refresh_);
@@ -100,9 +109,15 @@ class ToolWidget : public QFrame {
 
     QVBoxLayout* layout_;
 
+    QHBoxLayout* layout_name_frame_;
+    NameFrame* name_frame_;
+
     QHBoxLayout* layout_refresh_;
     QPushButton* refresh_button_;
 
     QVBoxLayout* layout_tools_;
     QList<CollapsibleSection*> tool_sections_;
+
+    inline static const QString kName{"Tools"};
+    inline static constexpr int kWidth{300};
 };

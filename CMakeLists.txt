@@ -24,6 +24,7 @@ set(PROJECT_SOURCES
         src/mainWindow.h
         src/mainWindow.ui
         src/tool.h
+        src/history.h
         src/widgets/toolWidget/collapsibleSection.h
         src/widgets/toolWidget/toolButton.h
         src/widgets/toolWidget/toolWidget.h
@@ -38,7 +39,7 @@ set(PROJECT_SOURCES
         src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellAction.h
         src/widgets/historyWidget/historyWidget.h
         src/widgets/historyWidget/cellActionWidget.h
-        src/history.h
+        src/widgets/components/nameFrame.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

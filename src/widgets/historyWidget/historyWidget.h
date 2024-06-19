@@ -2,25 +2,46 @@
 
 #include <qboxlayout.h>
 #include <qframe.h>
+#include <qlayoutitem.h>
 #include <qlist.h>
 #include <qnamespace.h>
 #include <qpushbutton.h>
+#include <qscrollarea.h>
+#include <qsizepolicy.h>
 #include <qtmetamacros.h>
 
 #include "../../history.h"
+#include "../components/nameFrame.h"
 #include "cellActionWidget.h"
 
-// TODO(clovis): make it ScrollWidget
-class HistoryWidget : public QFrame {
+class HistoryWidget : public QScrollArea {
     Q_OBJECT
 
    public:
     explicit HistoryWidget(QWidget* parent)
-        : QFrame{parent}, layout_{new QVBoxLayout{this}} {
-        setFixedWidth(k_widget_width_);
-
+        : QScrollArea{parent},
+          name_frame_{new NameFrame{kName, this}},
+          layout_{new QVBoxLayout{this}},
+          content_{new QFrame{this}},
+          content_layout_{new QVBoxLayout{content_}} {
+        // Layout
         setLayout(layout_);
-        layout_->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+        layout_->setContentsMargins(0, 0, 0, 0);
+        layout_->setAlignment(Qt::AlignTop);
+        layout_->addWidget(name_frame_);
+
+        setFixedWidth(kWidgetWidth);
+
+        // Content layout
+        content_layout_->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+        int top_margin{name_frame_->height() +
+                       content_layout_->contentsMargins().top()};
+        content_layout_->setContentsMargins(0, top_margin, 0, 0);
+        content_->setLayout(content_layout_);
+
+        // Content
+        setWidgetResizable(true);
+        setWidget(content_);
 
         QObject::connect(History::History::signalSender(),
                          &History::History::pushed, this,
@@ -28,8 +49,8 @@ class HistoryWidget : public QFrame {
     }
 
     void addWidget(const CellAction& action) {
-        auto* widget{new CellActionWidget{this, action}};
-        layout_->insertWidget(0, widget);
+        auto* widget{new CellActionWidget{content_, action}};
+        content_layout_->insertWidget(0, widget);
         widgets_.push_back(widget);
 
         QObject::connect(
@@ -52,8 +73,12 @@ class HistoryWidget : public QFrame {
     }
 
    protected:
+    NameFrame* name_frame_;
     QVBoxLayout* layout_;
+    QFrame* content_;
+    QVBoxLayout* content_layout_;
     QList<CellActionWidget*> widgets_;
 
-    inline static int k_widget_width_{100};
+    inline static constexpr int kWidgetWidth{150};
+    inline static const QString kName{"Action History"};
 };

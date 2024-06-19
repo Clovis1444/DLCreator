@@ -131,7 +131,6 @@ class CellCollection : public QWidget {
     }
 
     // This function MUST be called only in mouseReleaseEvent and before
-    // changed_cells_.clear()
     void pushToHistory() {
         QList<CellAction> list{};
         for (auto* i : selected_cells_) {
