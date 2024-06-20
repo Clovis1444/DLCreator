@@ -37,8 +37,9 @@ set(PROJECT_SOURCES
         src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.h
         src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.cpp
         src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellAction.h
-        src/widgets/historyWidget/historyWidget.h
-        src/widgets/historyWidget/cellActionWidget.h
+        src/widgets/tabWidget/stackedHistoryWidget/stackedHistoryWidget.h
+        src/widgets/tabWidget/stackedHistoryWidget/historyWidget/historyWidget.h
+        src/widgets/tabWidget/stackedHistoryWidget/historyWidget/cellActionWidget.h
         src/widgets/components/nameFrame.h
 )
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <qcontainerfwd.h>
+#include <qhash.h>
 #include <qlist.h>
 #include <qobject.h>
 #include <qtmetamacros.h>
@@ -11,23 +13,37 @@ class History : public QObject {
     Q_OBJECT
 
    public:
-    inline static void push(const CellAction& action) {
-        actions_.push_back(action);
+    inline static void push(QWidget* w, const CellAction& action) {
+        if (w == nullptr) {
+            return;
+        }
+
+        actions_[w].push_back(action);
+
+        last_action_ = {w, action};
 
         emit signalSender() -> pushed();
     }
 
-    inline static void undo(const CellAction& action) {
-        for (auto i : actions_) {
+    inline static void remove(QWidget* w) { actions_.remove(w); }
+
+    inline static void undo(QWidget* w, const CellAction& action) {
+        if (!actions_.contains(w)) {
+            return;
+        }
+
+        for (auto i : actions_[w]) {
             if (i == action) {
                 i.undo();
-                actions_.removeOne(i);
+                actions_[w].removeOne(i);
                 return;
             }
         }
     }
 
-    inline static CellAction last() { return actions_.last(); }
+    inline static const QPair<QWidget*, CellAction>& last() {
+        return last_action_;
+    }
 
     inline static History* signalSender() {
         if (sender_ == nullptr) {
@@ -42,6 +58,8 @@ class History : public QObject {
    protected:
     inline static History* sender_{nullptr};
 
-    inline static QList<CellAction> actions_{};
+    inline static QHash<QWidget*, QList<CellAction>> actions_{};
+
+    inline static QPair<QWidget*, CellAction> last_action_{};
 };
 }  // namespace History

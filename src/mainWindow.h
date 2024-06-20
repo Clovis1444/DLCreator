@@ -9,7 +9,6 @@
 
 #include <QMainWindow>
 
-#include "widgets/historyWidget/historyWidget.h"
 #include "widgets/tabWidget/tabWidget.h"
 #include "widgets/toolWidget/toolWidget.h"
 
@@ -43,6 +42,5 @@ class MainWindow : public QMainWindow {
     Ui::MainWindow *ui_;
     TabWidget *tabWidget_;
     ToolWidget *toolWidget_;
-    HistoryWidget *historyWidget_;
 };
 #endif  // MAINWINDOW_H

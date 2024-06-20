@@ -23,14 +23,11 @@ class ContentWidget : public QScrollArea {
    public:
     explicit ContentWidget(QWidget* parent,
                            unsigned int size = kDefaultContentWidgetSize)
-        : QScrollArea(parent) {
+        : QScrollArea(parent), content_{new CellCollection{this, size}} {
         // CellColection widget alignment
         setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
-        // Content widget
-        auto* content = new CellCollection{this, size};
-        content_ = content;
 
-        setWidget(content);
+        setWidget(content_);
     }
 
    protected:

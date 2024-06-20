@@ -139,7 +139,7 @@ class CellCollection : public QWidget {
         auto action{CellAction{list}};
 
         if (action.changed()) {
-            History::History::push(action);
+            History::History::push(this, action);
         }
     }
 

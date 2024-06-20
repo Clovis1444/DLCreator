@@ -13,14 +13,12 @@
 
 #include "./ui_mainWindow.h"
 #include "settings.h"
-#include "widgets/historyWidget/historyWidget.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
       ui_(new Ui::MainWindow),
       tabWidget_{new TabWidget{this}},
-      toolWidget_{new ToolWidget{this}},
-      historyWidget_{new HistoryWidget{this}} {
+      toolWidget_{new ToolWidget{this}} {
     // Setup from .ui file
     ui_->setupUi(this);
 
@@ -31,9 +29,6 @@ MainWindow::MainWindow(QWidget* parent)
 
     // Add TabWidget
     ui_->centralwidget->layout()->addWidget(tabWidget_);
-
-    // Add HistoryWidget
-    ui_->centralwidget->layout()->addWidget(historyWidget_);
 
     //
 
@@ -107,7 +102,7 @@ void MainWindow::onActionTabs() {
 }
 
 void MainWindow::onActionHistory() {
-    historyWidget_->setVisible(ui_->actionHistory->isChecked());
+    tabWidget_->setHistoryVisible(ui_->actionHistory->isChecked());
 }
 
 void MainWindow::onActionExit() { QApplication::quit(); }

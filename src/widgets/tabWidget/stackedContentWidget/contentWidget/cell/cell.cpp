@@ -54,7 +54,7 @@ void Cell::setLayer(const CellLayer* layer, bool track_history) {
 
     if (track_history) {
         a.registerAction();
-        History::History::push(a);
+        History::History::push(parentWidget(), a);
     }
 }
 void Cell::setLayer(const CellInfo& i) {
@@ -81,7 +81,7 @@ void Cell::clearLayers(bool track_history) {
 
     if (track_history) {
         a.registerAction();
-        History::History::push(a);
+        History::History::push(parentWidget(), a);
     }
 }
 

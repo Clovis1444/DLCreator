@@ -18,12 +18,13 @@ class HistoryWidget : public QScrollArea {
     Q_OBJECT
 
    public:
-    explicit HistoryWidget(QWidget* parent)
+    HistoryWidget(QWidget* parent, QWidget* target)
         : QScrollArea{parent},
           name_frame_{new NameFrame{kName, this}},
           layout_{new QVBoxLayout{this}},
           content_{new QFrame{this}},
-          content_layout_{new QVBoxLayout{content_}} {
+          content_layout_{new QVBoxLayout{content_}},
+          target_{target} {
         // Layout
         setLayout(layout_);
         layout_->setContentsMargins(0, 0, 0, 0);
@@ -47,6 +48,7 @@ class HistoryWidget : public QScrollArea {
                          &History::History::pushed, this,
                          &HistoryWidget::onHistoryPushed);
     }
+    ~HistoryWidget() override { History::History::remove(target_); }
 
     void addWidget(const CellAction& action) {
         auto* widget{new CellActionWidget{content_, action}};
@@ -59,10 +61,17 @@ class HistoryWidget : public QScrollArea {
     }
 
    protected slots:
-    void onHistoryPushed() { addWidget(History::History::last()); };
+    void onHistoryPushed() {
+        auto pair{History::History::last()};
+        if (pair.first != target_) {
+            return;
+        }
+
+        addWidget(pair.second);
+    };
 
     void undoActionAndDeleteActionWidget(CellActionWidget* w) {
-        History::History::undo(w->action());
+        History::History::undo(target_, w->action());
 
         removeWidget(w);
     };
@@ -78,6 +87,7 @@ class HistoryWidget : public QScrollArea {
     QFrame* content_;
     QVBoxLayout* content_layout_;
     QList<CellActionWidget*> widgets_;
+    QWidget* target_;
 
     inline static constexpr int kWidgetWidth{150};
     inline static const QString kName{"Action History"};

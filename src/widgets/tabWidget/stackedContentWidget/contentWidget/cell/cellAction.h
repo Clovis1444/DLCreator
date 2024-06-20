@@ -65,6 +65,7 @@ class CellAction : public QObject {
         }
 
         actions_ = other.actions_;
+        action_name_ = other.action_name_;
 
         return *this;
     }
