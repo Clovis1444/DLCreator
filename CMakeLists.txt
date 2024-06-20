@@ -67,6 +67,9 @@ endif()
 
 target_link_libraries(DLCreator PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
+# Add project dir to the include path
+target_include_directories(DLCreator PRIVATE "${CMAKE_SOURCE_DIR}")
+
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.

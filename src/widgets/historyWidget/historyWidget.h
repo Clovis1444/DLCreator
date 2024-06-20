@@ -10,9 +10,9 @@
 #include <qsizepolicy.h>
 #include <qtmetamacros.h>
 
-#include "../../history.h"
-#include "../components/nameFrame.h"
 #include "cellActionWidget.h"
+#include "src/history.h"
+#include "src/widgets/components/nameFrame.h"
 
 class HistoryWidget : public QScrollArea {
     Q_OBJECT

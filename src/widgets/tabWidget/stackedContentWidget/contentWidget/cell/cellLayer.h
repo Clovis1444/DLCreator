@@ -18,7 +18,7 @@
 #include <cassert>
 #include <utility>
 
-#include "../../../../../settings.h"
+#include "src/settings.h"
 
 class CellLayer {
    public:

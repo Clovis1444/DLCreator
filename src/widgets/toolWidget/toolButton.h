@@ -3,8 +3,8 @@
 #include <qpushbutton.h>
 #include <qtmetamacros.h>
 
-#include "../../tool.h"
-#include "../tabWidget/stackedContentWidget/contentWidget/cell/cellLayer.h"
+#include "src/tool.h"
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellLayer.h"
 
 class ToolButton : public QPushButton {
     Q_OBJECT

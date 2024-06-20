@@ -9,8 +9,8 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
-#include "../components/nameFrame.h"
 #include "collapsibleSection.h"
+#include "src/widgets/components/nameFrame.h"
 #include "toolButton.h"
 
 class ToolWidget : public QFrame {

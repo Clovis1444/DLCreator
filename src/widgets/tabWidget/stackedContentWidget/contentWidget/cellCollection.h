@@ -18,10 +18,10 @@
 
 #include <QWheelEvent>
 
-#include "../../../../history.h"
-#include "../../../../tool.h"
 #include "cell/cell.h"
 #include "cell/cellAction.h"
+#include "src/history.h"
+#include "src/tool.h"
 
 class CellCollection : public QWidget {
     Q_OBJECT

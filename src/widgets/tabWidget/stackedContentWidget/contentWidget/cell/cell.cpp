@@ -1,8 +1,8 @@
 #include "cell.h"
 
-#include "../../../../../history.h"
-#include "../../../../../tool.h"
 #include "cellAction.h"
+#include "src/history.h"
+#include "src/tool.h"
 
 Cell::Cell(QWidget* parent, int cell_size, QColor background_color)
     : QLabel{parent},
