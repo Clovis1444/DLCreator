@@ -7,4 +7,3 @@
 - add destructors
 
 - Fix bug when user can use `Tool` associated with deleted `CellLayer`
-- Consider refactor `History` to avoid multiple checks in `HistoryWidget`
