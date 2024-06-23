@@ -22,8 +22,9 @@ class ContentWidget : public QScrollArea {
 
    public:
     explicit ContentWidget(QWidget* parent,
-                           unsigned int size = kDefaultContentWidgetSize)
+                           int size = kDefaultContentWidgetSize)
         : QScrollArea(parent), content_{new CellCollection{this, size}} {
+        setWidgetResizable(true);
         // CellColection widget alignment
         setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
 
@@ -43,6 +44,9 @@ class ContentWidget : public QScrollArea {
             case Qt::Key_Delete:
                 content_->clearSelectedCells();
                 break;
+            case Qt::Key_Shift:
+                content_->SwitchExpandButtons(false);
+                break;
             default:
                 break;
         }
@@ -50,7 +54,15 @@ class ContentWidget : public QScrollArea {
             content_->unselectCells();
         };
 
-        QAbstractScrollArea::keyPressEvent(e);
+        QScrollArea::keyPressEvent(e);
+    }
+
+    void keyReleaseEvent(QKeyEvent* e) override {
+        if (e->key() == Qt::Key_Shift) {
+            content_->SwitchExpandButtons(true);
+        }
+
+        QScrollArea::keyReleaseEvent(e);
     }
 
    private:

@@ -1,15 +1,20 @@
 #include "cell.h"
 
+#include <qsizepolicy.h>
+
 #include "cellAction.h"
 #include "src/history.h"
 #include "src/tool.h"
 
-Cell::Cell(QWidget* parent, int cell_size, QColor background_color)
+Cell::Cell(QWidget* parent, QPoint pos, int cell_size, QColor background_color)
     : QLabel{parent},
+      pos_{pos},
       background_color_{background_color},
       size_{cell_size},
       pixmap_{new QPixmap{size_, size_}} {
     setFixedSize(kCellSize, kCellSize);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
     drawCell();
 
     QObject::connect(this, &Cell::clicked, this, &Cell::onClicked);
@@ -29,22 +34,22 @@ void Cell::setLayer(const CellLayer* layer, bool track_history) {
 
     switch (layer->type()) {
         case CellLayer::kBackground:
-            if (background_ == layer->name()) {
+            if (layer_background_ == layer->name()) {
                 return;
             }
-            background_ = layer->name();
+            layer_background_ = layer->name();
             break;
         case CellLayer::kLiquid:
-            if (liquid_ == layer->name()) {
+            if (layer_liquid_ == layer->name()) {
                 return;
             }
-            liquid_ = layer->name();
+            layer_liquid_ = layer->name();
             break;
         case CellLayer::kGaz:
-            if (gaz_ == layer->name()) {
+            if (layer_gaz_ == layer->name()) {
                 return;
             }
-            gaz_ = layer->name();
+            layer_gaz_ = layer->name();
             break;
         case CellLayer::kEnumLength:
             return;
@@ -62,21 +67,21 @@ void Cell::setLayer(const CellInfo& i) {
         return;
     }
 
-    background_ = i.background;
-    liquid_ = i.liquid;
-    gaz_ = i.gaz;
+    layer_background_ = i.background;
+    layer_liquid_ = i.liquid;
+    layer_gaz_ = i.gaz;
 
     drawCell();
 }
 void Cell::clearLayers(bool track_history) {
-    if (liquid_.isEmpty() && gaz_.isEmpty()) {
+    if (layer_liquid_.isEmpty() && layer_gaz_.isEmpty()) {
         return;
     }
 
     CellAction a{this};
 
-    liquid_.clear();
-    gaz_.clear();
+    layer_liquid_.clear();
+    layer_gaz_.clear();
     drawCell();
 
     if (track_history) {
@@ -85,11 +90,16 @@ void Cell::clearLayers(bool track_history) {
     }
 }
 
-Cell::CellInfo Cell::info() { return CellInfo{background_, liquid_, gaz_}; }
+Cell::CellInfo Cell::info() {
+    return CellInfo{layer_background_, layer_liquid_, layer_gaz_};
+}
 
-QString Cell::background() const { return background_; }
-QString Cell::liquid() const { return liquid_; }
-QString Cell::gaz() const { return gaz_; }
+QString Cell::background() const { return layer_background_; }
+QString Cell::liquid() const { return layer_liquid_; }
+QString Cell::gaz() const { return layer_gaz_; }
+
+QPoint Cell::pos() const { return pos_; }
+void Cell::setPos(QPoint pos) { pos_ = pos; }
 
 //
 // Slots
@@ -114,7 +124,7 @@ void Cell::onClicked() {
 void Cell::drawCell() {
     // Background
     const auto* background{
-        CellLayer::get(CellLayer::Type::kBackground, background_)};
+        CellLayer::get(CellLayer::Type::kBackground, layer_background_)};
     if (background == nullptr || background->isEmpty()) {
         if (k_use_default_background_ && k_default_background_ != nullptr)
             *pixmap_ = k_default_background_->scaled(size_, size_);
@@ -138,13 +148,13 @@ void Cell::drawCell() {
     }
 
     // Liquid
-    const auto* liquid{CellLayer::get(CellLayer::Type::kLiquid, liquid_)};
+    const auto* liquid{CellLayer::get(CellLayer::Type::kLiquid, layer_liquid_)};
     if (liquid != nullptr && !liquid->isEmpty()) {
         pntr.drawPixmap(0, 0, liquid->pixmap()->scaled(size_, size_));
     }
 
     // Gaz
-    const auto* gaz{CellLayer::get(CellLayer::Type::kGaz, gaz_)};
+    const auto* gaz{CellLayer::get(CellLayer::Type::kGaz, layer_gaz_)};
     if (gaz != nullptr && !gaz->isEmpty()) {
         pntr.drawPixmap(0, 0, gaz->pixmap()->scaled(size_, size_));
     }

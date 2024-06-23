@@ -32,8 +32,9 @@ set(PROJECT_SOURCES
         src/widgets/tabWidget/tabScrollArea/tabScrollArea.h
         src/widgets/tabWidget/tabScrollArea/tabButton.h
         src/widgets/tabWidget/stackedContentWidget/stackedContentWidget.h
-        src/widgets/tabWidget/stackedContentWidget/contentWidget/contentWidget.h
         src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h
+        src/widgets/tabWidget/stackedContentWidget/contentWidget/contentWidget.h
+        src/widgets/tabWidget/stackedContentWidget/contentWidget/expandButton.h
         src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.h
         src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.cpp
         src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellAction.h

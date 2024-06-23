@@ -16,20 +16,29 @@ class CellAction : public QObject {
    public:
     explicit CellAction(Cell* cell) {
         actions_.append(QPair<Cell*, Cell::CellInfo>{cell, cell->info()});
+
+        make_connect();
     }
     explicit CellAction(const QList<Cell*>& cells) {
         for (auto* i : cells) {
             actions_.append(QPair<Cell*, Cell::CellInfo>{i, i->info()});
         }
+
+        make_connect();
     }
     CellAction(const CellAction& other)
-        : actions_{other.actions_}, action_name_{other.action_name_} {};
+        : actions_{other.actions_}, action_name_{other.action_name_} {
+        make_connect();
+    };
     explicit CellAction(const QList<CellAction>& list) {
         for (const auto& i : list) {
             actions_.append(i.actions_);
         }
         registerAction();
+
+        make_connect();
     }
+
     CellAction() = default;
 
     // TODO(clovis): implement proper action name/action tooltip
@@ -42,7 +51,9 @@ class CellAction : public QObject {
 
     void undo() {
         for (auto i : actions_) {
-            i.first->setLayer(i.second);
+            if (i.first != nullptr) {
+                i.first->setLayer(i.second);
+            }
         }
     }
 
@@ -75,6 +86,14 @@ class CellAction : public QObject {
     }
 
    protected:
+    // TODO(clovis): fix terminal error(use disconnect()?)
+    void make_connect() {
+        for (auto& i : actions_) {
+            QObject::connect(i.first, &Cell::destroyed, this,
+                             [&] { i.first = nullptr; });
+        }
+    }
+
     QList<QPair<Cell*, Cell::CellInfo>> actions_;
 
     QString action_name_;

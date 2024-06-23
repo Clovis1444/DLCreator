@@ -14,7 +14,7 @@ class Cell : public QLabel {
     Q_OBJECT
 
    public:
-    explicit Cell(QWidget* parent, int cell_size = kCellSize,
+    explicit Cell(QWidget* parent, QPoint pos, int cell_size = kCellSize,
                   QColor background_color = kDefaultBackgroundColor);
 
     struct CellInfo {
@@ -116,6 +116,9 @@ class Cell : public QLabel {
     QString liquid() const;
     QString gaz() const;
 
+    QPoint pos() const;
+    void setPos(QPoint pos);
+
    signals:
     void clicked();
 
@@ -129,12 +132,14 @@ class Cell : public QLabel {
     void mousePressEvent(QMouseEvent* e) override;
     void mouseReleaseEvent(QMouseEvent* e) override;
 
+    QPoint pos_;
+
     QColor background_color_;
     int size_{};
     QPixmap* pixmap_;
-    QString background_;
-    QString liquid_;
-    QString gaz_;
+    QString layer_background_;
+    QString layer_liquid_;
+    QString layer_gaz_;
     bool selected_{false};
 
     QPoint click_pos_;
