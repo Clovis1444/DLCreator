@@ -86,11 +86,12 @@ class CellAction : public QObject {
     }
 
    protected:
-    // TODO(clovis): fix terminal error(use disconnect()?)
     void make_connect() {
         for (auto& i : actions_) {
-            QObject::connect(i.first, &Cell::destroyed, this,
-                             [&] { i.first = nullptr; });
+            if (i.first != nullptr) {
+                QObject::connect(i.first, &QObject::destroyed, this,
+                                 [&] { i.first = nullptr; });
+            }
         }
     }
 

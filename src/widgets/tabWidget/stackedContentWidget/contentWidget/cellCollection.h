@@ -35,7 +35,7 @@ class CellCollection : public QWidget {
 
    public:
     CellCollection(QWidget* parent, int size)
-        : QWidget{parent}, size_hor_{size}, size_ver_{size} {
+        : QWidget{parent}, cols_{size}, rows_{size} {
         // Grid layout
         layout_->setContentsMargins(0, 0, 0, 0);
         layout_->setSpacing(0);
@@ -84,7 +84,7 @@ class CellCollection : public QWidget {
 
     bool hasSelection() { return !selected_cells_.isEmpty(); }
 
-    QPair<int, int> gridSize() { return {size_hor_, size_ver_}; }
+    QPair<int, int> gridSize() { return {cols_, rows_}; }
 
     void resizeGrid(ExpandDirection d, bool expand = true) {
         if (expand) {
@@ -182,21 +182,20 @@ class CellCollection : public QWidget {
     }
 
     void placeExpandButtons() {
-        layout_->addWidget(expand_buttons_[kUp], 0, 1, 1, size_hor_);
+        layout_->addWidget(expand_buttons_[kUp], 0, 1, 1, cols_);
 
-        layout_->addWidget(expand_buttons_[kDown], size_ver_ + 1, 1, 1,
-                           size_hor_);
+        layout_->addWidget(expand_buttons_[kDown], rows_ + 1, 1, 1, cols_);
 
-        layout_->addWidget(expand_buttons_[kLeft], 1, 0, size_ver_, 1);
+        layout_->addWidget(expand_buttons_[kLeft], 1, 0, rows_, 1);
 
-        layout_->addWidget(expand_buttons_[kRight], 1, size_hor_ + 1, size_ver_,
-                           1);
+        layout_->addWidget(expand_buttons_[kRight], 1, cols_ + 1, rows_, 1);
     }
 
+    // TODO(clovis): refactor this like shrinkGrid?
     void expandGrid(ExpandDirection d) {
         switch (d) {
             case kUp:
-                if (size_ver_ <= 0) {
+                if (rows_ <= 0) {
                     return;
                 }
 
@@ -210,24 +209,24 @@ class CellCollection : public QWidget {
                 }
 
                 // Place new cells
-                for (int i{1}; i <= size_hor_; ++i) {
+                for (int i{1}; i <= cols_; ++i) {
                     auto* cell{new Cell{this, {i, 1}}};
 
                     addCell(cell);
                 }
 
-                ++size_ver_;
+                ++rows_;
                 break;
             case kDown:
-                for (int i{1}; i <= size_hor_; ++i) {
-                    auto* cell{new Cell{this, {i, size_ver_ + 1}}};
+                for (int i{1}; i <= cols_; ++i) {
+                    auto* cell{new Cell{this, {i, rows_ + 1}}};
 
                     addCell(cell);
                 }
-                ++size_ver_;
+                ++rows_;
                 break;
             case kLeft:
-                if (size_hor_ <= 0) {
+                if (cols_ <= 0) {
                     return;
                 }
 
@@ -241,21 +240,21 @@ class CellCollection : public QWidget {
                 }
 
                 // Place new cells
-                for (int j{1}; j <= size_ver_; ++j) {
+                for (int j{1}; j <= rows_; ++j) {
                     auto* cell{new Cell{this, {1, j}}};
 
                     addCell(cell);
                 }
 
-                ++size_hor_;
+                ++cols_;
                 break;
             case kRight:
-                for (int j{1}; j <= size_ver_; ++j) {
-                    auto* cell{new Cell{this, {size_hor_ + 1, j}}};
+                for (int j{1}; j <= rows_; ++j) {
+                    auto* cell{new Cell{this, {cols_ + 1, j}}};
 
                     addCell(cell);
                 }
-                ++size_hor_;
+                ++cols_;
                 break;
             case kEnumLength:
                 return;
@@ -264,105 +263,75 @@ class CellCollection : public QWidget {
         placeExpandButtons();
     }
     void shrinkGrid(ExpandDirection d) {
-        switch (d) {
-            case kUp: {
-                if (size_ver_ <= 1) {
-                    return;
-                }
+        // TODO(clovis): reduce amount of parameters to two bools?
+        auto func = [this](int position, bool UpOrLeft, int& size_to_change,
+                           bool LeftOrRight) {
+            //
+            if (size_to_change <= 1) {
+                return;
+            }
 
-                QList<Cell*> to_remove{};
-                for (auto* i : cells_) {
-                    auto pos{i->pos()};
-                    if (pos.y() == 1) {
+            //
+            QList<Cell*> to_remove{};
+            for (auto* i : cells_) {
+                auto pos{i->pos()};
+                //
+                if (LeftOrRight) {
+                    if (pos.x() == position) {
                         to_remove.push_back(i);
                     }
                     // Update Remaining Cells pos
                     else {
-                        pos.setY(pos.y() - 1);
-                        i->setPos(pos);
-                        layout_->addWidget(i, pos.y(), pos.x());
+                        //
+                        if (UpOrLeft) {
+                            pos.setX(pos.x() - 1);
+                            i->setPos(pos);
+                            layout_->addWidget(i, pos.y(), pos.x());
+                        }
                     }
                 }
-                // Remove cells
-                for (auto* i : to_remove) {
-                    cells_.removeOne(i);
-                    selected_cells_.removeOne(i);
-                    delete i;
+                //
+                if (!LeftOrRight) {
+                    if (pos.y() == position) {
+                        to_remove.push_back(i);
+                    }
+                    // Update Remaining Cells pos
+                    else {
+                        //
+                        if (UpOrLeft) {
+                            pos.setY(pos.y() - 1);
+                            i->setPos(pos);
+                            layout_->addWidget(i, pos.y(), pos.x());
+                        }
+                    }
                 }
+            }
+            // Remove cells
+            for (auto* i : to_remove) {
+                cells_.removeOne(i);
+                selected_cells_.removeOne(i);
+                delete i;
+            }
 
-                --size_ver_;
+            //
+            --size_to_change;
+        };
+
+        switch (d) {
+            case kUp: {
+                func(1, true, rows_, false);
                 break;
             }
             case kDown: {
-                if (size_ver_ <= 1) {
-                    return;
-                }
-
-                QList<Cell*> to_remove{};
-                for (auto* i : cells_) {
-                    auto pos{i->pos()};
-                    if (pos.y() == size_ver_) {
-                        to_remove.push_back(i);
-                    }
-                }
-                // Remove cells
-                for (auto* i : to_remove) {
-                    cells_.removeOne(i);
-                    selected_cells_.removeOne(i);
-                    delete i;
-                }
-
-                --size_ver_;
+                func(rows_, false, rows_, false);
                 break;
             }
             case kLeft: {
-                if (size_hor_ <= 1) {
-                    return;
-                }
-
-                QList<Cell*> to_remove{};
-                for (auto* i : cells_) {
-                    auto pos{i->pos()};
-                    if (pos.x() == 1) {
-                        to_remove.push_back(i);
-                    }
-                    // Update Remaining Cells pos
-                    else {
-                        pos.setX(pos.x() - 1);
-                        i->setPos(pos);
-                        layout_->addWidget(i, pos.y(), pos.x());
-                    }
-                }
-                // Remove cells
-                for (auto* i : to_remove) {
-                    cells_.removeOne(i);
-                    selected_cells_.removeOne(i);
-                    delete i;
-                }
-
-                --size_hor_;
+                func(1, true, cols_, true);
                 break;
             }
             case kRight: {
-                if (size_hor_ <= 1) {
-                    return;
-                }
-
-                QList<Cell*> to_remove{};
-                for (auto* i : cells_) {
-                    auto pos{i->pos()};
-                    if (pos.x() == size_hor_) {
-                        to_remove.push_back(i);
-                    }
-                }
-                // Remove cells
-                for (auto* i : to_remove) {
-                    cells_.removeOne(i);
-                    selected_cells_.removeOne(i);
-                    delete i;
-                }
-
-                --size_hor_;
+                func(cols_, false, cols_, true);
                 break;
             }
             case kEnumLength:
@@ -431,11 +400,11 @@ class CellCollection : public QWidget {
 
    private:
     int scale_{1};
-    int size_hor_;
-    int size_ver_;
+    int cols_;
+    int rows_;
     QGridLayout* layout_{new QGridLayout{this}};
-    // TODO(clovis): change QList to a proper data type. Consider something like
-    // QHash<QPoint, Cell*>
+    // TODO(clovis): change(?) QList to a proper data type. Consider something
+    // like QHash<QPoint, Cell*>
     QList<Cell*> cells_;
     QList<Cell*> selected_cells_;
 

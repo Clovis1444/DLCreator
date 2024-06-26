@@ -5,8 +5,6 @@
 - Implement zoom
 - add destructors
 
-- Get rid of code duplication in `CellCollection::expandGrid()` and `CellCollection::shrinkGrid()`
-
 - Make all keyboard shortcuts `MainWindow` wide?
 - Fix bug when user can use `Tool` associated with deleted `CellLayer`
 - Consider implement History tracking when add/remove `Cell` to/from `CellCollection`
