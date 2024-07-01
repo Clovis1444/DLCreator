@@ -9,7 +9,7 @@ defaults:
 
 env:
   SOURCE_DIR:   ${{ github.workspace }}
-  QT_VERSION:   6.2.*
+  QT_VERSION:   6.7.2
   ARTIFACT:     qt-planets-linux-build.AppImage
 
 jobs:
@@ -30,8 +30,7 @@ jobs:
         target:       desktop
         arch:         linux_gcc_64
         dir:          ${{ runner.temp }}
-        modules:      qtcharts qt3d
         setup-python: false
 
-    - name: Check
-      run: aqt list-qt linux desktop --arch 6.7.2
+    # - name: Check
+    #   run: aqt list-qt linux desktop --arch 6.7.2
