@@ -9,7 +9,7 @@ defaults:
 
 env:
   SOURCE_DIR:   ${{ github.workspace }}
-  QT_VERSION:   6.7.2
+  QT_VERSION:   6.2.*
   ARTIFACT:     qt-planets-linux-build.AppImage
 
 jobs:
@@ -17,13 +17,13 @@ jobs:
     runs-on:  ubuntu-20.04
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
+    #   - name: Checkout repo
+    #     uses: actions/checkout@v2
+    #     with:
+    #       submodules: recursive
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2
+        uses: jurplel/install-qt-action@v4
         with:
           version:      ${{ env.QT_VERSION }}
           host:         linux
@@ -32,30 +32,3 @@ jobs:
           dir:          ${{ runner.temp }}
           modules:      qtcharts qt3d
           setup-python: false
-              
-      - name: Create build directory
-        run:  mkdir ${{ env.SOURCE_DIR }}/build
-
-      - name: Build
-        working-directory: ${{ env.SOURCE_DIR }}/build
-        run:  |
-              qmake -r ${{ env.SOURCE_DIR }}/planets-qml.pro
-              make
-              
-      - name: AppImage
-        working-directory: ${{ env.SOURCE_DIR }}/build
-        run: |
-          wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
-          chmod +x deploy.AppImage
-          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/5.15.2/gcc_64/lib/
-          cp ${{ env.SOURCE_DIR }}/linux/* .
-          ./deploy.AppImage planets-qml.desktop -appimage -no-translations -qmldir=${{ env.SOURCE_DIR }} -extra-plugins=renderers
-          mv Qt_planets_app*.AppImage ${{ env.ARTIFACT }}          
-      
-      - name: Linux artefact
-        uses: actions/upload-artifact@v1
-        with:
-          name: ${{ env.ARTIFACT }}
-          path: ${{ env.SOURCE_DIR }}/build/${{ env.ARTIFACT }}
-
-              
