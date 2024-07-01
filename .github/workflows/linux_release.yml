@@ -9,7 +9,7 @@ defaults:
 
 env:
   SOURCE_DIR:   ${{ github.workspace }}
-  QT_VERSION:   6.8.0
+  QT_VERSION:   6.7.2
   ARTIFACT:     qt-planets-linux-build.AppImage
 
 jobs:
@@ -17,10 +17,20 @@ jobs:
     runs-on:  ubuntu-20.04
 
     steps:
-    #   - name: Checkout repo
-    #     uses: actions/checkout@v2
-    #     with:
-    #       submodules: recursive
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+          submodules: recursive
+
+    - name: Setup Ninja
+      uses: seanmiddleditch/gha-setup-ninja@v4
+
+    - name: Setup CMake
+      uses: threeal/cmake-action@main
+      with:
+        generator: Ninja
+        c-compiler: clang
+        cxx-compiler: clang++
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
@@ -32,5 +42,5 @@ jobs:
         dir:          ${{ runner.temp }}
         setup-python: false
 
-    # - name: Check
-    #   run: aqt list-qt linux desktop --arch 6.7.2
+    - name: Create build directory
+      run:  mkdir ${{ env.SOURCE_DIR }}/build
