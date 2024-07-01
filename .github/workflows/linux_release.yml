@@ -50,14 +50,7 @@ jobs:
       run:  mkdir ${{ env.SOURCE_DIR }}/build
 
     - name: Build
-      run:  cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_C_COMPILER:FILEPATH=clang -DCMAKE_CXX_COMPILER:FILEPATH=clang++ -S${{ env.SOURCE_DIR }} -B${{ env.SOURCE_DIR }}/build -G Ninja
-
-    - name: AppImage
-      working-directory: ${{ env.SOURCE_DIR }}/build
-      run: |
-        wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
-        chmod +x deploy.AppImage
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/5.15.2/gcc_64/lib/
-        cp ${{ env.SOURCE_DIR }}/linux/* .
-        ./deploy.AppImage planets-qml.desktop -appimage -no-translations -qmldir=${{ env.SOURCE_DIR }} -extra-plugins=renderers
-        mv Qt_planets_app*.AppImage ${{ env.ARTIFACT }}  
+      run:  cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_C_COMPILER:FILEPATH=clang -DCMAKE_CXX_COMPILER:FILEPATH=clang++ -S${{ env.SOURCE_DIR }} -B${{ env.SOURCE_DIR }}/build/linux -G Ninja
+  
+    - name: Zip
+      run: cd ${{ env.SOURCE_DIR }}/build/linux && ls -la
