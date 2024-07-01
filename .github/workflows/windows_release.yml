@@ -26,10 +26,11 @@ jobs:
         working-directory:  ${{ github.workspace }}
         run: |
           git fetch --all --tags -f
-          
-      - name: fix Python
-        run: |
-          pip install --upgrade pip setuptools wheel
+
+      - name: Install python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' 
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v2
@@ -40,7 +41,7 @@ jobs:
           arch:         win64_msvc2019_64
           dir:          ${{ runner.temp }}
           modules:      qtcharts qt3d
-          setup-python: true
+          setup-python: false
 
 
       - name: Download JOM
