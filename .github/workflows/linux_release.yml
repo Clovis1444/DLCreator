@@ -26,11 +26,9 @@ jobs:
       uses: seanmiddleditch/gha-setup-ninja@v4
 
     - name: Setup CMake
-      uses: threeal/cmake-action@main
+      uses: jwlawson/actions-setup-cmake@v2
       with:
-        generator: Ninja
-        c-compiler: clang
-        cxx-compiler: clang++
+        cmake-version: '3.25.1'
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
