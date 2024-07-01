@@ -42,3 +42,6 @@ jobs:
 
     - name: Create build directory
       run:  mkdir ${{ env.SOURCE_DIR }}/build
+
+    - name: Build
+      run:  cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_C_COMPILER:FILEPATH=clang -DCMAKE_CXX_COMPILER:FILEPATH=clang++ -S${{ env.SOURCE_DIR }} -B${{ env.SOURCE_DIR }}/build -G Ninja
