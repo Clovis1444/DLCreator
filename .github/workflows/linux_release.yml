@@ -50,11 +50,11 @@ jobs:
     - name: Create build directory
       run:  mkdir ${{ env.SOURCE_DIR }}/build
 
-    - name: Build
+    - name: Configure project
       run:  cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_C_COMPILER:FILEPATH=clang -DCMAKE_CXX_COMPILER:FILEPATH=clang++ -S${{ env.SOURCE_DIR }} -B${{ env.SOURCE_DIR }}/build/linux -G Ninja
-  
-    - name: Check QT
-      run: cd ~Qt && ls -la
+
+    - name: Start build
+      run: cmake --build ${{ env.SOURCE_DIR }}/build/linux --config Debug --target all --
 
     - name: Zip
       run: 7z a -tzip -mx5 -r0 ${{ env.SOURCE_DIR }}/build/DLCreator-linux.zip ${{ env.SOURCE_DIR }}/build/linux
