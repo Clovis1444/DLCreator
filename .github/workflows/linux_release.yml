@@ -79,3 +79,6 @@ jobs:
         asset_path: ${{ env.SOURCE_DIR }}/build/DLCreator-linux.zip
         asset_name: DLCreator-linux.zip
         asset_content_type: application/zip
+    
+    - name: Check
+      run: cd $QT_ROOT_DIR/bin && ls -la
