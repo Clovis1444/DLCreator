@@ -53,7 +53,7 @@ jobs:
     - name: Configure project
       run:  cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_C_COMPILER:FILEPATH=clang -DCMAKE_CXX_COMPILER:FILEPATH=clang++ -S${{ env.SOURCE_DIR }} -B${{ env.SOURCE_DIR }}/build/linux -G Ninja
 
-    - name: Start build
+    - name: Build project
       run: cmake --build ${{ env.SOURCE_DIR }}/build/linux --config Debug --target all --
 
     - name: Deploy
@@ -61,6 +61,7 @@ jobs:
         wget https://github.com/probonopd/linuxdeployqt/releases/latest/download/linuxdeployqt-continuous-x86_64.AppImage && 
         chmod a+x linuxdeployqt-continuous-x86_64.AppImage &&
         mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage &&
+        mv DLCreator.desktop ./build/linux/DLCreator.desktop &&
         ./linuxdeployqt.AppImage ${{ env.SOURCE_DIR }}/build/linux/DLCreator
 
     - name: Zip
