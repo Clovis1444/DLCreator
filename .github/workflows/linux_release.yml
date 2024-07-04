@@ -61,12 +61,10 @@ jobs:
         wget https://github.com/probonopd/linuxdeployqt/releases/latest/download/linuxdeployqt-continuous-x86_64.AppImage && 
         chmod a+x linuxdeployqt-continuous-x86_64.AppImage &&
         mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage &&
-        mv DLCreator-0.0.1-x86_64.desktop ./build/linux/DLCreator-0.0.1-x86_64.desktop &&
-        VERSION=0.0.1 &&
-        ./linuxdeployqt.AppImage ${{ env.SOURCE_DIR }}/build/linux/DLCreator-0.0.1-x86_64 -appimage
+        ./linuxdeployqt.AppImage ${{ env.SOURCE_DIR }}/build/linux/DLCreator -always-overwrite
 
-    # - name: Zip
-    #   run: 7z a -tzip -mx5 -r0 ${{ env.SOURCE_DIR }}/build/DLCreator-linux.zip ${{ env.SOURCE_DIR }}/build/linux
+    - name: Zip
+      run: 7z a -tzip -mx5 -r0 ${{ env.SOURCE_DIR }}/build/DLCreator-linux.zip ${{ env.SOURCE_DIR }}/build/linux
 
     - name: Create release
       uses: actions/create-release@v1
@@ -85,7 +83,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.new-release.outputs.upload_url }}
-        # asset_path: ${{ env.SOURCE_DIR }}/build/DLCreator-linux.zip
-        asset_path: DLCreator-0.0.1-x86_64.AppImage
-        asset_name: DLCreator.AppImage
+        asset_path: ${{ env.SOURCE_DIR }}/build/DLCreator-linux.zip
+        # asset_path: DLCreator.AppImage
+        asset_name: DLCreator.zip
         asset_content_type: application/zip
