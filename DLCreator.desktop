@@ -3,4 +3,4 @@ Name=DLCreator
 Comment=Dungeon Layout Creator
 Exec=DLCreator
 Type=Application
-Categories=IDE
+Categories=IDE;
