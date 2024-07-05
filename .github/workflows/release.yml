@@ -47,6 +47,20 @@ jobs:
             echo $PROJECT_VER >> "$GITHUB_OUTPUT"
             echo $PROJECT_VER
 
+        - name: Check if tag is already exists
+          if: matrix.os.name == 'linux'
+          uses: mukunku/tag-exists-action@v1.6.0
+          id: check-tag
+          with: 
+            tag: ${{steps.get_version.outputs.project_version}}
+
+        - name: Cancel workflow if tag already exists
+          if: matrix.os.name == 'linux'
+          uses: nick-fields/assert-action@v2
+          with:
+            expected: "false"
+            actual: ${{ steps.check-tag.outputs.exists }}
+
         - name: Setup Clang
           uses: egor-tensin/setup-clang@v1
           with:
