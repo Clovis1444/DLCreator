@@ -1,4 +1,3 @@
-# TODO(clovis): get rid of repeiting steps 
 name: Release(linux, windows)
 on:
     workflow_dispatch:
@@ -9,24 +8,26 @@ env:
     CLANG_VERSION: 15
     CMAKE_VERSION: 3.25.1
     QT_VERSION: 6.7.2
-    QT_LINUX_ARCH: linux_gcc_64
-    QT_WINDOWS_ARCH: win64_msvc2019_64
-    LINUX_ARTIFACT: DLCreator-linux
-    LINUX_ARTIFACT_FILE: DLCreator-linux.zip
-    WINDOWS_ARTIFACT: DLCreator-windows
-    WINDOWS_ARTIFACT_FILE: DLCreator-windows.zip
+    # QT_LINUX_ARCH: linux_gcc_64
+    # QT_WINDOWS_ARCH: win64_msvc2019_64
+    # LINUX_ARTIFACT: DLCreator-linux
+    # LINUX_ARTIFACT_FILE: DLCreator-linux.zip
+    # WINDOWS_ARTIFACT: DLCreator-windows
+    # WINDOWS_ARTIFACT_FILE: DLCreator-windows.zip
 
 jobs:
     build:
         outputs:
           project_version: ${{steps.get_version.outputs.project_version}}
+          windows_artifact: ${{matrix.os.artifact[0]}}
+          linux_artifact: ${{matrix.os.artifact[1]}}
 
         strategy:
             matrix:
                 os:
                     [
-                        { name: "windows", image: "windows-2019" },
-                        { name: "linux", image: "ubuntu-20.04" },
+                        { name: "windows", image: "windows-2019", arch: "win64_msvc2019_64", artifact: DLCreator-windows },
+                        { name: "linux", image: "ubuntu-20.04", arch: "linux_gcc_64", artifact: DLCreator-linux },
                     ]
             fail-fast: true
         runs-on: ${{ matrix.os.image }}
@@ -54,6 +55,7 @@ jobs:
           with: 
             tag: v${{steps.get_version.outputs.project_version}}
 
+        # To prevent creating releases with the same version
         - name: Cancel workflow if tag already exists
           if: matrix.os.name == 'linux'
           uses: nick-fields/assert-action@v2
@@ -75,25 +77,13 @@ jobs:
           with:
             cmake-version: ${{ env.CMAKE_VERSION }}
         
-        - name: Install Qt(linux)
-          if: matrix.os.name == 'linux'
+        - name: Install Qt
           uses: jurplel/install-qt-action@v4
           with:
             version:      ${{ env.QT_VERSION }}
-            host:         linux
+            host:         ${{ matrix.os.name }}
             target:       desktop
-            arch:         ${{ env.QT_LINUX_ARCH }}
-            dir:          ${{ runner.temp }}
-            setup-python: false
-
-        - name: Install Qt(windows)
-          if: matrix.os.name == 'windows'
-          uses: jurplel/install-qt-action@v4
-          with:
-            version:      ${{ env.QT_VERSION }}
-            host:         windows
-            target:       desktop
-            arch:         ${{ env.QT_WINDOWS_ARCH }}
+            arch:         ${{ matrix.os.arch }}
             dir:          ${{ runner.temp }}
             setup-python: false
 
@@ -109,37 +99,27 @@ jobs:
         - name: Deploy project(linux)
           if: matrix.os.name == 'linux'
           run: | 
-              wget https://github.com/probonopd/linuxdeployqt/releases/latest/download/linuxdeployqt-continuous-x86_64.AppImage && 
-              chmod a+x linuxdeployqt-continuous-x86_64.AppImage &&
-              mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage &&
-              ./linuxdeployqt.AppImage ${{ env.SOURCE_DIR }}/build/DLCreator -always-overwrite
+              wget https://github.com/probonopd/linuxdeployqt/releases/latest/download/linuxdeployqt-continuous-x86_64.AppImage 
+              chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+              mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage
+              mkdir DLCreator-linux && mv ${{ env.SOURCE_DIR }}/build/DLCreator DLCreator-linux/DLCreator
+              ./linuxdeployqt.AppImage DLCreator-linux/DLCreator -always-overwrite
 
         - name: Deploy project(windows)
           if: matrix.os.name == 'windows'
           # Path to windeployqt.exe depends on QT version and Arch
-          run: ${{ runner.temp }}\Qt\6.7.2\msvc2019_64\bin\windeployqt.exe ${{ env.SOURCE_DIR }}\build\DLCreator.exe
+          run: |
+            mkdir DLCreator-windows && mv ${{ env.SOURCE_DIR }}\build\DLCreator.exe DLCreator-windows\DLCreator.exe
+            ${{ runner.temp }}\Qt\6.7.2\msvc2019_64\bin\windeployqt.exe DLCreator-windows\DLCreator.exe
 
-        - name: Zip(linux)
-          if: matrix.os.name == 'linux'
-          run: 7z a -tzip -mx5 -r0 ${{ env.SOURCE_DIR }}/build/${{ env.LINUX_ARTIFACT_FILE }} ${{ env.SOURCE_DIR }}/build
+        - name: Zip
+          run: 7z a -tzip -mx5 -r0 ${{ matrix.os.artifact }}.zip ${{matrix.os.artifact}}
 
-        - name: Zip(windows)
-          if: matrix.os.name == 'windows'
-          run: 7z a -tzip -mx5 -r0 ${{ env.SOURCE_DIR }}\build\${{ env.WINDOWS_ARTIFACT_FILE }} ${{ env.SOURCE_DIR }}\build
-
-        - name: Upload artifact(linux)
-          if: matrix.os.name == 'linux'
+        - name: Upload artifact
           uses: actions/upload-artifact@v4
           with:
-            name: ${{env.LINUX_ARTIFACT}}
-            path: ${{ env.SOURCE_DIR }}/build/${{ env.LINUX_ARTIFACT_FILE }}
-
-        - name: Upload artifact(windows)
-          if: matrix.os.name == 'windows'
-          uses: actions/upload-artifact@v4
-          with:
-            name: ${{env.WINDOWS_ARTIFACT}}
-            path: ${{ env.SOURCE_DIR }}\build\${{ env.WINDOWS_ARTIFACT_FILE }}
+            name: ${{matrix.os.artifact}}
+            path: ${{matrix.os.artifact}}.zip
 
     upload_release:
         needs: [build]
@@ -151,12 +131,12 @@ jobs:
         - name: Download linux artifact
           uses: actions/download-artifact@v4
           with: 
-            name: ${{env.LINUX_ARTIFACT}}
+            name: ${{needs.build.outputs.linux_artifact}}
 
         - name: Download windows artifact
           uses: actions/download-artifact@v4
           with: 
-            name: ${{env.WINDOWS_ARTIFACT}}
+            name: ${{needs.build.outputs.windows_artifact}}
 
         - name: Create new release
           uses: actions/create-release@v1
@@ -175,8 +155,8 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
             upload_url: ${{ steps.release.outputs.upload_url}}
-            asset_path: ${{ env.SOURCE_DIR }}/${{ env.LINUX_ARTIFACT_FILE }}
-            asset_name: DLCreator-linux.zip
+            asset_path: ${{needs.build.outputs.linux_artifact}}.zip
+            asset_name: ${{needs.build.outputs.linux_artifact}}.zip
             asset_content_type: application/zip
 
         - name: Upload windows artifact
@@ -185,7 +165,7 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
             upload_url: ${{ steps.release.outputs.upload_url}}
-            asset_path: ${{ env.SOURCE_DIR }}/${{ env.WINDOWS_ARTIFACT_FILE }}
-            asset_name: DLCreator-windows.zip
+            asset_path: ${{needs.build.outputs.windows_artifact}}.zip
+            asset_name: ${{needs.build.outputs.windows_artifact}}.zip
             asset_content_type: application/zip
           
