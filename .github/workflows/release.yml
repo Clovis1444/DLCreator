@@ -8,19 +8,11 @@ env:
     CLANG_VERSION: 15
     CMAKE_VERSION: 3.25.1
     QT_VERSION: 6.7.2
-    # QT_LINUX_ARCH: linux_gcc_64
-    # QT_WINDOWS_ARCH: win64_msvc2019_64
-    # LINUX_ARTIFACT: DLCreator-linux
-    # LINUX_ARTIFACT_FILE: DLCreator-linux.zip
-    # WINDOWS_ARTIFACT: DLCreator-windows
-    # WINDOWS_ARTIFACT_FILE: DLCreator-windows.zip
 
 jobs:
     build:
         outputs:
           project_version: ${{steps.get_version.outputs.project_version}}
-          # windows_artifact: ${{matrix.os.artifact[0]}}
-          # linux_artifact: ${{matrix.os.artifact[1]}}
 
         strategy:
             matrix:
@@ -143,35 +135,5 @@ jobs:
             target_commitish: ${{github.sha}}
             draft: true
             files: ${{steps.artifacts.outputs.download-path}}/*
-
-        # - name: Create new release
-        #   uses: actions/create-release@v1
-        #   id: release
-        #   env:
-        #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        #   with:
-        #     tag_name: v${{needs.build.outputs.project_version}}
-        #     release_name: ${{env.PROJECT_NAME}} v${{needs.build.outputs.project_version}}
-        #     commitish: ${{github.sha}}
-        #     draft: true
-
-        # - name: Upload linux artifact
-        #   uses: actions/upload-release-asset@v1
-        #   env:
-        #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        #   with:
-        #     upload_url: ${{ steps.release.outputs.upload_url}}
-        #     asset_path: ${{needs.build.outputs.linux_artifact}}.zip
-        #     asset_name: ${{needs.build.outputs.linux_artifact}}.zip
-        #     asset_content_type: application/zip
-
-        # - name: Upload windows artifact
-        #   uses: actions/upload-release-asset@v1
-        #   env:
-        #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        #   with:
-        #     upload_url: ${{ steps.release.outputs.upload_url}}
-        #     asset_path: ${{needs.build.outputs.windows_artifact}}.zip
-        #     asset_name: ${{needs.build.outputs.windows_artifact}}.zip
-        #     asset_content_type: application/zip
+            fail_on_unmatched_files: true
           
