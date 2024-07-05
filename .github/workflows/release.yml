@@ -1,4 +1,4 @@
-name: Release major
+name: Release(linux, windows)
 on:
     workflow_dispatch:
 
@@ -78,11 +78,12 @@ jobs:
 
         - name: Deploy project(linux)
           if: matrix.os.name == 'linux'
-          run: | 
-              wget https://github.com/probonopd/linuxdeployqt/releases/latest/download/linuxdeployqt-continuous-x86_64.AppImage && 
-              chmod a+x linuxdeployqt-continuous-x86_64.AppImage &&
-              mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage &&
-              ./linuxdeployqt.AppImage ${{ env.SOURCE_DIR }}/build/DLCreator -always-overwrite
+        #   run: | 
+        #       wget https://github.com/probonopd/linuxdeployqt/releases/latest/download/linuxdeployqt-continuous-x86_64.AppImage && 
+        #       chmod a+x linuxdeployqt-continuous-x86_64.AppImage &&
+        #       mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage &&
+        #       ./linuxdeployqt.AppImage ${{ env.SOURCE_DIR }}/build/DLCreator -always-overwrite
+          run: cd ${{ env.SOURCE_DIR }}/build/ && ls -la
 
         - name: Deploy project(windows)
           if: matrix.os.name == 'windows'
