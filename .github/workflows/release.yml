@@ -1,8 +1,10 @@
+# TODO(clovis): get rid of repeiting steps 
 name: Release(linux, windows)
 on:
     workflow_dispatch:
 
 env:
+    PROJECT_NAME: DLCreator
     SOURCE_DIR:   ${{ github.workspace }}
     CLANG_VERSION: 15
     CMAKE_VERSION: 3.25.1
@@ -16,6 +18,9 @@ env:
 
 jobs:
     build:
+        outputs:
+          project_version: ${{steps.get_version.outputs.project_version}}
+
         strategy:
             matrix:
                 os:
@@ -40,7 +45,7 @@ jobs:
             platform: x64
       
         - name: Setup Ninja
-          uses: seanmiddleditch/gha-setup-ninja@v4
+          uses: seanmiddleditch/gha-setup-ninja@v5
       
         - name: Setup CMake
           uses: jwlawson/actions-setup-cmake@v2
@@ -68,6 +73,14 @@ jobs:
             arch:         ${{ env.QT_WINDOWS_ARCH }}
             dir:          ${{ runner.temp }}
             setup-python: false
+
+        - name: Get project version
+          if: matrix.os.name == 'linux'
+          id: get_version
+          run: |
+            PROJECT_VER="$(grep project(DLCreator VERSION" ./CMakeLists.txt | grep -o '[0-9].[0-9].[0-9]')"
+            PROJECT_VER="project_version=$PROJECT_VER"
+            echo $PROJECT_VER >> "$GITHUB_OUTPUT"
 
         - name: Create build directory
           run:  mkdir ${{ env.SOURCE_DIR }}\\build
@@ -136,10 +149,10 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
-            tag_name: v0.1
-            release_name: Test
+            tag_name: v${{needs.build.outputs.project_version}}
+            release_name: ${{env.PROJECT_NAME}} v${{needs.build.outputs.project_version}}
+            commitish: ${{github.sha}}
             draft: true
-            prerelease: true
 
         - name: Upload linux artifact
           uses: actions/upload-release-asset@v1
