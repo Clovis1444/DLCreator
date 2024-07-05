@@ -29,7 +29,7 @@ jobs:
         steps:
 
         - name: Checkout repo
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
           with:
             submodules: recursive
       
@@ -93,11 +93,11 @@ jobs:
 
         - name: Zip(linux)
           if: matrix.os.name == 'linux'
-          run: 7z a -tzip -mx5 -r0 ${{ env.SOURCE_DIR }}/build/DLCreator-linux.zip ${{ env.SOURCE_DIR }}/build
+          run: 7z a -tzip -mx5 -r0 ${{ env.SOURCE_DIR }}/build/${{ env.LINUX_ARTIFACT_FILE }} ${{ env.SOURCE_DIR }}/build
 
         - name: Zip(windows)
           if: matrix.os.name == 'windows'
-          run: 7z a -tzip -mx5 -r0 ${{ env.SOURCE_DIR }}\build\DLCreator-win.zip ${{ env.SOURCE_DIR }}\build
+          run: 7z a -tzip -mx5 -r0 ${{ env.SOURCE_DIR }}\build\${{ env.WINDOWS_ARTIFACT_FILE }} ${{ env.SOURCE_DIR }}\build
 
         - name: Upload artifact(linux)
           if: matrix.os.name == 'linux'
@@ -129,9 +129,6 @@ jobs:
           uses: actions/download-artifact@v4
           with: 
             name: ${{env.WINDOWS_ARTIFACT}}
-
-        - name: Check
-          run: ls -la
 
         - name: Create new release
           uses: actions/create-release@v1
