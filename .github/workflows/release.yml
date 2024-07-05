@@ -42,7 +42,7 @@ jobs:
           if: matrix.os.name == 'linux'
           id: get_version
           run: |
-            grep project(DLCreator VERSION" CMakeLists.txt | grep -o '[0-9].[0-9].[0-9]'
+            PROJECT_VER="project_version=$PROJECT_VER"
             echo $PROJECT_VER >> "$GITHUB_OUTPUT"
 
         - name: Setup Clang
