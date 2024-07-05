@@ -13,29 +13,7 @@ env:
     WINDOWS_ARTIFACT: DLCreator-windows
 
 jobs:
-    create_release:
-        runs-on: ubuntu-latest
-        permissions: write-all
-
-        outputs:
-            release_url: ${{ steps.new-release.outputs.upload_url }}
-
-        steps:
-
-        - name: Create new release
-          uses: actions/create-release@v1
-          id: new-release
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            tag_name: v0.1
-            release_name: Test
-            draft: true
-            prerelease: true
-
     build:
-        needs: [create_release]
-
         strategy:
             matrix:
                 os:
@@ -134,7 +112,7 @@ jobs:
             path: ${{ env.SOURCE_DIR }}\build\DLCreator-win.zip
 
     upload_release:
-        needs: [build, create_release]
+        needs: [build]
         runs-on: ubuntu-latest
         permissions: write-all
 
@@ -150,12 +128,23 @@ jobs:
           with: 
             name: ${{env.WINDOWS_ARTIFACT}}
 
+        - name: Create new release
+          uses: actions/create-release@v1
+          id: release
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            tag_name: v0.1
+            release_name: Test
+            draft: true
+            prerelease: true
+
         - name: Upload linux artifact
           uses: actions/upload-release-asset@v1
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
-            upload_url: ${{ needs.create_release.outputs.release_url}}
+            upload_url: ${{ steps.release.outputs.upload_url}}
             asset_path: ${{ env.SOURCE_DIR }}/DLCreator-linux.zip
             asset_name: DLCreator-linux.zip
             asset_content_type: application/zip
@@ -165,7 +154,7 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
-            upload_url: ${{ needs.create_release.outputs.release_url}}
+            upload_url: ${{ steps.release.outputs.upload_url}}
             asset_path: ${{ env.SOURCE_DIR }}/DLCreator-windows.zip
             asset_name: DLCreator-windows.zip
             asset_content_type: application/zip
