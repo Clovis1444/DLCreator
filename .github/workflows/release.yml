@@ -38,6 +38,15 @@ jobs:
           with:
             submodules: recursive
       
+        - name: Get project version
+          if: matrix.os.name == 'linux'
+          id: get_version
+          run: |
+            grep --version
+            PROJECT_VER="$(grep project(DLCreator VERSION" CMakeLists.txt | grep -o '[0-9].[0-9].[0-9]')"
+            PROJECT_VER="project_version=$PROJECT_VER"
+            echo $PROJECT_VER >> "$GITHUB_OUTPUT"
+
         - name: Setup Clang
           uses: egor-tensin/setup-clang@v1
           with:
@@ -73,14 +82,6 @@ jobs:
             arch:         ${{ env.QT_WINDOWS_ARCH }}
             dir:          ${{ runner.temp }}
             setup-python: false
-
-        - name: Get project version
-          if: matrix.os.name == 'linux'
-          id: get_version
-          run: |
-            PROJECT_VER="$(grep project(DLCreator VERSION" CMakeLists.txt | grep -o '[0-9].[0-9].[0-9]')" &&
-            PROJECT_VER="project_version=$PROJECT_VER" &&
-            echo $PROJECT_VER >> "$GITHUB_OUTPUT"
 
         - name: Create build directory
           run:  mkdir ${{ env.SOURCE_DIR }}\\build
