@@ -132,6 +132,9 @@ jobs:
           with: 
             name: ${{env.WINDOWS_ARTIFACT}}
 
+        - name: check
+          run: ls -las
+
         - name: Create new release
           uses: actions/create-release@v1
           id: release
