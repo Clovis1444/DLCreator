@@ -67,23 +67,26 @@ jobs:
             dir:          ${{ runner.temp }}
             setup-python: false
 
+        # - name: Create build directory(linux)
+        #   if: matrix.os.name == 'linux'
+        #   run:  mkdir ${{ env.SOURCE_DIR }}\build
+
         - name: Create build directory
-          run:  mkdir ${{ env.SOURCE_DIR }}\build
+          run:  mkdir ${{ env.SOURCE_DIR }}\\build
         
         - name: Configure project
-          run:  cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_C_COMPILER:FILEPATH=clang -DCMAKE_CXX_COMPILER:FILEPATH=clang++ -S${{ env.SOURCE_DIR }} -B${{ env.SOURCE_DIR }}\build -G Ninja
+          run:  cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_C_COMPILER:FILEPATH=clang -DCMAKE_CXX_COMPILER:FILEPATH=clang++ -S${{ env.SOURCE_DIR }} -B${{ env.SOURCE_DIR }}\\build -G Ninja
         
         - name: Build project
-          run: cmake --build ${{ env.SOURCE_DIR }}\build --config Release --target all --
+          run: cmake --build ${{ env.SOURCE_DIR }}\\build --config Release --target all --
 
         - name: Deploy project(linux)
           if: matrix.os.name == 'linux'
-        #   run: | 
-        #       wget https://github.com/probonopd/linuxdeployqt/releases/latest/download/linuxdeployqt-continuous-x86_64.AppImage && 
-        #       chmod a+x linuxdeployqt-continuous-x86_64.AppImage &&
-        #       mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage &&
-        #       ./linuxdeployqt.AppImage ${{ env.SOURCE_DIR }}/build/DLCreator -always-overwrite
-          run: cd ${{ env.SOURCE_DIR }} && ls -la
+          run: | 
+              wget https://github.com/probonopd/linuxdeployqt/releases/latest/download/linuxdeployqt-continuous-x86_64.AppImage && 
+              chmod a+x linuxdeployqt-continuous-x86_64.AppImage &&
+              mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage &&
+              ./linuxdeployqt.AppImage ${{ env.SOURCE_DIR }}/build/DLCreator -always-overwrite
 
         - name: Deploy project(windows)
           if: matrix.os.name == 'windows'
