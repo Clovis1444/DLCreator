@@ -120,15 +120,18 @@ jobs:
 
         steps:
         
-        - name: Download linux artifact
-          uses: actions/download-artifact@v4
-          with: 
-            name: ${{env.LINUX_ARTIFACT}}
+        # - name: Download linux artifact
+        #   uses: actions/download-artifact@v4
+        #   with: 
+        #     name: ${{env.LINUX_ARTIFACT}}
 
-        - name: Download windows artifact
+        # - name: Download windows artifact
+        #   uses: actions/download-artifact@v4
+        #   with: 
+        #     name: ${{env.WINDOWS_ARTIFACT}}
+
+        - name: Download all artifacts
           uses: actions/download-artifact@v4
-          with: 
-            name: ${{env.WINDOWS_ARTIFACT}}
 
         - name: Create new release
           uses: actions/create-release@v1
