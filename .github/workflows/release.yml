@@ -10,7 +10,9 @@ env:
     QT_LINUX_ARCH: linux_gcc_64
     QT_WINDOWS_ARCH: win64_msvc2019_64
     LINUX_ARTIFACT: DLCreator-linux
+    LINUX_ARTIFACT_FILE: DLCreator-linux.zip
     WINDOWS_ARTIFACT: DLCreator-windows
+    WINDOWS_ARTIFACT_FILE: DLCreator-windows.zip
 
 jobs:
     build:
@@ -67,10 +69,6 @@ jobs:
             dir:          ${{ runner.temp }}
             setup-python: false
 
-        # - name: Create build directory(linux)
-        #   if: matrix.os.name == 'linux'
-        #   run:  mkdir ${{ env.SOURCE_DIR }}\build
-
         - name: Create build directory
           run:  mkdir ${{ env.SOURCE_DIR }}\\build
         
@@ -106,14 +104,14 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: ${{env.LINUX_ARTIFACT}}
-            path: ${{ env.SOURCE_DIR }}/build/DLCreator-linux.zip
+            path: ${{ env.SOURCE_DIR }}/build/${{ env.LINUX_ARTIFACT_FILE }}
 
         - name: Upload artifact(windows)
           if: matrix.os.name == 'windows'
           uses: actions/upload-artifact@v4
           with:
             name: ${{env.WINDOWS_ARTIFACT}}
-            path: ${{ env.SOURCE_DIR }}\build\DLCreator-win.zip
+            path: ${{ env.SOURCE_DIR }}\build\${{ env.WINDOWS_ARTIFACT_FILE }}
 
     upload_release:
         needs: [build]
@@ -127,13 +125,10 @@ jobs:
           with: 
             name: ${{env.LINUX_ARTIFACT}}
 
-        - name: Download linux artifact
+        - name: Download windows artifact
           uses: actions/download-artifact@v4
           with: 
             name: ${{env.WINDOWS_ARTIFACT}}
-
-        - name: check
-          run: ls -las
 
         - name: Create new release
           uses: actions/create-release@v1
@@ -152,17 +147,17 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
             upload_url: ${{ steps.release.outputs.upload_url}}
-            asset_path: ${{ env.SOURCE_DIR }}/DLCreator-linux.zip
+            asset_path: ${{ env.SOURCE_DIR }}/${{ env.LINUX_ARTIFACT_FILE }}
             asset_name: DLCreator-linux.zip
             asset_content_type: application/zip
 
-        - name: Upload linux artifact
+        - name: Upload windows artifact
           uses: actions/upload-release-asset@v1
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
             upload_url: ${{ steps.release.outputs.upload_url}}
-            asset_path: ${{ env.SOURCE_DIR }}/DLCreator-windows.zip
+            asset_path: ${{ env.SOURCE_DIR }}/${{ env.WINDOWS_ARTIFACT_FILE }}
             asset_name: DLCreator-windows.zip
             asset_content_type: application/zip
           
