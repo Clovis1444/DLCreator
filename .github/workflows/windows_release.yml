@@ -57,8 +57,7 @@ jobs:
         run: cmake --build ${{ env.SOURCE_DIR }}\build --config Debug --target all --
       
       - name: Deploy
-        # run: ${{ runner.temp }}\Qt\6.7.2\msvc2019_64\bin\windowsdeployqt.exe ${{ env.SOURCE_DIR }}\build\DLCreator.exe
-        run: cd ${{ runner.temp }}\Qt\6.7.2\msvc2019_64\bin && ls la
+        run: ${{ runner.temp }}\Qt\6.7.2\msvc2019_64\bin\windeployqt.exe ${{ env.SOURCE_DIR }}\build\DLCreator.exe
 
       - name: Zip
         run: 7z a -tzip -mx5 -r0 ${{ env.SOURCE_DIR }}\build\DLCreator-win.zip ${{ env.SOURCE_DIR }}\build
