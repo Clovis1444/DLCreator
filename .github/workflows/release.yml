@@ -83,7 +83,7 @@ jobs:
         #       chmod a+x linuxdeployqt-continuous-x86_64.AppImage &&
         #       mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage &&
         #       ./linuxdeployqt.AppImage ${{ env.SOURCE_DIR }}/build/DLCreator -always-overwrite
-          run: cd ${{ env.SOURCE_DIR }}/build/ && ls -la
+          run: cd ${{ env.SOURCE_DIR }} && ls -la
 
         - name: Deploy project(windows)
           if: matrix.os.name == 'windows'
