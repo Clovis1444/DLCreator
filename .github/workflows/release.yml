@@ -35,7 +35,7 @@ jobs:
           if: matrix.os.name == 'linux'
           id: get_version
           run: |
-            PROJECT_VER="$(grep "project(DLCreator VERSION" CMakeLists.txt | grep -o '[0-9].[0-9].[0-9]')"
+            PROJECT_VER="$(grep "project(${{ env.PROJECT_NAME }} VERSION" CMakeLists.txt | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')"
             PROJECT_VER="project_version=$PROJECT_VER"
             echo $PROJECT_VER >> "$GITHUB_OUTPUT"
             echo $PROJECT_VER
