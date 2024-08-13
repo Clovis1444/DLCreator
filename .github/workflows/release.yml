@@ -9,109 +9,118 @@ on:
 
 env:
     PROJECT_NAME: DLCreator
-    SOURCE_DIR:   ${{ github.workspace }}
+    SOURCE_DIR: ${{ github.workspace }}
     CLANG_VERSION: 15
     CMAKE_VERSION: 3.25.1
     QT_VERSION: 6.7.2
 
 jobs:
     build:
+        environment: CI/CD
         strategy:
             matrix:
                 os:
                     [
-                        { name: "windows", image: "windows-2019", arch: "win64_msvc2019_64", artifact: DLCreator-windows },
-                        { name: "linux", image: "ubuntu-20.04", arch: "linux_gcc_64", artifact: DLCreator-linux },
+                        {
+                            name: "windows",
+                            image: "windows-2019",
+                            arch: "win64_msvc2019_64",
+                            artifact: DLCreator-windows,
+                        },
+                        {
+                            name: "linux",
+                            image: "ubuntu-20.04",
+                            arch: "linux_gcc_64",
+                            artifact: DLCreator-linux,
+                        },
                     ]
             fail-fast: true
         runs-on: ${{ matrix.os.image }}
 
         steps:
+            - name: Checkout repo
+              uses: actions/checkout@v4
+              with:
+                  submodules: recursive
 
-        - name: Checkout repo
-          uses: actions/checkout@v4
-          with:
-            submodules: recursive
+            - name: Setup Clang
+              uses: egor-tensin/setup-clang@v1
+              with:
+                  version: ${{ env.CLANG_VERSION }}
+                  platform: x64
 
-        - name: Setup Clang
-          uses: egor-tensin/setup-clang@v1
-          with:
-            version: ${{ env.CLANG_VERSION }}
-            platform: x64
-      
-        - name: Setup Ninja
-          uses: seanmiddleditch/gha-setup-ninja@v5
-      
-        - name: Setup CMake
-          uses: jwlawson/actions-setup-cmake@v2
-          with:
-            cmake-version: ${{ env.CMAKE_VERSION }}
-        
-        - name: Install Qt
-          uses: jurplel/install-qt-action@v4
-          with:
-            version:      ${{ env.QT_VERSION }}
-            host:         ${{ matrix.os.name }}
-            target:       desktop
-            arch:         ${{ matrix.os.arch }}
-            dir:          ${{ runner.temp }}
-            setup-python: false
+            - name: Setup Ninja
+              uses: seanmiddleditch/gha-setup-ninja@v5
 
-        - name: Create build directory
-          run:  mkdir ${{ env.SOURCE_DIR }}\\build
-        
-        - name: Configure project
-          run:  cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_C_COMPILER:FILEPATH=clang -DCMAKE_CXX_COMPILER:FILEPATH=clang++ -S${{ env.SOURCE_DIR }} -B${{ env.SOURCE_DIR }}\\build -G Ninja
-        
-        - name: Build project
-          run: cmake --build ${{ env.SOURCE_DIR }}\\build --config Release --target all --
+            - name: Setup CMake
+              uses: jwlawson/actions-setup-cmake@v2
+              with:
+                  cmake-version: ${{ env.CMAKE_VERSION }}
 
-        - name: Deploy project(linux)
-          if: matrix.os.name == 'linux'
-          run: | 
-              wget https://github.com/probonopd/linuxdeployqt/releases/latest/download/linuxdeployqt-continuous-x86_64.AppImage 
-              chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-              mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage
-              mkdir DLCreator-linux && mv ${{ env.SOURCE_DIR }}/build/DLCreator DLCreator-linux/DLCreator
-              ./linuxdeployqt.AppImage DLCreator-linux/DLCreator -always-overwrite
+            - name: Install Qt
+              uses: jurplel/install-qt-action@v4
+              with:
+                  version: ${{ env.QT_VERSION }}
+                  host: ${{ matrix.os.name }}
+                  target: desktop
+                  arch: ${{ matrix.os.arch }}
+                  dir: ${{ runner.temp }}
+                  setup-python: false
 
-        - name: Deploy project(windows)
-          if: matrix.os.name == 'windows'
-          # Path to windeployqt.exe depends on QT version and Arch
-          run: |
-            mkdir DLCreator-windows && mv ${{ env.SOURCE_DIR }}\build\DLCreator.exe DLCreator-windows\DLCreator.exe
-            ${{ runner.temp }}\Qt\6.7.2\msvc2019_64\bin\windeployqt.exe DLCreator-windows\DLCreator.exe
+            - name: Create build directory
+              run: mkdir ${{ env.SOURCE_DIR }}\\build
 
-        - name: Zip
-          run: 7z a -tzip -mx5 -r0 ${{ matrix.os.artifact }}.zip ${{matrix.os.artifact}}
+            - name: Configure project
+              run: cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_C_COMPILER:FILEPATH=clang -DCMAKE_CXX_COMPILER:FILEPATH=clang++ -S${{ env.SOURCE_DIR }} -B${{ env.SOURCE_DIR }}\\build -G Ninja
 
-        - name: Upload artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: ${{matrix.os.artifact}}
-            path: ${{matrix.os.artifact}}.zip
+            - name: Build project
+              run: cmake --build ${{ env.SOURCE_DIR }}\\build --config Release --target all --
+
+            - name: Deploy project(linux)
+              if: matrix.os.name == 'linux'
+              run: |
+                  wget https://github.com/probonopd/linuxdeployqt/releases/latest/download/linuxdeployqt-continuous-x86_64.AppImage 
+                  chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+                  mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage
+                  mkdir DLCreator-linux && mv ${{ env.SOURCE_DIR }}/build/DLCreator DLCreator-linux/DLCreator
+                  ./linuxdeployqt.AppImage DLCreator-linux/DLCreator -always-overwrite
+
+            - name: Deploy project(windows)
+              if: matrix.os.name == 'windows'
+              # Path to windeployqt.exe depends on QT version and Arch
+              run: |
+                  mkdir DLCreator-windows && mv ${{ env.SOURCE_DIR }}\build\DLCreator.exe DLCreator-windows\DLCreator.exe
+                  ${{ runner.temp }}\Qt\6.7.2\msvc2019_64\bin\windeployqt.exe DLCreator-windows\DLCreator.exe
+
+            - name: Zip
+              run: 7z a -tzip -mx5 -r0 ${{ matrix.os.artifact }}-${{inputs.release_tag}}.zip ${{matrix.os.artifact}}
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ${{matrix.os.artifact}}-${{inputs.release_tag}}
+                  path: ${{matrix.os.artifact}}-${{inputs.release_tag}}.zip
 
     upload_release:
         needs: [build]
+        environment: CI/CD
         runs-on: ubuntu-latest
         permissions:
-          contents: write
+            contents: write
 
         steps:
-        
-        - name: Download all artifacts
-          uses: actions/download-artifact@v4
-          id: artifacts
-          with: 
-            merge-multiple: true
-            path: ${{env.SOURCE_DIR}}/artifacts
+            - name: Download all artifacts
+              uses: actions/download-artifact@v4
+              id: artifacts
+              with:
+                  merge-multiple: true
+                  path: ${{env.SOURCE_DIR}}/artifacts
 
-        - name: Release
-          uses: softprops/action-gh-release@v2
-          with:
-            tag_name: v${{inputs.release_tag}}
-            target_commitish: ${{github.sha}}
-            draft: true
-            files: ${{steps.artifacts.outputs.download-path}}/*
-            fail_on_unmatched_files: true
-          
+            - name: Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: ${{inputs.release_tag}}
+                  target_commitish: ${{github.sha}}
+                  draft: true
+                  files: ${{steps.artifacts.outputs.download-path}}/*
+                  fail_on_unmatched_files: true

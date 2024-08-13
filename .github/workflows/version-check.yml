@@ -1,53 +1,51 @@
 name: Project version check
 on:
     push:
-        branches:
-            "main"
+        branches: "main"
 
 env:
     PROJECT_NAME: DLCreator
 
 jobs:
     version_check:
+        environment: CI/CD
         outputs:
-          project_version: ${{steps.get_version.outputs.project_version}}
+            project_version: ${{steps.get_version.outputs.project_version}}
 
         runs-on: ubuntu-latest
 
         steps:
+            - name: Checkout repo
+              uses: actions/checkout@v4
+              with:
+                  submodules: recursive
+                  sparse-checkout: CMakeLists.txt
 
-        - name: Checkout repo
-          uses: actions/checkout@v4
-          with:
-            submodules: recursive
-      
-        - name: Get project version
-          id: get_version
-          run: |
-            PROJECT_VER="$(grep "project(${{ env.PROJECT_NAME }} VERSION" CMakeLists.txt | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')"
-            PROJECT_VER="project_version=$PROJECT_VER"
-            echo $PROJECT_VER >> "$GITHUB_OUTPUT"
-            echo $PROJECT_VER
+            - name: Get project version
+              id: get_version
+              run: |
+                  PROJECT_VER="$(grep "project(${{ env.PROJECT_NAME }} VERSION" CMakeLists.txt | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')"
+                  PROJECT_VER="project_version=$PROJECT_VER"
+                  echo $PROJECT_VER >> "$GITHUB_OUTPUT"
+                  echo $PROJECT_VER
 
-        - name: Check if tag is already exists
-          uses: mukunku/tag-exists-action@v1.6.0
-          id: check-tag
-          with: 
-            tag: v${{steps.get_version.outputs.project_version}}
+            - name: Check if tag is already exists
+              uses: mukunku/tag-exists-action@v1.6.0
+              id: check-tag
+              with:
+                  tag: v${{steps.get_version.outputs.project_version}}
 
-        # To prevent creating releases with the same version
-        - name: Cancel workflow if tag already exists
-          uses: nick-fields/assert-action@v2
-          with:
-            expected: "false"
-            actual: ${{ steps.check-tag.outputs.exists }}
+            # To prevent creating releases with the same version
+            - name: Cancel workflow if tag already exists
+              uses: nick-fields/assert-action@v2
+              with:
+                  expected: "false"
+                  actual: ${{ steps.check-tag.outputs.exists }}
 
     create_release:
         needs: [version_check]
         permissions:
-          contents: write
+            contents: write
         uses: ./.github/workflows/release.yml
         with:
             release_tag: v${{needs.version_check.outputs.project_version}}
-        
-          
