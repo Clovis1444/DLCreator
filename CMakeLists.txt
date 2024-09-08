@@ -72,6 +72,16 @@ target_link_libraries(DLCreator PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 # Add project dir to the include path
 target_include_directories(DLCreator PRIVATE "${CMAKE_SOURCE_DIR}")
 
+# [BUILD_SCRIPT]: Copy resources dir to build dir
+set(RESOURCES_DIR "${CMAKE_SOURCE_DIR}/resources")
+set(RESOURCES_DEST "${CMAKE_SOURCE_DIR}/build/resources")
+add_custom_command(
+    TARGET DLCreator PRE_BUILD
+    COMMAND echo '[BUILD_SCRIPT]: Copying ${RESOURCES_DIR} to the ${RESOURCES_DEST}' &&
+    rm -rf ${RESOURCES_DEST} && 
+    cp -r ${RESOURCES_DIR} ${RESOURCES_DEST}
+)
+
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
