@@ -1,30 +1,50 @@
 #pragma once
 
+#include <qapplication.h>
 #include <qstring.h>
 
-namespace Settings {
-inline static const QString kProgramName{"DLCreator"};
+class Settings {
+   public:
+    inline static const QString kProgramName{"DLCreator"};
 
-inline static const QString kCellLayerResourcesFilePath{
-    "/home/clovis/dev/DLCreator/resources/cellLayer.json"};
-inline static const QString kCellLayerResourcesDirPath{
-    "/home/clovis/dev/DLCreator/resources/"};
+    static QString CellLayerResourcesFilePath() {
+        return QApplication::applicationDirPath() + kCellLayerResourcesFilePath;
+    }
+    static QString CellLayerResourcesDirPath() {
+        return QApplication::applicationDirPath() + kCellLayerResourcesDirPath;
+    }
 
-inline static const QString kCellResourcesFilePath{
-    "/home/clovis/dev/DLCreator/resources/cell.json"};
-inline static const QString kCellResourcesDirPath{
-    "/home/clovis/dev/DLCreator/resources/"};
+    static QString CellResourcesFilePath() {
+        return QApplication::applicationDirPath() + kCellResourcesFilePath;
+    }
+    static QString CellResourcesDirPath() {
+        return QApplication::applicationDirPath() + kCellResourcesDirPath;
+    }
 
-namespace JSON {
-namespace Cell {
-inline static const QString kBackgroundFileKey{
-    "default_cell_background_file_name"};
-inline static const QString kFrameFileKey{"default_cell_frame_file_name"};
-inline static const QString kActiveFrameFileKey{"active_cell_frame_file_name"};
-}  // namespace Cell
-namespace CellLayer {
-inline static const QString kNameKey{"name"};
-inline static const QString kFileKey{"file_name"};
-}  // namespace CellLayer
-}  // namespace JSON
-}  // namespace Settings
+    class JSON {
+       public:
+        class Cell {
+           public:
+            inline static const QString kBackgroundFileKey{
+                "default_cell_background_file_name"};
+            inline static const QString kFrameFileKey{
+                "default_cell_frame_file_name"};
+            inline static const QString kActiveFrameFileKey{
+                "active_cell_frame_file_name"};
+        };
+        class CellLayer {
+           public:
+            inline static const QString kNameKey{"name"};
+            inline static const QString kFileKey{"file_name"};
+        };
+    };
+
+   protected:
+    inline static const QString kCellLayerResourcesFilePath{
+        "/resources/cellLayer.json"};
+    inline static const QString kCellLayerResourcesDirPath{
+        "/resources/cellLayer_res/"};
+
+    inline static const QString kCellResourcesFilePath{"/resources/cell.json"};
+    inline static const QString kCellResourcesDirPath{"/resources/cell_res/"};
+};

@@ -95,7 +95,7 @@ class CellLayer {
     inline static QString jsonName(Type type) { return kJsonNames[type]; }
 
     inline static void loadCellLayersFromJson() {
-        QFile res{Settings::kCellLayerResourcesFilePath};
+        QFile res{Settings::CellLayerResourcesFilePath()};
         if (!res.exists()) {
             qDebug() << res.fileName() << "does not exists";
 
@@ -129,7 +129,7 @@ class CellLayer {
                         if (name.isEmpty() || file_name.isEmpty()) {
                             continue;
                         }
-                        QFile file{Settings::kCellLayerResourcesDirPath +
+                        QFile file{Settings::CellLayerResourcesDirPath() +
                                    file_name};
                         if (!file.exists()) {
                             continue;

@@ -27,7 +27,7 @@ class Cell : public QLabel {
     };
 
     static void loadResourcesFromJson() {
-        QFile res{Settings::kCellResourcesFilePath};
+        QFile res{Settings::CellResourcesFilePath()};
         if (!res.exists()) {
             qDebug() << res.fileName() << "does not exists";
 
@@ -55,9 +55,9 @@ class Cell : public QLabel {
                 if (background.isEmpty()) {
                     qDebug() << "Failed to find value of"
                              << Settings::JSON::Cell::kBackgroundFileKey << "in"
-                             << Settings::kCellResourcesFilePath;
+                             << Settings::CellResourcesFilePath();
                 } else {
-                    QString background_path{Settings::kCellResourcesDirPath +
+                    QString background_path{Settings::CellResourcesDirPath() +
                                             background};
 
                     if (QFile::exists(background_path)) {
@@ -72,9 +72,10 @@ class Cell : public QLabel {
                 if (frame.isEmpty()) {
                     qDebug() << "Failed to find value of"
                              << Settings::JSON::Cell::kFrameFileKey << "in"
-                             << Settings::kCellResourcesFilePath;
+                             << Settings::CellResourcesFilePath();
                 } else {
-                    QString frame_path{Settings::kCellResourcesDirPath + frame};
+                    QString frame_path{Settings::CellResourcesDirPath() +
+                                       frame};
 
                     if (QFile::exists(frame_path)) {
                         delete k_cell_frame_;
@@ -87,9 +88,9 @@ class Cell : public QLabel {
                 if (active_frame.isEmpty()) {
                     qDebug() << "Failed to find value of"
                              << Settings::JSON::Cell::kActiveFrameFileKey
-                             << "in" << Settings::kCellResourcesFilePath;
+                             << "in" << Settings::CellResourcesFilePath();
                 } else {
-                    QString active_frame_path{Settings::kCellResourcesDirPath +
+                    QString active_frame_path{Settings::CellResourcesDirPath() +
                                               active_frame};
 
                     if (QFile::exists(active_frame_path)) {
