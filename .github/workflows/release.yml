@@ -84,15 +84,13 @@ jobs:
           mv linuxdeployqt-continuous-x86_64.AppImage linuxdeployqt.AppImage
           mkdir DLCreator-linux && mv ${{ env.SOURCE_DIR }}/build/DLCreator ${{ env.SOURCE_DIR }}/build/resources DLCreator-linux
           ./linuxdeployqt.AppImage DLCreator-linux/DLCreator -always-overwrite
-        shell: bash
 
       - name: Deploy project(windows)
         if: matrix.os.name == 'windows'
         # Path to windeployqt.exe depends on QT version and Arch
         run: |
-          mkdir DLCreator-windows && mv ${{ env.SOURCE_DIR }}/build/DLCreator.exe ${{ env.SOURCE_DIR }}/build/resources DLCreator-windows
-          ${{ runner.temp }}/Qt/6.7.2/msvc2019_64/bin/windeployqt.exe DLCreator-windows/DLCreator.exe
-        shell: bash
+          mkdir DLCreator-windows && mv ${{ env.SOURCE_DIR }}\build\DLCreator.exe, ${{ env.SOURCE_DIR }}\build\resources DLCreator-windows
+          ${{ runner.temp }}\Qt\6.7.2\msvc2019_64\bin\windeployqt.exe DLCreator-windows\DLCreator.exe
 
       - name: Zip
         run: 7z a -tzip -mx5 -r0 ${{ matrix.os.artifact }}-${{inputs.release_tag}}.zip ${{matrix.os.artifact}}
