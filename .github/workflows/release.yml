@@ -90,8 +90,8 @@ jobs:
         if: matrix.os.name == 'windows'
         # Path to windeployqt.exe depends on QT version and Arch
         run: |
-          mkdir DLCreator-windows && mv ${{ env.SOURCE_DIR }}\build\DLCreator.exe ${{ env.SOURCE_DIR }}/build/resources DLCreator-windows
-          ${{ runner.temp }}\Qt\6.7.2\msvc2019_64\bin\windeployqt.exe DLCreator-windows\DLCreator.exe
+          mkdir DLCreator-windows && mv ${{ env.SOURCE_DIR }}/build/DLCreator.exe ${{ env.SOURCE_DIR }}/build/resources DLCreator-windows
+          ${{ runner.temp }}/Qt/6.7.2/msvc2019_64/bin/windeployqt.exe DLCreator-windows/DLCreator.exe
         shell: bash
 
       - name: Zip
