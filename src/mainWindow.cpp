@@ -2,7 +2,9 @@
 
 #include <qaction.h>
 #include <qboxlayout.h>
+#include <qcontainerfwd.h>
 #include <qdebug.h>
+#include <qdir.h>
 #include <qlabel.h>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -48,6 +50,9 @@ void MainWindow::initConnect() {
     // File -> New
     QObject::connect(ui_->actionNew, &QAction::triggered, this,
                      &MainWindow::onActionNew);
+    // File -> Save
+    QObject::connect(ui_->actionSave, &QAction::triggered, this,
+                     &MainWindow::onActionSave);
     // File -> Exit
     QObject::connect(ui_->actionExit, &QAction::triggered, this,
                      &MainWindow::onActionExit);
@@ -79,6 +84,32 @@ void MainWindow::initConnect() {
 
 void MainWindow::createNewDocument() { tabWidget_->createTab(); }
 
+QString MainWindow::getNewSaveFileName(QPair<int, int> map_size) {
+    QString file_name{QString::number(map_size.first) + "x" +
+                      QString::number(map_size.second) + "map"};
+    QFile save_file{Settings::SavesDir() + file_name +
+                    Settings::kSaveFileExtension};
+
+    // If file does not exists - return default file name
+    if (!save_file.exists()) {
+        return save_file.fileName();
+    }
+
+    // If file already exists - return file name with number
+    int count{1};
+    while (true) {
+        save_file.setFileName(Settings::SavesDir() + file_name + '(' +
+                              QString::number(count) + ')' +
+                              Settings::kSaveFileExtension);
+
+        if (!save_file.exists()) {
+            return save_file.fileName();
+        }
+
+        ++count;
+    }
+}
+
 void MainWindow::onToolChanged() {
     QString msg{"Tool: "};
     msg.append(Tool::toolName());
@@ -108,3 +139,36 @@ void MainWindow::onActionHistory() {
 void MainWindow::onActionExit() { QApplication::quit(); }
 
 void MainWindow::onActionNew() { createNewDocument(); }
+
+void MainWindow::onActionSave() {
+    QPair<int, int> map_size{tabWidget_->gridSize()};
+
+    // Do nothing if there is no grid
+    if (map_size.first == 0 && map_size.second == 0) {
+        qDebug() << "There is no grid";
+        return;
+    }
+
+    // Create saves dir if it is not exists
+    QDir saves_dir{Settings::SavesDir()};
+    if (!saves_dir.exists()) {
+        saves_dir.mkpath(".");
+    }
+
+    // Create file
+    QFile save_file{getNewSaveFileName(map_size)};
+
+    if (!save_file.open(QIODevice::WriteOnly)) {
+        qDebug() << "Failed to write save file: " << save_file.errorString();
+    }
+
+    save_file.write("// This is dungeon layout map file\n");
+    save_file.write("rows: ");
+    save_file.write(
+        (QString::number(map_size.first) + '\n').toStdString().c_str());
+    save_file.write("cols: ");
+    save_file.write(
+        (QString::number(map_size.second) + '\n').toStdString().c_str());
+
+    save_file.close();
+}

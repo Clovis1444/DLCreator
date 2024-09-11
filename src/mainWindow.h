@@ -28,6 +28,7 @@ class MainWindow : public QMainWindow {
    private:
     void initConnect();
     void createNewDocument();
+    static QString getNewSaveFileName(QPair<int, int> map_size);
 
    public slots:
     void onActionTools();
@@ -36,6 +37,7 @@ class MainWindow : public QMainWindow {
     void onActionHistory();
     static void onActionExit();
     void onActionNew();
+    void onActionSave();
     void onToolChanged();
 
    private:

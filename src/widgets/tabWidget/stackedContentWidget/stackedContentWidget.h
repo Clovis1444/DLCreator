@@ -40,6 +40,16 @@ class StackedContentWidget : public QStackedWidget {
         }
     }
 
+    QPair<int, int> gridSize() {
+        auto* active_widget{currentWidget()};
+
+        if (active_widget == nullptr) {
+            return {0, 0};
+        }
+
+        return static_cast<ContentWidget*>(active_widget)->gridSize();
+    }
+
    protected:
     QList<ContentWidget*> contents_;
 };

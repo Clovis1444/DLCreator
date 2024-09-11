@@ -31,6 +31,8 @@ class ContentWidget : public QScrollArea {
         setWidget(content_);
     }
 
+    QPair<int, int> gridSize() { return content_->gridSize(); }
+
    protected:
     void keyPressEvent(QKeyEvent* e) override {
         switch (e->key()) {

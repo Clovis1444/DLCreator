@@ -77,6 +77,8 @@ class TabWidget : public QWidget {
         stacked_content_widget_->setVisible(visible);
     }
 
+    QPair<int, int> gridSize() { return stacked_content_widget_->gridSize(); }
+
    protected slots:
     void onTabClicked() {
         for (auto i : items_) {

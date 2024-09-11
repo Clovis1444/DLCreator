@@ -7,6 +7,8 @@ class Settings {
    public:
     inline static const QString kProgramName{"DLCreator"};
 
+    inline static const QString kSaveFileExtension{".dlmap"};
+
     static QString CellLayerResourcesFilePath() {
         return QApplication::applicationDirPath() + kCellLayerResourcesFilePath;
     }
@@ -19,6 +21,10 @@ class Settings {
     }
     static QString CellResourcesDirPath() {
         return QApplication::applicationDirPath() + kCellResourcesDirPath;
+    }
+
+    static QString SavesDir() {
+        return QApplication::applicationDirPath() + kSavesDir;
     }
 
     class JSON {
@@ -47,4 +53,6 @@ class Settings {
 
     inline static const QString kCellResourcesFilePath{"/resources/cell.json"};
     inline static const QString kCellResourcesDirPath{"/resources/cell_res/"};
+
+    inline static const QString kSavesDir{"/saves/"};
 };
