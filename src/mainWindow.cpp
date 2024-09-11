@@ -5,6 +5,9 @@
 #include <qcontainerfwd.h>
 #include <qdebug.h>
 #include <qdir.h>
+#include <qjsonarray.h>
+#include <qjsondocument.h>
+#include <qjsonobject.h>
 #include <qlabel.h>
 #include <qlogging.h>
 #include <qnamespace.h>
@@ -14,6 +17,7 @@
 #include <qwidget.h>
 
 #include "./ui_mainWindow.h"
+#include "mapSave.h"
 #include "settings.h"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -162,13 +166,13 @@ void MainWindow::onActionSave() {
         qDebug() << "Failed to write save file: " << save_file.errorString();
     }
 
-    save_file.write("// This is dungeon layout map file\n");
-    save_file.write("rows: ");
-    save_file.write(
-        (QString::number(map_size.first) + '\n').toStdString().c_str());
-    save_file.write("cols: ");
-    save_file.write(
-        (QString::number(map_size.second) + '\n').toStdString().c_str());
+    // Create json
+    QJsonDocument json{
+        MapSave::fromCellCollection(tabWidget_->cellCollection())};
+
+    // Push json to the file
+    QTextStream file_stream{&save_file};
+    file_stream << json.toJson(QJsonDocument::Indented);
 
     save_file.close();
 }

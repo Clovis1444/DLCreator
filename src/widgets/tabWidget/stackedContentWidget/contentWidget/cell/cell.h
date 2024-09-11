@@ -21,7 +21,7 @@ class Cell : public QLabel {
         QString background;
         QString liquid;
         QString gaz;
-        // bool selected{false};
+        bool selected;
 
         bool operator==(const CellInfo& other) const = default;
     };
@@ -111,7 +111,7 @@ class Cell : public QLabel {
     void setLayer(const CellLayer* layer, bool track_history = true);
     void setLayer(const CellInfo& i);
     void clearLayers(bool track_history = true);
-    CellInfo info();
+    CellInfo info() const;
 
     QString background() const;
     QString liquid() const;

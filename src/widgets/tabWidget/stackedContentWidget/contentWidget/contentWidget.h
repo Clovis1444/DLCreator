@@ -31,7 +31,9 @@ class ContentWidget : public QScrollArea {
         setWidget(content_);
     }
 
-    QPair<int, int> gridSize() { return content_->gridSize(); }
+    QPair<int, int> gridSize() const { return content_->gridSize(); }
+
+    const CellCollection* cellCollection() { return content_; };
 
    protected:
     void keyPressEvent(QKeyEvent* e) override {

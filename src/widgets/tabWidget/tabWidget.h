@@ -79,6 +79,10 @@ class TabWidget : public QWidget {
 
     QPair<int, int> gridSize() { return stacked_content_widget_->gridSize(); }
 
+    const CellCollection* cellCollection() {
+        return stacked_content_widget_->cellCollection();
+    }
+
    protected slots:
     void onTabClicked() {
         for (auto i : items_) {

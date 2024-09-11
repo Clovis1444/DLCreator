@@ -6,6 +6,7 @@
 #include <qwidget.h>
 
 #include "contentWidget/contentWidget.h"
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h"
 
 class StackedContentWidget : public QStackedWidget {
     Q_OBJECT
@@ -48,6 +49,10 @@ class StackedContentWidget : public QStackedWidget {
         }
 
         return static_cast<ContentWidget*>(active_widget)->gridSize();
+    }
+
+    const CellCollection* cellCollection() {
+        return static_cast<ContentWidget*>(currentWidget())->cellCollection();
     }
 
    protected:

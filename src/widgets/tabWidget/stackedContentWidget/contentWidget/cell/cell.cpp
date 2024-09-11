@@ -90,8 +90,8 @@ void Cell::clearLayers(bool track_history) {
     }
 }
 
-Cell::CellInfo Cell::info() {
-    return CellInfo{layer_background_, layer_liquid_, layer_gaz_};
+Cell::CellInfo Cell::info() const {
+    return CellInfo{layer_background_, layer_liquid_, layer_gaz_, selected_};
 }
 
 QString Cell::background() const { return layer_background_; }

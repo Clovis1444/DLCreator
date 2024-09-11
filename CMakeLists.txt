@@ -25,6 +25,7 @@ set(PROJECT_SOURCES
         src/mainWindow.ui
         src/tool.h
         src/history.h
+        src/mapSave.h
         src/widgets/toolWidget/collapsibleSection.h
         src/widgets/toolWidget/toolButton.h
         src/widgets/toolWidget/toolWidget.h
