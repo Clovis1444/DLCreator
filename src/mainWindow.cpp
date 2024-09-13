@@ -5,6 +5,7 @@
 #include <qcontainerfwd.h>
 #include <qdebug.h>
 #include <qdir.h>
+#include <qfiledialog.h>
 #include <qjsonarray.h>
 #include <qjsondocument.h>
 #include <qjsonobject.h>
@@ -57,6 +58,9 @@ void MainWindow::initConnect() {
     // File -> Save
     QObject::connect(ui_->actionSave, &QAction::triggered, this,
                      &MainWindow::onActionSave);
+    // File -> Load
+    QObject::connect(ui_->actionLoad, &QAction::triggered, this,
+                     &MainWindow::onActionLoad);
     // File -> Exit
     QObject::connect(ui_->actionExit, &QAction::triggered, this,
                      &MainWindow::onActionExit);
@@ -167,12 +171,26 @@ void MainWindow::onActionSave() {
     }
 
     // Create json
-    QJsonDocument json{
-        MapSave::fromCellCollection(tabWidget_->cellCollection())};
+    QJsonDocument json{MapSave::saveMapToFile(tabWidget_->cellCollection())};
 
     // Push json to the file
     QTextStream file_stream{&save_file};
     file_stream << json.toJson(QJsonDocument::Indented);
 
     save_file.close();
+}
+
+void MainWindow::onActionLoad() {
+    auto file_open_callback = [](const QString& file_name,
+                                 const QByteArray& file_content) {
+        if (!file_name.isEmpty()) {
+            MapSave::loadMapFromFile(file_name, file_content);
+        } else {
+            qDebug() << "No file was selected";
+        }
+    };
+
+    QFileDialog::getOpenFileContent(
+        QString{"dlmap (*%1)"}.arg(Settings::kSaveFileExtension),
+        file_open_callback, this);
 }

@@ -6,12 +6,11 @@
 #include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellLayer.h"
 #include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h"
 
-// TODO(clovis): implement deserialization
 class MapSave : public QObject {
     Q_OBJECT
 
    public:
-    static QJsonDocument fromCellCollection(const CellCollection* cc) {
+    static QJsonDocument saveMapToFile(const CellCollection* cc) {
         // Obj containing all cells
         QJsonObject json_cells{};
         // Iterate cells
@@ -46,6 +45,23 @@ class MapSave : public QObject {
         QJsonDocument json{json_obj_root};
 
         return json;
+    }
+
+    // TODO(clovis): implement return CellCollection*
+    static void loadMapFromFile(const QString& file_name,
+                                const QByteArray& file_content) {
+        QJsonParseError err{};
+        QJsonDocument map_json{QJsonDocument::fromJson(file_content, &err)};
+
+        // Return if json read error
+        if (err.error != QJsonParseError::NoError) {
+            qDebug() << QString{"Failed to read %1 file: "}.arg(
+                            Settings::kSaveFileExtension)
+                     << err.errorString();
+            return;
+        }
+
+        qDebug() << map_json["dlmap"]["Cells"]["10_6"];
     }
 
     inline static const QString kRootObjKey{

@@ -9,6 +9,3 @@
 -   Fix bug when user can use `Tool` associated with deleted `CellLayer`
 -   Consider implement History tracking when add/remove `Cell` to/from `CellCollection`
 
-# GITHUB ACTIONS
-
--   Create `Check version from file` reusable action action
