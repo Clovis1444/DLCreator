@@ -6,6 +6,7 @@
 #include <qdebug.h>
 #include <qdir.h>
 #include <qfiledialog.h>
+#include <qfileinfo.h>
 #include <qjsonarray.h>
 #include <qjsondocument.h>
 #include <qjsonobject.h>
@@ -18,8 +19,8 @@
 #include <qwidget.h>
 
 #include "./ui_mainWindow.h"
-#include "mapSave.h"
 #include "settings.h"
+#include "src/mapSaver/mapSaver.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
@@ -148,6 +149,7 @@ void MainWindow::onActionExit() { QApplication::quit(); }
 
 void MainWindow::onActionNew() { createNewDocument(); }
 
+// TODO(clovis): implement this function using QFileDialog
 void MainWindow::onActionSave() {
     QPair<int, int> map_size{tabWidget_->gridSize()};
 
@@ -171,7 +173,7 @@ void MainWindow::onActionSave() {
     }
 
     // Create json
-    QJsonDocument json{MapSave::saveMapToFile(tabWidget_->cellCollection())};
+    QJsonDocument json{MapSaver::saveMapToFile(tabWidget_->cellCollection())};
 
     // Push json to the file
     QTextStream file_stream{&save_file};
@@ -181,10 +183,15 @@ void MainWindow::onActionSave() {
 }
 
 void MainWindow::onActionLoad() {
-    auto file_open_callback = [](const QString& file_name,
-                                 const QByteArray& file_content) {
+    auto file_open_callback = [this](const QString& file_name,
+                                     const QByteArray& file_content) {
         if (!file_name.isEmpty()) {
-            MapSave::loadMapFromFile(file_name, file_content);
+            auto* cc{MapSaver::loadMapFromFile(file_name, file_content)};
+
+            // Check if json was loaded correctly
+            if (cc == nullptr) return;
+
+            tabWidget_->createTab(cc, QFileInfo{file_name}.baseName());
         } else {
             qDebug() << "No file was selected";
         }

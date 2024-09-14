@@ -30,6 +30,14 @@ class ContentWidget : public QScrollArea {
 
         setWidget(content_);
     }
+    ContentWidget(QWidget* parent, CellCollection* cc)
+        : QScrollArea(parent), content_{cc} {
+        setWidgetResizable(true);
+        // CellColection widget alignment
+        setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
+
+        setWidget(content_);
+    }
 
     QPair<int, int> gridSize() const { return content_->gridSize(); }
 

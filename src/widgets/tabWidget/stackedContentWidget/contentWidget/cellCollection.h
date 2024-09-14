@@ -36,37 +36,11 @@ class CellCollection : public QWidget {
    public:
     CellCollection(QWidget* parent, int size)
         : QWidget{parent}, cols_{size}, rows_{size} {
-        // Grid layout
-        layout_->setContentsMargins(0, 0, 0, 0);
-        layout_->setSpacing(0);
-        layout_->setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
-        setLayout(layout_);
-
-        // Expand buttons
-        placeExpandButtons();
-        QObject::connect(expand_buttons_[kUp], &ExpandButton::pressed, this,
-                         &CellCollection::onExpandPress);
-        QObject::connect(expand_buttons_[kDown], &ExpandButton::pressed, this,
-                         &CellCollection::onExpandPress);
-        QObject::connect(expand_buttons_[kLeft], &ExpandButton::pressed, this,
-                         &CellCollection::onExpandPress);
-        QObject::connect(expand_buttons_[kRight], &ExpandButton::pressed, this,
-                         &CellCollection::onExpandPress);
-
-        // Cells
-        for (int i{1}; i <= size; ++i) {
-            for (int j{1}; j <= size; ++j) {
-                auto* cell = new Cell{this, {j, i}};
-                addCell(cell);
-
-                QObject::connect(cell, &Cell::clicked, this,
-                                 [this, cell] { onCellClicked(cell); });
-            }
-        }
-
-        // Connects
-        QObject::connect(this, &CellCollection::mouseMoved, this,
-                         &CellCollection::onMouseMove);
+        constructorBody(size, size);
+    }
+    CellCollection(QWidget* parent, int rows, int cols)
+        : QWidget{parent}, cols_{cols}, rows_{rows} {
+        constructorBody(rows, cols);
     }
 
     void unselectCells() {
@@ -109,8 +83,43 @@ class CellCollection : public QWidget {
 
         return list;
     }
+    QList<Cell*> cellListMut() { return cells_; }
 
    protected:
+    void constructorBody(int rows, int cols) {
+        // Grid layout
+        layout_->setContentsMargins(0, 0, 0, 0);
+        layout_->setSpacing(0);
+        layout_->setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
+        setLayout(layout_);
+
+        // Expand buttons
+        placeExpandButtons();
+        QObject::connect(expand_buttons_[kUp], &ExpandButton::pressed, this,
+                         &CellCollection::onExpandPress);
+        QObject::connect(expand_buttons_[kDown], &ExpandButton::pressed, this,
+                         &CellCollection::onExpandPress);
+        QObject::connect(expand_buttons_[kLeft], &ExpandButton::pressed, this,
+                         &CellCollection::onExpandPress);
+        QObject::connect(expand_buttons_[kRight], &ExpandButton::pressed, this,
+                         &CellCollection::onExpandPress);
+
+        // Cells
+        for (int i{1}; i <= cols; ++i) {
+            for (int j{1}; j <= rows; ++j) {
+                auto* cell = new Cell{this, {j, i}};
+                addCell(cell);
+
+                QObject::connect(cell, &Cell::clicked, this,
+                                 [this, cell] { onCellClicked(cell); });
+            }
+        }
+
+        // Connects
+        QObject::connect(this, &CellCollection::mouseMoved, this,
+                         &CellCollection::onMouseMove);
+    }
+
     // TODO(clovis): implement zoom
     void wheelEvent(QWheelEvent* e) override {
         if (e->angleDelta().y() < 0) {

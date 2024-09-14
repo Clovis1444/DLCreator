@@ -8,6 +8,8 @@
 #include <qpixmap.h>
 #include <qpoint.h>
 
+#include <utility>
+
 #include "cellLayer.h"
 
 class Cell : public QLabel {
@@ -23,7 +25,42 @@ class Cell : public QLabel {
         QString gaz;
         bool selected;
 
+        CellInfo() = default;
+        CellInfo(QString background, QString liquid, QString gaz, bool selected)
+            : background{std::move(background)},
+              liquid{std::move(liquid)},
+              gaz{std::move(gaz)},
+              selected{selected} {}
         bool operator==(const CellInfo& other) const = default;
+        // Const
+        QString operator[](const CellLayer::Type& type) const {
+            switch (type) {
+                case CellLayer::kBackground:
+                    return background;
+                case CellLayer::kLiquid:
+                    return liquid;
+                case CellLayer::kGaz:
+                    return gaz;
+                default:
+                    return "";
+            }
+        }
+        // Mut
+        QString& operator[](CellLayer::Type type) {
+            switch (type) {
+                case CellLayer::kBackground:
+                    return background;
+                case CellLayer::kLiquid:
+                    return liquid;
+                case CellLayer::kGaz:
+                    return gaz;
+                default:
+                    return subscript_operator_overflow_buffer_;
+            }
+        }
+
+       protected:
+        QString subscript_operator_overflow_buffer_;
     };
 
     static void loadResourcesFromJson() {

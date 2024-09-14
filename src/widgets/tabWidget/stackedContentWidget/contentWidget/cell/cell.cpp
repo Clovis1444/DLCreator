@@ -71,6 +71,8 @@ void Cell::setLayer(const CellInfo& i) {
     layer_liquid_ = i.liquid;
     layer_gaz_ = i.gaz;
 
+    selected_ = i.selected;
+
     drawCell();
 }
 void Cell::clearLayers(bool track_history) {

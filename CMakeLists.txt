@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(DLCreator VERSION 0.0.2 LANGUAGES CXX)
+project(DLCreator VERSION 0.0.3 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -25,7 +25,9 @@ set(PROJECT_SOURCES
         src/mainWindow.ui
         src/tool.h
         src/history.h
-        src/mapSave.h
+        src/mapSaver/mapSaver.h
+        src/mapSaver/mapSaver.cpp
+        src/mapSaver/mapSaverJsons.h
         src/widgets/toolWidget/collapsibleSection.h
         src/widgets/toolWidget/toolButton.h
         src/widgets/toolWidget/toolWidget.h

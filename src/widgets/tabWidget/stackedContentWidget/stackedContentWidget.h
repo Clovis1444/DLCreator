@@ -31,6 +31,16 @@ class StackedContentWidget : public QStackedWidget {
 
         return content;
     }
+    ContentWidget* createContent(CellCollection* cc) {
+        auto* content{new ContentWidget{this, cc}};
+        cc->setParent(content);
+
+        contents_.push_back(content);
+
+        addWidget(content);
+
+        return content;
+    }
     void deleteContent(ContentWidget* c) {
         for (auto* i : contents_) {
             if (i == c) {
