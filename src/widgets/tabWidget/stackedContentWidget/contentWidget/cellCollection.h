@@ -58,7 +58,8 @@ class CellCollection : public QWidget {
 
     bool hasSelection() { return !selected_cells_.isEmpty(); }
 
-    QPair<int, int> gridSize() const { return {cols_, rows_}; }
+    // Returns [rows, cols] pair
+    QPair<int, int> gridSize() const { return {rows_, cols_}; }
 
     void resizeGrid(ExpandDirection d, bool expand = true) {
         if (expand) {
@@ -105,8 +106,8 @@ class CellCollection : public QWidget {
                          &CellCollection::onExpandPress);
 
         // Cells
-        for (int i{1}; i <= cols; ++i) {
-            for (int j{1}; j <= rows; ++j) {
+        for (int i{1}; i <= rows; ++i) {
+            for (int j{1}; j <= cols; ++j) {
                 auto* cell = new Cell{this, {j, i}};
                 addCell(cell);
 

@@ -68,7 +68,8 @@ class TabWidget : public QWidget {
         QObject::connect(tab_button, &TabButton::closePressed, this,
                          &TabWidget::onTabClose);
     }
-    void createTab(CellCollection* cc, const QString& name = "New tab") {
+    void createTab(CellCollection* cc, const QString& name = "New tab",
+                   const QString& file_path = "") {
         if (cc == nullptr) return;
 
         auto* tab_button{tabs_widget_->createButton(name)};
@@ -76,7 +77,7 @@ class TabWidget : public QWidget {
         auto* history{
             stacked_history_widget_->createHistory(content->widget())};
 
-        TabWidgetItem item{tab_button, content, history};
+        TabWidgetItem item{tab_button, content, history, file_path};
         items_.push_back(item);
 
         // Set new tab as active tab
@@ -102,6 +103,18 @@ class TabWidget : public QWidget {
         return stacked_content_widget_->cellCollection();
     }
 
+    int tabs_count() const { return static_cast<int>(items_.count()); }
+
+    QString activeTabName() const {
+        TabWidgetItem item{currentItem()};
+
+        if (item.button == nullptr) {
+            return "";
+        }
+
+        return item.button->text();
+    }
+
    protected slots:
     void onTabClicked() {
         for (auto i : items_) {
@@ -125,6 +138,7 @@ class TabWidget : public QWidget {
         TabButton* button;
         ContentWidget* content;
         HistoryWidget* history;
+        QString file_path{""};
 
         friend bool operator==(const TabWidgetItem& first,
                                const TabWidgetItem& second) = default;
@@ -141,6 +155,16 @@ class TabWidget : public QWidget {
         tabs_widget_->deleteButton(i.button);
 
         items_.removeOne(i);
+    }
+
+    TabWidgetItem currentItem() const {
+        for (auto i : items_) {
+            if (i.content == stacked_content_widget_->currentWidget()) {
+                return i;
+            }
+        }
+
+        return TabWidgetItem{};
     }
 
     StackedContentWidget* stacked_content_widget_;

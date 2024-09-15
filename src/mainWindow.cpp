@@ -151,6 +151,25 @@ void MainWindow::onActionNew() { createNewDocument(); }
 
 // TODO(clovis): implement this function using QFileDialog
 void MainWindow::onActionSave() {
+    if (tabWidget_->tabs_count() == 0) {
+        return;
+    }
+
+    // TODO(clovis): create new button "Save as" and use the following code in
+    // it
+    // QString tab_name{tabWidget_->activeTabName()};
+
+    // QString file_name{QFileDialog::getSaveFileName(
+    //     this, "Save file",
+    //     QString{"%1%2%3"}
+    //         .arg(Settings::SavesDir())
+    //         .arg(tab_name)
+    //         .arg(Settings::kSaveFileExtension),
+    //     QString{"dlmap (*%1)"}.arg(Settings::kSaveFileExtension))};
+
+    // // TODO(clovis): refactor the rest of the function
+    // qDebug() << file_name;
+
     QPair<int, int> map_size{tabWidget_->gridSize()};
 
     // Do nothing if there is no grid
@@ -183,21 +202,27 @@ void MainWindow::onActionSave() {
 }
 
 void MainWindow::onActionLoad() {
-    auto file_open_callback = [this](const QString& file_name,
-                                     const QByteArray& file_content) {
-        if (!file_name.isEmpty()) {
-            auto* cc{MapSaver::loadMapFromFile(file_name, file_content)};
+    // Let user choose the file
+    QString file_name{QFileDialog::getOpenFileName(
+        this, QString{"Load %1"}.arg(Settings::kSaveFileExtension),
+        QString{"%1%2%3"}.arg(Settings::SavesDir()),
+        QString{"dlmap (*%1)"}.arg(Settings::kSaveFileExtension))};
 
-            // Check if json was loaded correctly
-            if (cc == nullptr) return;
+    QFile file{file_name};
 
-            tabWidget_->createTab(cc, QFileInfo{file_name}.baseName());
-        } else {
-            qDebug() << "No file was selected";
-        }
-    };
+    // Return if failed to open the file
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "Failed to open save file: " << file.errorString();
+        return;
+    }
 
-    QFileDialog::getOpenFileContent(
-        QString{"dlmap (*%1)"}.arg(Settings::kSaveFileExtension),
-        file_open_callback, this);
+    // Get file content
+    QByteArray file_content{file.readAll()};
+    file.close();
+
+    // Load map and then create a new tab
+    auto* cc{MapSaver::loadMapFromFile(file_name, file_content)};
+    // Check if json was loaded correctly
+    if (cc == nullptr) return;
+    tabWidget_->createTab(cc, QFileInfo{file_name}.baseName(), file_name);
 }
