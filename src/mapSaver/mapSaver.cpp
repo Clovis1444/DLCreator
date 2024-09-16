@@ -66,3 +66,30 @@ CellCollection* MapSaver::loadMapFromFile(const QString& file_name,
 
     return cc;
 }
+
+// Generates absolute save file path with the file extension
+// If add_number is set - adds number in parenthesis at the end of file name if
+// the file already exists
+QString MapSaver::getSaveFilePath(const QString& name, bool add_number) {
+    QFile save_file{Settings::SavesDir() + name + Settings::kSaveFileExtension};
+
+    // If file does not exists(or add_number is not set) - return default file
+    // name
+    if (!add_number || !save_file.exists()) {
+        return save_file.fileName();
+    }
+
+    // If file already exists - return file name with number
+    int count{1};
+    while (true) {
+        save_file.setFileName(Settings::SavesDir() + name + '(' +
+                              QString::number(count) + ')' +
+                              Settings::kSaveFileExtension);
+
+        if (!save_file.exists()) {
+            return save_file.fileName();
+        }
+
+        ++count;
+    }
+}

@@ -8,3 +8,8 @@
 -   Make all keyboard shortcuts `MainWindow` wide?
 -   Fix bug when user can use `Tool` associated with deleted `CellLayer`
 -   Consider implement History tracking when add/remove `Cell` to/from `CellCollection`
+   
+
+# IMPORTANT
+- check all classed: if there is a member variable that allocates memory - dealocate it in destructor
+- Change `qDebug()` to `qInfo()`/`qWarning()`/`qCritical()`

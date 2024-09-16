@@ -93,6 +93,8 @@ void MainWindow::initConnect() {
 
 void MainWindow::createNewDocument() { tabWidget_->createTab(); }
 
+// TODO(clovis): useless function? -> this function was reimplemented as
+// MapSaver::getSaveFilePath()
 QString MainWindow::getNewSaveFileName(QPair<int, int> map_size) {
     QString file_name{QString::number(map_size.first) + "x" +
                       QString::number(map_size.second) + "map"};
@@ -174,7 +176,7 @@ void MainWindow::onActionSave() {
 
     // Do nothing if there is no grid
     if (map_size.first == 0 && map_size.second == 0) {
-        qDebug() << "There is no grid";
+        qInfo() << "There is no grid";
         return;
     }
 
@@ -184,11 +186,31 @@ void MainWindow::onActionSave() {
         saves_dir.mkpath(".");
     }
 
-    // Create file
-    QFile save_file{getNewSaveFileName(map_size)};
+    QString save_file_name{};
+    // Generate new file path or use file path from already loaded file
+    if (tabWidget_->tabFilePath().isEmpty()) {
+        save_file_name = MapSaver::getSaveFilePath(tabWidget_->tabName());
+        // What do we have:
+        // - Files may be just created or loaded
+        // - File name may exists or not
+        //
+        // LOADED -> MAY REWRITE
+        // NEW -> if exists call saveAs()
+        // TODO(clovis): handle this case
+        if (QFile{save_file_name}.exists()) {
+            qDebug() << "File with that name already exists!!!!";
+            qWarning() << "Handle this case!";
+            return;
+        }
+    } else {
+        save_file_name = tabWidget_->tabFilePath();
+    }
+    qDebug() << save_file_name;
+
+    QFile save_file{save_file_name};
 
     if (!save_file.open(QIODevice::WriteOnly)) {
-        qDebug() << "Failed to write save file: " << save_file.errorString();
+        qWarning() << "Failed to write save file: " << save_file.errorString();
     }
 
     // Create json
@@ -199,9 +221,18 @@ void MainWindow::onActionSave() {
     file_stream << json.toJson(QJsonDocument::Indented);
 
     save_file.close();
+
+    // Dont forget to update file_path
+    tabWidget_->setTabFilePath(save_file_name);
 }
 
 void MainWindow::onActionLoad() {
+    // Create saves dir if it is not exists
+    QDir saves_dir{Settings::SavesDir()};
+    if (!saves_dir.exists()) {
+        saves_dir.mkpath(".");
+    }
+
     // Let user choose the file
     QString file_name{QFileDialog::getOpenFileName(
         this, QString{"Load %1"}.arg(Settings::kSaveFileExtension),

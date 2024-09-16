@@ -51,7 +51,7 @@ class TabWidget : public QWidget {
         delete tabs_widget_;
     }
 
-    void createTab(const QString& name = "New tab") {
+    void createTab(const QString& name = kDefaultNewTabName) {
         auto* tab_button{tabs_widget_->createButton(name)};
         auto* content{stacked_content_widget_->createContent()};
         auto* history{
@@ -68,7 +68,7 @@ class TabWidget : public QWidget {
         QObject::connect(tab_button, &TabButton::closePressed, this,
                          &TabWidget::onTabClose);
     }
-    void createTab(CellCollection* cc, const QString& name = "New tab",
+    void createTab(CellCollection* cc, const QString& name = kDefaultNewTabName,
                    const QString& file_path = "") {
         if (cc == nullptr) return;
 
@@ -97,6 +97,40 @@ class TabWidget : public QWidget {
         stacked_content_widget_->setVisible(visible);
     }
 
+    // TODO(clovis): consider renaming existing file also
+    void setTabName(const QString& name) {
+        // Tab name must contains at least 1 symbol
+        if (name.isEmpty()) return;
+
+        TabWidgetItem item{currentItem()};
+
+        if (item == TabWidgetItem{}) return;
+
+        // Update file_path
+        for (auto& i : items_) {
+            if (i == item) {
+                i.file_path.replace(i.button->text(), name);
+                break;
+            }
+        }
+
+        // Set new name
+        item.button->setText(name);
+    }
+
+    void setTabFilePath(const QString& file_path) {
+        TabWidgetItem item{currentItem()};
+
+        if (item == TabWidgetItem{}) return;
+
+        for (auto& i : items_) {
+            if (i == item) {
+                i.file_path = file_path;
+                break;
+            }
+        }
+    }
+
     QPair<int, int> gridSize() { return stacked_content_widget_->gridSize(); }
 
     const CellCollection* cellCollection() {
@@ -105,7 +139,7 @@ class TabWidget : public QWidget {
 
     int tabs_count() const { return static_cast<int>(items_.count()); }
 
-    QString activeTabName() const {
+    QString tabName() const {
         TabWidgetItem item{currentItem()};
 
         if (item.button == nullptr) {
@@ -113,6 +147,12 @@ class TabWidget : public QWidget {
         }
 
         return item.button->text();
+    }
+
+    QString tabFilePath() const {
+        TabWidgetItem item{currentItem()};
+
+        return item.file_path;
     }
 
    protected slots:
@@ -172,4 +212,6 @@ class TabWidget : public QWidget {
     TabScrollArea* tabs_widget_;
     QGridLayout* layout_;
     QList<TabWidgetItem> items_;
+
+    inline static const QString kDefaultNewTabName{"Untitled map"};
 };
