@@ -38,6 +38,7 @@ class MainWindow : public QMainWindow {
     static void onActionExit();
     void onActionNew();
     void onActionSave();
+    void onActionSaveAs();
     void onActionLoad();
     void onToolChanged();
 

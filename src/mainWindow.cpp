@@ -59,6 +59,9 @@ void MainWindow::initConnect() {
     // File -> Save
     QObject::connect(ui_->actionSave, &QAction::triggered, this,
                      &MainWindow::onActionSave);
+    // File -> Save As
+    QObject::connect(ui_->actionSaveAs, &QAction::triggered, this,
+                     &MainWindow::onActionSaveAs);
     // File -> Load
     QObject::connect(ui_->actionLoad, &QAction::triggered, this,
                      &MainWindow::onActionLoad);
@@ -151,26 +154,13 @@ void MainWindow::onActionExit() { QApplication::quit(); }
 
 void MainWindow::onActionNew() { createNewDocument(); }
 
-// TODO(clovis): implement this function using QFileDialog
+// TODO(clovis): this function and onActionSaveAs() have similar code. REFACTOR?
+// If file LOADED -> rewrite
+// If file NEW -> call onActionSaveAs()
 void MainWindow::onActionSave() {
     if (tabWidget_->tabs_count() == 0) {
         return;
     }
-
-    // TODO(clovis): create new button "Save as" and use the following code in
-    // it
-    // QString tab_name{tabWidget_->activeTabName()};
-
-    // QString file_name{QFileDialog::getSaveFileName(
-    //     this, "Save file",
-    //     QString{"%1%2%3"}
-    //         .arg(Settings::SavesDir())
-    //         .arg(tab_name)
-    //         .arg(Settings::kSaveFileExtension),
-    //     QString{"dlmap (*%1)"}.arg(Settings::kSaveFileExtension))};
-
-    // // TODO(clovis): refactor the rest of the function
-    // qDebug() << file_name;
 
     QPair<int, int> map_size{tabWidget_->gridSize()};
 
@@ -196,16 +186,13 @@ void MainWindow::onActionSave() {
         //
         // LOADED -> MAY REWRITE
         // NEW -> if exists call saveAs()
-        // TODO(clovis): handle this case
         if (QFile{save_file_name}.exists()) {
-            qDebug() << "File with that name already exists!!!!";
-            qWarning() << "Handle this case!";
+            onActionSaveAs();
             return;
         }
     } else {
         save_file_name = tabWidget_->tabFilePath();
     }
-    qDebug() << save_file_name;
 
     QFile save_file{save_file_name};
 
@@ -226,6 +213,59 @@ void MainWindow::onActionSave() {
     tabWidget_->setTabFilePath(save_file_name);
 }
 
+void MainWindow::onActionSaveAs() {
+    if (tabWidget_->tabs_count() == 0) {
+        return;
+    }
+
+    QPair<int, int> map_size{tabWidget_->gridSize()};
+
+    // Do nothing if there is no grid
+    if (map_size.first == 0 && map_size.second == 0) {
+        qInfo() << "There is no grid";
+        return;
+    }
+
+    // Create saves dir if it is not exists
+    QDir saves_dir{Settings::SavesDir()};
+    if (!saves_dir.exists()) {
+        saves_dir.mkpath(".");
+    }
+
+    QString tab_name{tabWidget_->tabName()};
+
+    // Let user choose the file
+    QString save_file_name{QFileDialog::getSaveFileName(
+        this, QString{"Save %1 as"}.arg(Settings::kSaveFileExtension),
+        MapSaver::getSaveFilePath(tabWidget_->tabName()),
+        QString{"dlmap (*%1)"}.arg(Settings::kSaveFileExtension))};
+
+    // Return if user press "cancel"
+    if (save_file_name.isEmpty()) {
+        return;
+    }
+
+    QFile save_file{save_file_name};
+
+    if (!save_file.open(QIODevice::WriteOnly)) {
+        qWarning() << "Failed to write save file: " << save_file.errorString();
+    }
+
+    // Create json
+    QJsonDocument json{MapSaver::saveMapToFile(tabWidget_->cellCollection())};
+
+    // Push json to the file
+    QTextStream file_stream{&save_file};
+    file_stream << json.toJson(QJsonDocument::Indented);
+
+    save_file.close();
+
+    // Dont forget to update file_path and rename tab
+    tabWidget_->setTabFilePath(save_file_name);
+    tabWidget_->setTabName(QFileInfo{save_file_name}.baseName());
+}
+
+// TODO(clovis): implement if file already opened -> just make his tab active
 void MainWindow::onActionLoad() {
     // Create saves dir if it is not exists
     QDir saves_dir{Settings::SavesDir()};

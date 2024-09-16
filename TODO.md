@@ -13,3 +13,4 @@
 # IMPORTANT
 - check all classed: if there is a member variable that allocates memory - dealocate it in destructor
 - Change `qDebug()` to `qInfo()`/`qWarning()`/`qCritical()`
+- Add tests for MapSaver

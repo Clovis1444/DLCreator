@@ -97,7 +97,6 @@ class TabWidget : public QWidget {
         stacked_content_widget_->setVisible(visible);
     }
 
-    // TODO(clovis): consider renaming existing file also
     void setTabName(const QString& name) {
         // Tab name must contains at least 1 symbol
         if (name.isEmpty()) return;
@@ -105,14 +104,6 @@ class TabWidget : public QWidget {
         TabWidgetItem item{currentItem()};
 
         if (item == TabWidgetItem{}) return;
-
-        // Update file_path
-        for (auto& i : items_) {
-            if (i == item) {
-                i.file_path.replace(i.button->text(), name);
-                break;
-            }
-        }
 
         // Set new name
         item.button->setText(name);
@@ -157,7 +148,7 @@ class TabWidget : public QWidget {
 
    protected slots:
     void onTabClicked() {
-        for (auto i : items_) {
+        for (const auto& i : items_) {
             if (i.button == sender()) {
                 setCurrentItem(i);
                 return;
@@ -165,7 +156,7 @@ class TabWidget : public QWidget {
         }
     }
     void onTabClose() {
-        for (auto i : items_) {
+        for (const auto& i : items_) {
             if (i.button == sender()) {
                 deleteItem(i);
                 return;
