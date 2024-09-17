@@ -1,5 +1,7 @@
 #include "mapSaver.h"
 
+#include <qlogging.h>
+
 #include "src/mapSaver/mapSaverJsons.h"
 #include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h"
 
@@ -18,27 +20,27 @@ CellCollection* MapSaver::loadMapFromFile(const QString& file_name,
 
     // Return if failed to read map_size
     if (!map.size_arr().isValid()) {
-        qDebug() << QString{"Failed to read %1: [%2][%3] is not valid"}
-                        .arg(file_name)
-                        .arg(kRootObjKey)
-                        .arg(kRootMapSizeKey);
+        qWarning() << QString{"Failed to read %1: [%2][%3] is not valid"}
+                          .arg(file_name)
+                          .arg(kRootObjKey)
+                          .arg(kRootMapSizeKey);
 
         return nullptr;
     }
 
     // Return if failed to read cells
     if (!map.cells().isValid()) {
-        qDebug() << QString{"Failed to read %1: [%2][%3] is not valid"}
-                        .arg(file_name)
-                        .arg(kRootObjKey)
-                        .arg(kRootCellsKey);
+        qWarning() << QString{"Failed to read %1: [%2][%3] is not valid"}
+                          .arg(file_name)
+                          .arg(kRootObjKey)
+                          .arg(kRootCellsKey);
 
         return nullptr;
     }
 
     // Throw warning if not all cells are valid
     if (!map.cells().isValid(true)) {
-        qDebug() << QString{"Warning while reading %1: not all cells in [%2][%3] are valid"}
+        qInfo() << QString{"Warning while reading %1: not all cells in [%2][%3] are valid"}
                         .arg(file_name)
                         .arg(kRootObjKey)
                         .arg(kRootCellsKey);
@@ -56,7 +58,7 @@ CellCollection* MapSaver::loadMapFromFile(const QString& file_name,
 
         // Skip if cell was not found
         if (!cell_obj.isValid()) {
-            qDebug() << QString{"Warning: cell %1 was not found"}.arg(cell_key);
+            qInfo() << QString{"Warning: cell %1 was not found"}.arg(cell_key);
             continue;
         }
 

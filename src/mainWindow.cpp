@@ -3,7 +3,6 @@
 #include <qaction.h>
 #include <qboxlayout.h>
 #include <qcontainerfwd.h>
-#include <qdebug.h>
 #include <qdir.h>
 #include <qfiledialog.h>
 #include <qfileinfo.h>

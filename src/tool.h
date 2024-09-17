@@ -1,6 +1,5 @@
 #pragma once
 
-#include <qdebug.h>
 #include <qobject.h>
 #include <qtmetamacros.h>
 

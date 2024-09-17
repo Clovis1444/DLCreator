@@ -4,6 +4,7 @@
 #include <qevent.h>
 #include <qlabel.h>
 #include <qlist.h>
+#include <qlogging.h>
 #include <qpainter.h>
 #include <qpixmap.h>
 #include <qpoint.h>
@@ -58,7 +59,7 @@ class Cell : public QLabel {
     static void loadResourcesFromJson() {
         QFile res{Settings::CellResourcesFilePath()};
         if (!res.exists()) {
-            qDebug() << res.fileName() << "does not exists";
+            qWarning() << res.fileName() << "does not exists";
 
             return;
         }
@@ -82,9 +83,9 @@ class Cell : public QLabel {
 
                 // Background
                 if (background.isEmpty()) {
-                    qDebug() << "Failed to find value of"
-                             << Settings::JSON::Cell::kBackgroundFileKey << "in"
-                             << Settings::CellResourcesFilePath();
+                    qWarning() << "Failed to find value of"
+                               << Settings::JSON::Cell::kBackgroundFileKey
+                               << "in" << Settings::CellResourcesFilePath();
                 } else {
                     QString background_path{Settings::CellResourcesDirPath() +
                                             background};
@@ -93,15 +94,15 @@ class Cell : public QLabel {
                         delete k_default_background_;
                         k_default_background_ = new QPixmap{background_path};
                     } else {
-                        qDebug() << background_path << "not found";
+                        qWarning() << background_path << "not found";
                     }
                 }
 
                 // Frame
                 if (frame.isEmpty()) {
-                    qDebug() << "Failed to find value of"
-                             << Settings::JSON::Cell::kFrameFileKey << "in"
-                             << Settings::CellResourcesFilePath();
+                    qWarning() << "Failed to find value of"
+                               << Settings::JSON::Cell::kFrameFileKey << "in"
+                               << Settings::CellResourcesFilePath();
                 } else {
                     QString frame_path{Settings::CellResourcesDirPath() +
                                        frame};
@@ -110,14 +111,14 @@ class Cell : public QLabel {
                         delete k_cell_frame_;
                         k_cell_frame_ = new QPixmap{frame_path};
                     } else {
-                        qDebug() << frame_path << "not found";
+                        qWarning() << frame_path << "not found";
                     }
                 }
                 // Active Frame
                 if (active_frame.isEmpty()) {
-                    qDebug() << "Failed to find value of"
-                             << Settings::JSON::Cell::kActiveFrameFileKey
-                             << "in" << Settings::CellResourcesFilePath();
+                    qWarning() << "Failed to find value of"
+                               << Settings::JSON::Cell::kActiveFrameFileKey
+                               << "in" << Settings::CellResourcesFilePath();
                 } else {
                     QString active_frame_path{Settings::CellResourcesDirPath() +
                                               active_frame};
@@ -126,12 +127,12 @@ class Cell : public QLabel {
                         delete k_active_cell_frame_;
                         k_active_cell_frame_ = new QPixmap{active_frame_path};
                     } else {
-                        qDebug() << active_frame_path << "not found";
+                        qWarning() << active_frame_path << "not found";
                     }
                 }
             }
         } else {
-            qDebug() << res.fileName() << "Error: " << res.errorString();
+            qWarning() << res.fileName() << "Error: " << res.errorString();
         }
     };
 

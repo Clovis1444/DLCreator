@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <qboxlayout.h>
 #include <qhash.h>
@@ -47,4 +46,3 @@ class MainWindow : public QMainWindow {
     TabWidget *tabWidget_;
     ToolWidget *toolWidget_;
 };
-#endif  // MAINWINDOW_H

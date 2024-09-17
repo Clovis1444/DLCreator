@@ -132,7 +132,7 @@ class CellCollection : public QWidget {
         if (scale_ > kMaxScale) scale_ = kMaxScale;
         if (scale_ < kMinScale) scale_ = kMinScale;
 
-        // qDebug() << scale_;
+        // qInfo() << scale_;
     };
 
     void mousePressEvent(QMouseEvent* e) override {
@@ -368,7 +368,7 @@ class CellCollection : public QWidget {
    public slots:
     void onCellClicked(Cell* cell) {
         // TODO(clovis): implement CellPos here
-        // qDebug() << layout_->indexOf(cell);
+        // qInfo() << layout_->indexOf(cell);
         emit cellClicked();
     }
 

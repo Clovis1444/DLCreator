@@ -1,7 +1,6 @@
 #pragma once
 
 #include <qassert.h>
-#include <qdebug.h>
 #include <qfile.h>
 #include <qhash.h>
 #include <qjsonarray.h>
@@ -9,6 +8,7 @@
 #include <qjsonobject.h>
 #include <qjsonvalue.h>
 #include <qlist.h>
+#include <qlogging.h>
 #include <qmap.h>
 #include <qobject.h>
 #include <qpixmap.h>
@@ -44,7 +44,7 @@ class CellLayer {
 
     static void add(Type type, const QString& name, const QString& file_path) {
         if (!QFile::exists(file_path)) {
-            qDebug() << "Failed to create pixmap: file does not exists";
+            qWarning() << "Failed to create pixmap: file does not exists";
             return;
         }
 
@@ -97,7 +97,7 @@ class CellLayer {
     inline static void loadCellLayersFromJson() {
         QFile res{Settings::CellLayerResourcesFilePath()};
         if (!res.exists()) {
-            qDebug() << res.fileName() << "does not exists";
+            qWarning() << res.fileName() << "does not exists";
 
             return;
         }
@@ -140,7 +140,7 @@ class CellLayer {
                 }
             }
         } else {
-            qDebug() << res.fileName() << "Error: " << res.errorString();
+            qWarning() << res.fileName() << "Error: " << res.errorString();
         }
     }
 
