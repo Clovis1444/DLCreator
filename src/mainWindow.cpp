@@ -154,7 +154,7 @@ void MainWindow::onActionExit() { QApplication::quit(); }
 void MainWindow::onActionNew() { createNewDocument(); }
 
 // TODO(clovis): this function and onActionSaveAs() have similar code. REFACTOR?
-// If file LOADED -> rewrite
+// If file LOADED -> rewrite.
 // If file NEW -> call onActionSaveAs()
 void MainWindow::onActionSave() {
     if (tabWidget_->tabs_count() == 0) {
@@ -264,7 +264,7 @@ void MainWindow::onActionSaveAs() {
     tabWidget_->setTabName(QFileInfo{save_file_name}.baseName());
 }
 
-// TODO(clovis): implement if file already opened -> just make his tab active
+// If file already loaded - switches to corresponding file tab
 void MainWindow::onActionLoad() {
     // Create saves dir if it is not exists
     QDir saves_dir{Settings::SavesDir()};
@@ -277,6 +277,12 @@ void MainWindow::onActionLoad() {
         this, QString{"Load %1"}.arg(Settings::kSaveFileExtension),
         QString{"%1%2%3"}.arg(Settings::SavesDir()),
         QString{"dlmap (*%1)"}.arg(Settings::kSaveFileExtension))};
+
+    // If file already loaded -> switch to corresponding tab and return
+    if (tabWidget_->switchToFileTabIfLoaded(file_name)) {
+        qInfo() << file_name << "already loaded";
+        return;
+    }
 
     QFile file{file_name};
 

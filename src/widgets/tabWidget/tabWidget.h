@@ -146,6 +146,20 @@ class TabWidget : public QWidget {
         return item.file_path;
     }
 
+    // If file already loaded makes its tab active and returns TRUE.
+    // If there is no such file returns FALSE
+    bool switchToFileTabIfLoaded(const QString& file_path) {
+        // NOLINTNEXTLINE
+        for (const auto& i : items_) {
+            if (i.file_path == file_path) {
+                setCurrentItem(i);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
    protected slots:
     void onTabClicked() {
         for (const auto& i : items_) {

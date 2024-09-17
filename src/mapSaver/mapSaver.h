@@ -13,7 +13,6 @@ class MapSaver : public QObject {
    public:
     static QJsonDocument saveMapToFile(const CellCollection* cc);
 
-    // TODO(clovis): implement return CellCollection*
     static CellCollection* loadMapFromFile(const QString& file_name,
                                            const QByteArray& file_content);
 
