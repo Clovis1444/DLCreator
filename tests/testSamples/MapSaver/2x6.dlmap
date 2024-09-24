@@ -1,0 +1,83 @@
+{
+    "comment": "This is a dungeon layout map save file",
+    "dlmap": {
+        "Cells": {
+            "1_1": {
+                "Background": "",
+                "Gaz": "Vapor",
+                "Liquid": "Oil",
+                "Selected": true
+            },
+            "1_2": {
+                "Background": "",
+                "Gaz": "Vapor",
+                "Liquid": "Oil",
+                "Selected": true
+            },
+            "2_1": {
+                "Background": "",
+                "Gaz": "Vapor",
+                "Liquid": "Oil",
+                "Selected": true
+            },
+            "2_2": {
+                "Background": "",
+                "Gaz": "Vapor",
+                "Liquid": "Oil",
+                "Selected": true
+            },
+            "3_1": {
+                "Background": "Dirt",
+                "Gaz": "Vapor",
+                "Liquid": "",
+                "Selected": true
+            },
+            "3_2": {
+                "Background": "Dirt",
+                "Gaz": "Vapor",
+                "Liquid": "",
+                "Selected": true
+            },
+            "4_1": {
+                "Background": "Dirt",
+                "Gaz": "Smoke",
+                "Liquid": "",
+                "Selected": false
+            },
+            "4_2": {
+                "Background": "Dirt",
+                "Gaz": "Smoke",
+                "Liquid": "",
+                "Selected": false
+            },
+            "5_1": {
+                "Background": "Grass",
+                "Gaz": "Smoke",
+                "Liquid": "",
+                "Selected": false
+            },
+            "5_2": {
+                "Background": "",
+                "Gaz": "Smoke",
+                "Liquid": "",
+                "Selected": false
+            },
+            "6_1": {
+                "Background": "Grass",
+                "Gaz": "",
+                "Liquid": "",
+                "Selected": false
+            },
+            "6_2": {
+                "Background": "",
+                "Gaz": "",
+                "Liquid": "",
+                "Selected": false
+            }
+        },
+        "map_size": [
+            2,
+            6
+        ]
+    }
+}

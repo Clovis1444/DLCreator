@@ -18,33 +18,33 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
-        # resources/resources.qrc
-        src/main.cpp
-        src/mainWindow.cpp
-        src/mainWindow.h
-        src/mainWindow.ui
-        src/tool.h
-        src/history.h
-        src/mapSaver/mapSaver.h
-        src/mapSaver/mapSaver.cpp
-        src/mapSaver/mapSaverJsons.h
-        src/widgets/toolWidget/collapsibleSection.h
-        src/widgets/toolWidget/toolButton.h
-        src/widgets/toolWidget/toolWidget.h
-        src/widgets/tabWidget/tabWidget.h
-        src/widgets/tabWidget/tabScrollArea/tabScrollArea.h
-        src/widgets/tabWidget/tabScrollArea/tabButton.h
-        src/widgets/tabWidget/stackedContentWidget/stackedContentWidget.h
-        src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h
-        src/widgets/tabWidget/stackedContentWidget/contentWidget/contentWidget.h
-        src/widgets/tabWidget/stackedContentWidget/contentWidget/expandButton.h
-        src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.h
-        src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.cpp
-        src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellAction.h
-        src/widgets/tabWidget/stackedHistoryWidget/stackedHistoryWidget.h
-        src/widgets/tabWidget/stackedHistoryWidget/historyWidget/historyWidget.h
-        src/widgets/tabWidget/stackedHistoryWidget/historyWidget/cellActionWidget.h
-        src/widgets/components/nameFrame.h
+        # ${CMAKE_CURRENT_SOURCE_DIR}/resources/resources.qrc      
+        # ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mainWindow.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mainWindow.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mainWindow.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/tool.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/history.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mapSaver/mapSaver.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mapSaver/mapSaver.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mapSaver/mapSaverJsons.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/toolWidget/collapsibleSection.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/toolWidget/toolButton.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/toolWidget/toolWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/tabWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/tabScrollArea/tabScrollArea.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/tabScrollArea/tabButton.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/stackedContentWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/contentWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/expandButton.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellAction.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedHistoryWidget/stackedHistoryWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedHistoryWidget/historyWidget/historyWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedHistoryWidget/historyWidget/cellActionWidget.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/components/nameFrame.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -70,16 +70,22 @@ else()
     endif()
 endif()
 
+# Add main.cpp
+target_sources(DLCreator PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+)
+
 target_link_libraries(DLCreator PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
 # Add project dir to the include path
 target_include_directories(DLCreator PRIVATE "${CMAKE_SOURCE_DIR}")
 
 # [BUILD_SCRIPT]: Copy resources dir to build dir
+set(BUILD_DIR "${CMAKE_SOURCE_DIR}/build")
 set(RESOURCES_DIR "${CMAKE_SOURCE_DIR}/resources")
-set(RESOURCES_DEST "${CMAKE_SOURCE_DIR}/build/resources")
+set(RESOURCES_DEST "${BUILD_DIR}/resources")
 add_custom_command(
-    TARGET DLCreator PRE_BUILD
+    TARGET DLCreator POST_BUILD
     COMMAND echo '[BUILD_SCRIPT]: Copying ${RESOURCES_DIR} to the ${RESOURCES_DEST}' &&
     rm -rf ${RESOURCES_DEST} && 
     cp -r ${RESOURCES_DIR} ${RESOURCES_DEST}
@@ -109,3 +115,7 @@ install(TARGETS DLCreator
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(DLCreator)
 endif()
+
+
+# Add a test directory
+add_subdirectory(tests)

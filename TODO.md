@@ -12,4 +12,3 @@
 
 # IMPORTANT
 - check all classed: if there is a member variable that allocates memory - dealocate it in destructor
-- Add tests for MapSaver
