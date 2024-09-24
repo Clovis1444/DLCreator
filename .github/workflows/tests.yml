@@ -50,4 +50,4 @@ jobs:
 
   version_check:
     needs: [tests]
-    uses: ./.github/workflows/version_check.yml
+    uses: ./.github/workflows/version-check.yml
