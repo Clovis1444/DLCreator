@@ -1,0 +1,53 @@
+name: Tests
+on:
+  push:
+    branches: "main"
+
+env:
+  PROJECT_NAME: DLCreator
+  CLANG_VERSION: 15
+  CMAKE_VERSION: 3.25.1
+  QT_VERSION: 6.7.2
+  QT_ARCH: linux_gcc_64
+
+jobs:
+  tests:
+    environment: CI/CD
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Clang
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: ${{ env.CLANG_VERSION }}
+          platform: x64
+
+      - name: Setup Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v5
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: ${{ env.CMAKE_VERSION }}
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: linux
+          target: desktop
+          arch: ${{ env.QT_ARCH }}
+          dir: ${{ runner.temp }}
+          setup-python: false
+
+      - name: Run tests
+        run: ./runTests.sh -c
+
+  version_check:
+    needs: [tests]
+    uses: ./.github/workflows/version_check.yml
