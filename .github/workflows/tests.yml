@@ -45,6 +45,10 @@ jobs:
           dir: ${{ runner.temp }}
           setup-python: false
 
+        # Fix misssing qt dependancy
+      - name: Install Qt dependancy
+        run: apt install libxcb-cursor0
+
       - name: Run tests
         run: ./runTests.sh -c
 
