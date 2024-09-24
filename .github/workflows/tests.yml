@@ -50,4 +50,6 @@ jobs:
 
   version_check:
     needs: [tests]
+    permissions:
+      contents: write
     uses: ./.github/workflows/version-check.yml
