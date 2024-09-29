@@ -47,6 +47,7 @@ jobs:
           arch: ${{ env.QT_ARCH }}
           dir: ${{ runner.temp }}
           setup-python: false
+          cache: true
 
       - name: LS
         run: ls -l1

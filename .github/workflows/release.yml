@@ -66,6 +66,7 @@ jobs:
           arch: ${{ matrix.os.arch }}
           dir: ${{ runner.temp }}
           setup-python: false
+          cache: true
 
       - name: Create build directory
         run: mkdir ${{ env.SOURCE_DIR }}\\build
