@@ -50,7 +50,7 @@ jobs:
         run: sudo apt install libxcb-cursor-dev
 
       - name: Run tests
-        run: QT_DEBUG_PLUGINS=1 ./runTests.sh -c
+        run: QT_QPA_PLATFORM=offscreen ./runTests.sh -c
 
   version_check:
     needs: [tests]
