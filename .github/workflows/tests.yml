@@ -13,7 +13,7 @@ env:
 jobs:
   tests:
     environment: CI/CD
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repo
@@ -47,7 +47,7 @@ jobs:
 
         # Fix misssing qt dependancy
       - name: Install Qt dependancy
-        run: sudo apt install libxcb-cursor-dev
+        run: export QT_DEBUG_PLUGINS=1 && sudo apt install libxcb-cursor-dev
 
       - name: Run tests
         run: ./runTests.sh -c
