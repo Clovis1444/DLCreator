@@ -46,7 +46,7 @@ class TestMapSaver : public QObject {
         auto* cc12x11{loadMap(QApplication::applicationDirPath() + k12x11)};
         QVERIFY2(cc12x11 != nullptr, "Map was not loaded");
 
-        const QPair<int, int> s10x10{11, 10};
+        const QPair<int, int> s10x10{10, 10};
         const QPair<int, int> s2x6{2, 6};
         const QPair<int, int> s12x8{12, 8};
         const QPair<int, int> s12x11{12, 11};
