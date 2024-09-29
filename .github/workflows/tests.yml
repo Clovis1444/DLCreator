@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: LS
+        run: ls -l1
+
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
@@ -45,6 +48,10 @@ jobs:
           dir: ${{ runner.temp }}
           setup-python: false
 
+      - name: LS
+        run: ls -l1
+
+      # IMPORTANT: use QT_QPA_PLATFORM=offscreen to run tests without display
       - name: Run tests
         run: QT_QPA_PLATFORM=offscreen ./runTests.sh -c
 
