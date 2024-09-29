@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(DLCreatorTests LANGUAGES CXX)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Test Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Test Widgets)
 
 qt_standard_project_setup()
 
@@ -24,8 +24,6 @@ set_target_properties(DLCreatorTests PROPERTIES
 )
 
 target_link_libraries(DLCreatorTests PRIVATE
-    Qt6::Core
-    Qt6::Gui
     Qt6::Test
     Qt6::Widgets
 )
