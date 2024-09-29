@@ -47,10 +47,10 @@ jobs:
 
         # Fix misssing qt dependancy
       - name: Install Qt dependancy
-        run: export QT_DEBUG_PLUGINS=1 && sudo apt install libxcb-cursor-dev
+        run: sudo apt install libxcb-cursor-dev
 
       - name: Run tests
-        run: ./runTests.sh -c
+        run: QT_DEBUG_PLUGINS=1 ./runTests.sh -c
 
   version_check:
     needs: [tests]
