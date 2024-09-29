@@ -47,9 +47,7 @@ jobs:
 
         # Fix misssing qt dependancy
       - name: Install Qt dependancy
-        run: |
-          sudo apt update
-          sudo apt install libxcb-icccm4 libxcb-xkb1 libxcb-icccm4 libxcb-image0 libxcb-render-util0 libxcb-randr0 libxcb-keysyms1 libxcb-xinerama0 libxcb-xinput-dev libxcb-cursor0
+        run: sudo apt install libxcb-cursor-dev
 
       - name: Run tests
         run: ./runTests.sh -c
