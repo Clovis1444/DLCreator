@@ -45,10 +45,6 @@ jobs:
           dir: ${{ runner.temp }}
           setup-python: false
 
-        # Fix misssing qt dependancy
-      - name: Install Qt dependancy
-        run: sudo apt install libxcb-cursor-dev
-
       - name: Run tests
         run: QT_QPA_PLATFORM=offscreen ./runTests.sh -c
 
