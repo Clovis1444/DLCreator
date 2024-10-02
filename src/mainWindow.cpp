@@ -20,6 +20,7 @@
 #include "./ui_mainWindow.h"
 #include "settings.h"
 #include "src/mapSaver/mapSaver.h"
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/gridManager.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
@@ -37,6 +38,10 @@ MainWindow::MainWindow(QWidget* parent)
     // Add TabWidget
     ui_->centralwidget->layout()->addWidget(tabWidget_);
 
+    // TEST
+    tabWidget_->hide();
+    auto* grid{new GridManager{this}};
+    ui_->centralwidget->layout()->addWidget(grid);
     //
 
     initConnect();
