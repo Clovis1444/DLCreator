@@ -46,6 +46,7 @@ set(PROJECT_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedHistoryWidget/historyWidget/cellActionWidget.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/components/nameFrame.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/gridManager.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cellItem/cellItem.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

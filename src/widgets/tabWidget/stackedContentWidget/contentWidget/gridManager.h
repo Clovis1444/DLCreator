@@ -8,6 +8,8 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellItem/cellItem.h"
+
 class GridManager : public QGraphicsView {
     Q_OBJECT
 
@@ -15,11 +17,21 @@ class GridManager : public QGraphicsView {
     explicit GridManager(QWidget* parent = nullptr) : QGraphicsView(parent) {
         auto* sc{new QGraphicsScene{this}};
         setScene(sc);
-        scene()->addRect(1000, 1000, 500, 500);
-        scene()->addRect(100, 100, 50, 50);
+
+        fillScene(3, 2, 150);
     }
 
-   protected:
+   private:
+    void fillScene(int rows, int cols, qreal rect_size = 100) {
+        for (int i{}; i < rows; ++i) {
+            for (int j{}; j < cols; ++j) {
+                auto* cell{new CellItem{rect_size, rect_size, rect_size * j,
+                                        rect_size * i}};
+                scene()->addItem(cell);
+            }
+        }
+    }
+
     void wheelEvent(QWheelEvent* e) override {
         constexpr double kScaleFactor{1.2};
 
