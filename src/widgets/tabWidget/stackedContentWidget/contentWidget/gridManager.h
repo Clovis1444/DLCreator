@@ -3,8 +3,10 @@
 #include <qevent.h>
 #include <qgraphicsscene.h>
 #include <qgraphicsview.h>
+#include <qnamespace.h>
 #include <qobject.h>
 #include <qpoint.h>
+#include <qscrollbar.h>
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
@@ -18,7 +20,7 @@ class GridManager : public QGraphicsView {
         auto* sc{new QGraphicsScene{this}};
         setScene(sc);
 
-        fillScene(3, 2, 150);
+        fillScene(1000, 1000, 50);
     }
 
    private:
@@ -32,21 +34,70 @@ class GridManager : public QGraphicsView {
         }
     }
 
+    // Zooming implementation
     void wheelEvent(QWheelEvent* e) override {
-        constexpr double kScaleFactor{1.2};
-
         // Get mouse pos scene cords
         QPointF mouse_pos{e->position()};
         QPointF scene_mouse_pos{mapToScene(mouse_pos.toPoint())};
 
         // Zooming
         if (e->angleDelta().y() < 0) {  // Down scroll, zoom out
-            scale(1 / kScaleFactor, 1 / kScaleFactor);
+            scale(1 / kZoomFactor_, 1 / kZoomFactor_);
         } else {  // Up scroll, zoom in
-            scale(kScaleFactor, kScaleFactor);
+            scale(kZoomFactor_, kZoomFactor_);
         }
 
         // Scroll view to the same cords
         centerOn(scene_mouse_pos);
+
+        QGraphicsView::wheelEvent(e);
     };
+
+    void mousePressEvent(QMouseEvent* e) override {
+        switch (e->button()) {
+            // Panning
+            case Qt::MiddleButton:
+                isPanning_ = true;
+                lastPanningPoint_ = e->pos();
+                break;
+            default:
+        }
+
+        QGraphicsView::mousePressEvent(e);
+    }
+    void mouseMoveEvent(QMouseEvent* e) override {
+        // Panning
+        if (isPanning_) {
+            int delta_x{e->pos().x() - lastPanningPoint_.x()};
+            int delta_y{e->pos().y() - lastPanningPoint_.y()};
+
+            horizontalScrollBar()->setValue(horizontalScrollBar()->value() +
+                                            delta_x * kPanningFactor_);
+            verticalScrollBar()->setValue(verticalScrollBar()->value() +
+                                          delta_y * kPanningFactor_);
+
+            lastPanningPoint_ = e->pos();
+        }
+
+        QGraphicsView::mouseMoveEvent(e);
+    }
+    void mouseReleaseEvent(QMouseEvent* e) override {
+        switch (e->button()) {
+            // Panning
+            case Qt::MiddleButton:
+                isPanning_ = false;
+                lastPanningPoint_ = {};
+                break;
+            default:
+        }
+
+        QGraphicsView::mouseReleaseEvent(e);
+    }
+
+    // How fast zooming works
+    double kZoomFactor_{1.2};
+    bool isPanning_{};
+    QPoint lastPanningPoint_;
+    // How fast panning scrolls
+    int kPanningFactor_{4};
 };
