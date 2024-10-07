@@ -32,6 +32,7 @@ class CellItem : public QGraphicsItem {
                 qInfo() << "Bounding rect: " << boundingRect();
                 break;
             default:
+                break;
         }
 
         QGraphicsItem::mousePressEvent(e);

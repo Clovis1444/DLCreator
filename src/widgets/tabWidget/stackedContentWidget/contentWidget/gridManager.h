@@ -61,6 +61,7 @@ class GridManager : public QGraphicsView {
                 lastPanningPoint_ = e->pos();
                 break;
             default:
+                break;
         }
 
         QGraphicsView::mousePressEvent(e);
@@ -89,6 +90,7 @@ class GridManager : public QGraphicsView {
                 lastPanningPoint_ = {};
                 break;
             default:
+                break;
         }
 
         QGraphicsView::mouseReleaseEvent(e);
