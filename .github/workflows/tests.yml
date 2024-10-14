@@ -48,7 +48,7 @@ jobs:
 
       # IMPORTANT: use QT_QPA_PLATFORM=offscreen to run tests without display
       - name: Run tests
-        run: QT_QPA_PLATFORM=offscreen ./runTests.sh -c
+        run: QT_QPA_PLATFORM=offscreen ./runTests.sh
 
   version_check:
     needs: [tests]
