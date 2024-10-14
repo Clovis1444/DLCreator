@@ -42,9 +42,17 @@ class GridManager : public QGraphicsView {
 
         // Zooming
         if (e->angleDelta().y() < 0) {  // Down scroll, zoom out
+            if (kCurrentZoomStep_ <= kMinZoomStep_) {
+                return;
+            }
             scale(1 / kZoomFactor_, 1 / kZoomFactor_);
+            --kCurrentZoomStep_;
         } else {  // Up scroll, zoom in
+            if (kCurrentZoomStep_ >= kMaxZoomStep_) {
+                return;
+            }
             scale(kZoomFactor_, kZoomFactor_);
+            ++kCurrentZoomStep_;
         }
 
         // Scroll view to the same cords
@@ -98,6 +106,10 @@ class GridManager : public QGraphicsView {
 
     // How fast zooming works
     double kZoomFactor_{1.2};
+    int kMaxZoomStep_{10};
+    int kMinZoomStep_{-10};
+    int kCurrentZoomStep_{};
+
     bool isPanning_{};
     QPoint lastPanningPoint_;
     // How fast panning scrolls
