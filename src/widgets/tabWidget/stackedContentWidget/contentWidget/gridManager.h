@@ -23,6 +23,17 @@ class GridManager : public QGraphicsView {
         fillScene(1000, 1000, 50);
     }
 
+    // TODO(clovis): add impl for this functions
+    void unselectCells() {}
+    void clearSelectedCells() {}
+    bool hasSelection() { return true; }
+    // Returns [rows, cols] pair
+    QPair<int, int> gridSize() const { return {}; }
+    void resizeGrid(/* ExpandDirection d, */ bool expand = true) {}
+    void switchExpandButtons(bool positive) {}
+    // QList<const Cell*> cellList() const {}
+    // QList<Cell*> cellListMut() {}
+
    private:
     void fillScene(int rows, int cols, qreal rect_size = 100) {
         for (int i{}; i < rows; ++i) {
