@@ -44,6 +44,13 @@ class Settings {
             inline static const QString kFileKey{"file_name"};
         };
     };
+    class CellItem {
+       public:
+        inline static const int kDefaultCellItemSize{50};
+        inline static const QColor kDefaultCellItemBackgroundColor{Qt::gray};
+        inline static const bool kUseDefaultBackgroundLayer{false};
+        inline static const QString kDefaultBackgroundLayerName{"Grass"};
+    };
 
    protected:
     inline static const QString kCellLayerResourcesFilePath{
