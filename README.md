@@ -5,10 +5,11 @@
 - [Screenshots](#screenshots)
 - [Installation](#installation)
 - [Development](#development)
+- [License](#license)
 
 # About
 
-**DLCreator** - crossplatform tool for creating maps for D&D.
+**DLCreator**(_Dungeuon Layout creator_) - crossplatform tool for creating D&D dungeon layouts.
 
 > [!NOTE]
 > The project is in the development stage and not all functions have been implemented yet.
@@ -79,3 +80,7 @@ Args:
 Args:
 
 - `--release` - release build(program will be build in debug mode without this argument)
+
+# License
+
+Distributed under **GNU LESSER GENERAL PUBLIC LICENSE**. See [LICENSE](LICENSE) for more information.
