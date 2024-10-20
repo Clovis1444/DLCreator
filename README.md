@@ -1,3 +1,7 @@
+<p align="center">
+    <img src= "images/DLCreator256.png" />
+</p>
+
 # Table of contents
 
 - [About](#about)
@@ -28,17 +32,17 @@
 
 ## **DLCreator GUI**
 
-![](screenshots/screenshot1.png)
-![](screenshots/screenshot2.png)
-![](screenshots/screenshot3.png)
+![](images/screenshots/screenshot1.png)
+![](images/screenshots/screenshot2.png)
+![](images/screenshots/screenshot3.png)
 
 ## **JSON resource file**
 
-![](screenshots/resource_file.png)
+![](images/screenshots/resource_file.png)
 
 ## **`dlmap` file**
 
-![](screenshots/dlmap.png)
+![](images/screenshots/dlmap.png)
 
 # Installation
 
