@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget* parent)
     ui_->setupUi(this);
 
     setWindowTitle(Settings::kProgramName);
+    setWindowIcon(QIcon{Settings::kProgramIconPath});
 
     // Add ToolWidget
     ui_->centralwidget->layout()->addWidget(toolWidget_);

@@ -6,6 +6,8 @@
 class Settings {
    public:
     inline static const QString kProgramName{"DLCreator"};
+    inline static const QString kProgramIconPath{
+        "./resources/icons/DLCreator800x800.svg"};
 
     inline static const QString kSaveFileExtension{".dlmap"};
 
