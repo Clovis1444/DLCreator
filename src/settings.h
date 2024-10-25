@@ -1,6 +1,10 @@
+// settings.h
+
 #pragma once
 
 #include <qapplication.h>
+#include <qnamespace.h>
+#include <qpen.h>
 #include <qstring.h>
 
 class Settings {
@@ -52,6 +56,23 @@ class Settings {
         inline static const QColor kDefaultCellItemBackgroundColor{Qt::gray};
         inline static const bool kUseDefaultBackgroundLayer{false};
         inline static const QString kDefaultBackgroundLayerName{"Grass"};
+
+        inline static const int kFrameWidth{4};
+        inline static const QColor kFrameColor{Qt::black};
+        inline static const QColor kFrameSelectedColor{Qt::blue};
+        static QPen framePen(bool selected = false) {
+            QPen pen{};
+            pen.setWidth(kFrameWidth);
+            pen.setJoinStyle(Qt::MiterJoin);
+
+            if (selected) {
+                pen.setBrush(kFrameSelectedColor);
+            } else {
+                pen.setBrush(kFrameColor);
+            }
+
+            return pen;
+        }
     };
 
    protected:

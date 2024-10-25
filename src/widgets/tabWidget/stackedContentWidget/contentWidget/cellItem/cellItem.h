@@ -1,3 +1,5 @@
+// cellItem.h
+
 #pragma once
 
 #include <qbrush.h>
@@ -10,6 +12,7 @@
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qpainter.h>
+#include <qpen.h>
 #include <qtypes.h>
 #include <qvectornd.h>
 #include <qwidget.h>
@@ -22,10 +25,7 @@ class CellItem : public QGraphicsItem {
     explicit CellItem(qreal width, qreal height, qreal x = 0, qreal y = 0,
                       QColor background_color =
                           Settings::CellItem::kDefaultCellItemBackgroundColor)
-        : width_{width},
-          height_{height},
-          background_color_{background_color},
-          kC_{++count_} {
+        : width_{width}, height_{height}, background_color_{background_color} {
         setPos(x, y);
     }
 
@@ -35,10 +35,62 @@ class CellItem : public QGraphicsItem {
             Settings::CellItem::kDefaultCellItemBackgroundColor)
         : width_{cell_size},
           height_{cell_size},
-          background_color_{background_color},
-          kC_{++count_} {
+          background_color_{background_color} {
         setPos(pos.x(), pos.y());
     }
+
+    struct CellInfo {
+        QString background;
+        QString liquid;
+        QString gaz;
+        bool selected;
+
+        bool operator==(const CellInfo& other) const = default;
+        // Const
+        QString operator[](const CellLayer::Type& type) const {
+            switch (type) {
+                case CellLayer::kBackground:
+                    return background;
+                case CellLayer::kLiquid:
+                    return liquid;
+                case CellLayer::kGaz:
+                    return gaz;
+                default:
+                    return subscript_operator_overflow_buffer_;
+            }
+        }
+        // Mut
+        QString& operator[](CellLayer::Type type) {
+            switch (type) {
+                case CellLayer::kBackground:
+                    return background;
+                case CellLayer::kLiquid:
+                    return liquid;
+                case CellLayer::kGaz:
+                    return gaz;
+                default:
+                    return subscript_operator_overflow_buffer_;
+            }
+        }
+
+       protected:
+        inline static QString subscript_operator_overflow_buffer_{};
+    };
+
+    void setSelected(bool selected = true);
+
+    void setLayer(const CellLayer* layer, bool track_history = true);
+    void setLayer(const CellInfo& i);
+    void clearLayers(bool track_history = true);
+    CellInfo info() const;
+
+    QString background() const;
+    QString liquid() const;
+    QString gaz() const;
+
+    // TODO(clovis): resolve naming conflict with QGrapgicsItem::(pos/setpos)
+    // QPoint pos() const;
+    // void setPos(QPoint pos);
 
    private:
     void mousePressEvent(QGraphicsSceneMouseEvent* e) override {
@@ -47,7 +99,11 @@ class CellItem : public QGraphicsItem {
             case Qt::LeftButton:
                 qInfo() << "Mouse pos: " << e->scenePos();
                 qInfo() << "Item pos: " << scenePos();
-                qInfo() << "Bounding rect: " << boundingRect();
+                qInfo() << "Bounding rect: " << boundingRect() << '\n';
+
+                selected_ = !selected_;
+                // Dont forget to redraw
+                update();
                 break;
             default:
                 break;
@@ -58,6 +114,11 @@ class CellItem : public QGraphicsItem {
 
     QRectF boundingRect() const override {
         return QRectF{0, 0, width_, height_};
+    }
+    QRectF frameRect(const QPen& frame_pen) const {
+        QRectF br{boundingRect()};
+        qreal margin{static_cast<qreal>(frame_pen.width()) / 2.0};
+        return br.adjusted(margin, margin, -margin, -margin);
     }
 
     void paint(QPainter* pntr, const QStyleOptionGraphicsItem* /*option*/,
@@ -96,11 +157,6 @@ class CellItem : public QGraphicsItem {
             pntr->drawPixmap(0, 0,
                              background->pixmap()->scaled(width(), height()));
         }
-        // TODO(clovis): refactor cellframe: put it in CellLayer?
-        //
-        // Draw frame
-        //
-        pntr->drawRect(boundingRect());
 
         //
         // Liquid
@@ -119,7 +175,11 @@ class CellItem : public QGraphicsItem {
             pntr->drawPixmap(0, 0, gaz->pixmap()->scaled(width(), height()));
         }
 
-        pntr->drawText(0, static_cast<int>(height_ / 2), QString::number(kC_));
+        //
+        // Draw frame
+        //
+        pntr->setPen(CellItem::framePen(selected_));
+        pntr->drawRect(frameRect(pntr->pen()));
     }
 
     int width() const { return static_cast<int>(width_); }
@@ -127,13 +187,11 @@ class CellItem : public QGraphicsItem {
 
     qreal width_;
     qreal height_;
+
     QColor background_color_;
     QString layer_background_;
     QString layer_liquid_{"Water"};
     QString layer_gaz_{"Smoke"};
-    bool selected_{false};
 
-    // TODO(clovis): remove this counter
-    const int kC_;
-    inline static int count_{0};
+    bool selected_{false};
 };
