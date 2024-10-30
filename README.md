@@ -2,6 +2,8 @@
     <img src= "images/DLCreator256.png" />
 </p>
 
+[![wakatime](https://wakatime.com/badge/user/018c31f8-854b-442a-a366-c44e4493de87/project/d7dd2057-d6c1-4cf6-8bb2-5dd85267e466.svg)](https://wakatime.com/badge/user/018c31f8-854b-442a-a366-c44e4493de87/project/d7dd2057-d6c1-4cf6-8bb2-5dd85267e466)
+
 # Table of contents
 
 - [About](#about)
