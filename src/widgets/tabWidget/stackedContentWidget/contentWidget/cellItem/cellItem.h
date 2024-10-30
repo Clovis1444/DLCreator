@@ -17,6 +17,8 @@
 #include <qvectornd.h>
 #include <qwidget.h>
 
+// #include <QGraphicsItem>
+
 #include "src/settings.h"
 #include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellLayer.h"
 
@@ -27,6 +29,7 @@ class CellItem : public QGraphicsItem {
                           Settings::CellItem::kDefaultCellItemBackgroundColor)
         : width_{width}, height_{height}, background_color_{background_color} {
         setPos(x, y);
+        setFlags(ItemIsSelectable);
     }
 
     explicit CellItem(
@@ -37,6 +40,7 @@ class CellItem : public QGraphicsItem {
           height_{cell_size},
           background_color_{background_color} {
         setPos(pos.x(), pos.y());
+        setFlags(ItemIsSelectable);
     }
 
     struct CellInfo {
@@ -77,8 +81,6 @@ class CellItem : public QGraphicsItem {
         inline static QString subscript_operator_overflow_buffer_{};
     };
 
-    void setSelected(bool selected = true);
-
     void setLayer(const CellLayer* layer, bool track_history = true);
     void setLayer(const CellInfo& i);
     void clearLayers(bool track_history = true);
@@ -93,24 +95,20 @@ class CellItem : public QGraphicsItem {
     // void setPos(QPoint pos);
 
    private:
-    void mousePressEvent(QGraphicsSceneMouseEvent* e) override {
-        switch (e->button()) {
-                // If LMB was pressed
-            case Qt::LeftButton:
-                qInfo() << "Mouse pos: " << e->scenePos();
-                qInfo() << "Item pos: " << scenePos();
-                qInfo() << "Bounding rect: " << boundingRect() << '\n';
-
-                selected_ = !selected_;
-                // Dont forget to redraw
-                update();
-                break;
-            default:
-                break;
-        }
-
-        QGraphicsItem::mousePressEvent(e);
-    }
+    // void mousePressEvent(QGraphicsSceneMouseEvent* e) override {
+    //     switch (e->button()) {
+    //             // If LMB was pressed
+    //             qInfo() << "Mouse pos: " << e->scenePos();
+    //             qInfo() << "Item pos: " << scenePos();
+    //             qInfo() << "Bounding rect: " << boundingRect() << '\n';
+    //
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    //
+    //     QGraphicsItem::mousePressEvent(e);
+    // }
 
     QRectF boundingRect() const override {
         return QRectF{0, 0, width_, height_};
@@ -178,7 +176,7 @@ class CellItem : public QGraphicsItem {
         //
         // Draw frame
         //
-        pntr->setPen(CellItem::framePen(selected_));
+        pntr->setPen(CellItem::framePen(isSelected()));
         pntr->drawRect(frameRect(pntr->pen()));
     }
 
@@ -192,6 +190,4 @@ class CellItem : public QGraphicsItem {
     QString layer_background_;
     QString layer_liquid_{"Water"};
     QString layer_gaz_{"Smoke"};
-
-    bool selected_{false};
 };

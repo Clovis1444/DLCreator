@@ -1,11 +1,20 @@
+// gridManager.h
+//
+// Controls:
+// - Panning: Shift + LMB move
+// - Extend RubberBand: Ctrl + LMB/RMB move
+// - Zoom: Mouse wheel Up/Down
+
 #pragma once
 
 #include <qevent.h>
 #include <qgraphicsscene.h>
 #include <qgraphicsview.h>
+#include <qlist.h>
 #include <qnamespace.h>
 #include <qobject.h>
 #include <qpoint.h>
+#include <qrubberband.h>
 #include <qscrollbar.h>
 #include <qtmetamacros.h>
 #include <qwidget.h>
@@ -20,17 +29,20 @@ class GridManager : public QGraphicsView {
         auto* sc{new QGraphicsScene{this}};
         setScene(sc);
 
-        fillScene(1000, 1000, 50);
+        fillScene(100, 100, 50);
+
+        // Enable RubberBandDrag by default
+        setDragMode(RubberBandDrag);
     }
 
     // TODO(clovis): add impl for this functions
-    void unselectCells() {}
-    void clearSelectedCells() {}
-    bool hasSelection() { return true; }
-    // Returns [rows, cols] pair
-    QPair<int, int> gridSize() const { return {}; }
-    void resizeGrid(/* ExpandDirection d, */ bool expand = true) {}
-    void switchExpandButtons(bool positive) {}
+    // void unselectCells() {}
+    // void clearSelectedCells() {}
+    // bool hasSelection() { return true; }
+    // // Returns [rows, cols] pair
+    // QPair<int, int> gridSize() const { return {}; }
+    // void resizeGrid(/* ExpandDirection d, */ bool expand = true) {}
+    // void switchExpandButtons(bool positive) {}
     // QList<const Cell*> cellList() const {}
     // QList<Cell*> cellListMut() {}
 
@@ -71,13 +83,19 @@ class GridManager : public QGraphicsView {
 
         QGraphicsView::wheelEvent(e);
     };
-
+    // Panning implementation
     void mousePressEvent(QMouseEvent* e) override {
         switch (e->button()) {
-            // Panning
-            case Qt::MiddleButton:
-                isPanning_ = true;
-                lastPanningPoint_ = e->pos();
+            case Qt::LeftButton:
+                // Panning
+                if (e->modifiers().testFlag(Qt::ShiftModifier)) {
+                    isPanning_ = true;
+                    lastPanningPoint_ = e->pos();
+                    setCursor(Qt::ClosedHandCursor);
+
+                    // Do not propogate event
+                    return;
+                }
                 break;
             default:
                 break;
@@ -91,10 +109,10 @@ class GridManager : public QGraphicsView {
             int delta_x{e->pos().x() - lastPanningPoint_.x()};
             int delta_y{e->pos().y() - lastPanningPoint_.y()};
 
-            horizontalScrollBar()->setValue(horizontalScrollBar()->value() +
-                                            delta_x * kPanningFactor_);
-            verticalScrollBar()->setValue(verticalScrollBar()->value() +
-                                          delta_y * kPanningFactor_);
+            horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
+                                            (delta_x * kPanningFactor_));
+            verticalScrollBar()->setValue(verticalScrollBar()->value() -
+                                          (delta_y * kPanningFactor_));
 
             lastPanningPoint_ = e->pos();
         }
@@ -104,9 +122,10 @@ class GridManager : public QGraphicsView {
     void mouseReleaseEvent(QMouseEvent* e) override {
         switch (e->button()) {
             // Panning
-            case Qt::MiddleButton:
+            case Qt::LeftButton:
                 isPanning_ = false;
                 lastPanningPoint_ = {};
+                setCursor(Qt::ArrowCursor);
                 break;
             default:
                 break;
@@ -124,5 +143,10 @@ class GridManager : public QGraphicsView {
     bool isPanning_{};
     QPoint lastPanningPoint_;
     // How fast panning scrolls
-    int kPanningFactor_{4};
+    // TODO(clovis): This factor should be 1. Remove this var?
+    int kPanningFactor_{1};
+
+    // TODO(clovis): deallocate memory in destructor
+    // TODO(clovis): add keyboard shortcuts
+    // TODO(clovis): implement variable rubber band color
 };
