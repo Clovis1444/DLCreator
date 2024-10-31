@@ -2,6 +2,8 @@
 
 #include "cellItem.h"
 
+#include "src/settings.h"
+
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////PUBLIC////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -17,6 +19,11 @@ CellItem::CellItem(QPoint pos, qreal cell_size, QColor background_color)
       background_color_{background_color} {
     constructorBody(pos.x(), pos.y());
 }
+
+QPoint CellItem::gridPos() const {
+    return QPoint{static_cast<int>(pos().x()) / width(),
+                  static_cast<int>(pos().y()) / height()};
+};
 
 // void setLayer(const CellLayer* layer, bool track_history = true);
 // void setLayer(const CellInfo& i);
@@ -96,6 +103,8 @@ void CellItem::paint(QPainter* pntr, const QStyleOptionGraphicsItem* /*option*/,
     //
     pntr->setPen(CellItem::framePen(isSelected()));
     pntr->drawRect(frameRect(pntr->pen()));
+
+    updateToolTip();
 }
 
 QRectF CellItem::boundingRect() const { return QRectF{0, 0, width_, height_}; }
@@ -107,3 +116,29 @@ QRectF CellItem::frameRect(const QPen& frame_pen) const {
 
 int CellItem::width() const { return static_cast<int>(width_); }
 int CellItem::height() const { return static_cast<int>(height_); }
+
+void CellItem::updateToolTip() {
+    if (!Settings::CellItem::kUseToolTip) {
+        setToolTip("");
+        return;
+    }
+
+    QString tooltip{};
+
+    // Line 1: pos
+    tooltip += QString{"[%1, %2]\n"}.arg(gridPos().x()).arg(gridPos().y());
+    // Line 2: size
+    tooltip += QString{"Size: {%1, %2}\n"}.arg(width()).arg(height());
+    // Line 3: selected
+    tooltip += QString{"Selected: %1\n"}.arg(isSelected() ? "True" : "False");
+    // Lines 4-6: layers
+    tooltip += QString{CellLayer::jsonName(CellLayer::kBackground)} + ": " +
+               (layer_background_.isEmpty() ? "Empty" : layer_background_) +
+               '\n';
+    tooltip += QString{CellLayer::jsonName(CellLayer::kLiquid)} + ": " +
+               (layer_liquid_.isEmpty() ? "Empty" : layer_liquid_) + '\n';
+    tooltip += QString{CellLayer::jsonName(CellLayer::kGaz)} + ": " +
+               (layer_gaz_.isEmpty() ? "Empty" : layer_gaz_) + '\n';
+
+    setToolTip(tooltip);
+};

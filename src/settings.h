@@ -73,6 +73,8 @@ class Settings {
 
             return pen;
         }
+
+        inline static const bool kUseToolTip{true};
     };
 
    protected:

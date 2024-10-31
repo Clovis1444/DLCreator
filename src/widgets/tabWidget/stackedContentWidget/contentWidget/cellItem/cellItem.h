@@ -70,6 +70,8 @@ class CellItem : public QGraphicsItem {
         inline static QString subscript_operator_overflow_buffer_{};
     };
 
+    QPoint gridPos() const;
+
     void setLayer(const CellLayer* layer, bool track_history = true);
     void setLayer(const CellInfo& i);
     void clearLayers(bool track_history = true);
@@ -109,6 +111,8 @@ class CellItem : public QGraphicsItem {
 
     int width() const;
     int height() const;
+
+    void updateToolTip();
 
     qreal width_;
     qreal height_;
