@@ -26,22 +26,11 @@ class CellItem : public QGraphicsItem {
    public:
     explicit CellItem(qreal width, qreal height, qreal x = 0, qreal y = 0,
                       QColor background_color =
-                          Settings::CellItem::kDefaultCellItemBackgroundColor)
-        : width_{width}, height_{height}, background_color_{background_color} {
-        setPos(x, y);
-        setFlags(ItemIsSelectable);
-    }
-
+                          Settings::CellItem::kDefaultCellItemBackgroundColor);
     explicit CellItem(
         QPoint pos, qreal cell_size = Settings::CellItem::kDefaultCellItemSize,
         QColor background_color =
-            Settings::CellItem::kDefaultCellItemBackgroundColor)
-        : width_{cell_size},
-          height_{cell_size},
-          background_color_{background_color} {
-        setPos(pos.x(), pos.y());
-        setFlags(ItemIsSelectable);
-    }
+            Settings::CellItem::kDefaultCellItemBackgroundColor);
 
     struct CellInfo {
         QString background;
@@ -110,78 +99,16 @@ class CellItem : public QGraphicsItem {
     //     QGraphicsItem::mousePressEvent(e);
     // }
 
-    QRectF boundingRect() const override {
-        return QRectF{0, 0, width_, height_};
-    }
-    QRectF frameRect(const QPen& frame_pen) const {
-        QRectF br{boundingRect()};
-        qreal margin{static_cast<qreal>(frame_pen.width()) / 2.0};
-        return br.adjusted(margin, margin, -margin, -margin);
-    }
+    void constructorBody(qreal pos_x, qreal pos_y);
 
     void paint(QPainter* pntr, const QStyleOptionGraphicsItem* /*option*/,
-               QWidget* /*widget*/) override {
-        using CellItem = Settings::CellItem;
+               QWidget* /*widget*/) override;
 
-        //
-        // Background
-        //
-        const auto* background{
-            CellLayer::get(CellLayer::Type::kBackground, layer_background_)};
-        const auto* default_background{
-            CellLayer::get(CellLayer::Type::kBackground,
-                           CellItem::kDefaultBackgroundLayerName)};
-        // If current background is invalid
-        if (background == nullptr || background->isEmpty()) {
-            // If UseDefaultBackground and default background is valid
-            if (CellItem::kUseDefaultBackgroundLayer &&
-                default_background != nullptr &&
-                !default_background->isEmpty()) {
-                // Draw default background
-                pntr->drawPixmap(
-                    0, 0,
-                    default_background->pixmap()->scaled(width(), height()));
-            }
-            // If default background is invalid
-            else {
-                // Fill background with default color
-                pntr->fillRect(boundingRect(),
-                               CellItem::kDefaultCellItemBackgroundColor);
-            }
-        }
-        // If current background is valid
-        else {
-            // Draw current background
-            pntr->drawPixmap(0, 0,
-                             background->pixmap()->scaled(width(), height()));
-        }
+    QRectF boundingRect() const override;
+    QRectF frameRect(const QPen& frame_pen) const;
 
-        //
-        // Liquid
-        //
-        const auto* liquid{
-            CellLayer::get(CellLayer::Type::kLiquid, layer_liquid_)};
-        if (liquid != nullptr && !liquid->isEmpty()) {
-            pntr->drawPixmap(0, 0, liquid->pixmap()->scaled(width(), height()));
-        }
-
-        //
-        // Gaz
-        //
-        const auto* gaz{CellLayer::get(CellLayer::Type::kGaz, layer_gaz_)};
-        if (gaz != nullptr && !gaz->isEmpty()) {
-            pntr->drawPixmap(0, 0, gaz->pixmap()->scaled(width(), height()));
-        }
-
-        //
-        // Draw frame
-        //
-        pntr->setPen(CellItem::framePen(isSelected()));
-        pntr->drawRect(frameRect(pntr->pen()));
-    }
-
-    int width() const { return static_cast<int>(width_); }
-    int height() const { return static_cast<int>(height_); }
+    int width() const;
+    int height() const;
 
     qreal width_;
     qreal height_;
