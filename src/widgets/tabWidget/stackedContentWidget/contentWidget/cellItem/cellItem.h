@@ -13,6 +13,7 @@
 #include <qobject.h>
 #include <qpainter.h>
 #include <qpen.h>
+#include <qtmetamacros.h>
 #include <qtypes.h>
 #include <qvectornd.h>
 #include <qwidget.h>
@@ -22,7 +23,9 @@
 #include "src/settings.h"
 #include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellLayer.h"
 
-class CellItem : public QGraphicsItem {
+class CellItem : public QObject, public QGraphicsItem {
+    Q_OBJECT
+
    public:
     explicit CellItem(qreal width, qreal height, qreal x = 0, qreal y = 0,
                       QColor background_color =

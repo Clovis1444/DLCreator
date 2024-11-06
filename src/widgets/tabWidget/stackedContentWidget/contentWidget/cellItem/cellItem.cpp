@@ -2,6 +2,8 @@
 
 #include "cellItem.h"
 
+#include "cellAction.h"
+// #include "src/history.h"
 #include "src/settings.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,10 +27,51 @@ QPoint CellItem::gridPos() const {
                   static_cast<int>(pos().y()) / height()};
 };
 
-// void setLayer(const CellLayer* layer, bool track_history = true);
+void CellItem::setLayer(const CellLayer* layer, bool track_history) {
+    if (layer == nullptr) {
+        return;
+    }
+
+    CellAction2 a{this};
+
+    switch (layer->type()) {
+        case CellLayer::kBackground:
+            if (layer_background_ == layer->name()) {
+                return;
+            }
+            layer_background_ = layer->name();
+            break;
+        case CellLayer::kLiquid:
+            if (layer_liquid_ == layer->name()) {
+                return;
+            }
+            layer_liquid_ = layer->name();
+            break;
+        case CellLayer::kGaz:
+            if (layer_gaz_ == layer->name()) {
+                return;
+            }
+            layer_gaz_ = layer->name();
+            break;
+        case CellLayer::kEnumLength:
+            return;
+    }
+
+    update();
+
+    if (track_history) {
+        a.registerAction();
+        // History::History::push(parentWidget(), a);
+    }
+};
 // void setLayer(const CellInfo& i);
 // void clearLayers(bool track_history = true);
-// CellInfo info() const;
+CellItem::CellInfo CellItem::info() const {
+    return CellInfo{.background = layer_background_,
+                    .liquid = layer_liquid_,
+                    .gaz = layer_gaz_,
+                    .selected = isSelected()};
+};
 //
 // QString background() const;
 // QString liquid() const;

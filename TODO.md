@@ -12,3 +12,5 @@
 
 - check all classes: if there is a member variable that allocates memory - dealocate it in destructor
 - cache clang,qt in workflows
+
+- QGraphicsItems does not have proper destructor: they should be deleted manually
