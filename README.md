@@ -29,6 +29,7 @@
 - **Export** your maps as an _image_. `[NOT YET IMPLEMENTED]`
 - Ability to **manually edit** `.dlmap` files without GUI.
 - Use **History** to track and undo your changes to a map. `[PARTIALLY IMPLEMENTED]`
+- Customizable **themes**. `[NOT YET IMPLEMENTED]`
 
 # Screenshots
 
