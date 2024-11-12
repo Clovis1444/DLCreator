@@ -12,28 +12,28 @@
 
 #include "cellItem.h"
 
-class CellAction2 : public QObject {
+class CellAction : public QObject {
     Q_OBJECT
 
    public:
-    explicit CellAction2(CellItem* cell) {
+    explicit CellAction(CellItem* cell) {
         actions_.append(
             QPair<CellItem*, CellItem::CellInfo>{cell, cell->info()});
 
         make_connect();
     }
-    explicit CellAction2(const QList<CellItem*>& cells) {
+    explicit CellAction(const QList<CellItem*>& cells) {
         for (auto* i : cells) {
             actions_.append(QPair<CellItem*, CellItem::CellInfo>{i, i->info()});
         }
 
         make_connect();
     }
-    CellAction2(const CellAction2& other)
+    CellAction(const CellAction& other)
         : actions_{other.actions_}, action_name_{other.action_name_} {
         make_connect();
     };
-    explicit CellAction2(const QList<CellAction2>& list) {
+    explicit CellAction(const QList<CellAction>& list) {
         for (const auto& i : list) {
             actions_.append(i.actions_);
         }
@@ -42,7 +42,7 @@ class CellAction2 : public QObject {
         make_connect();
     }
 
-    CellAction2() = default;
+    CellAction() = default;
 
     // TODO(clovis): implement proper action name/action tooltip
     void registerAction() {
@@ -73,7 +73,7 @@ class CellAction2 : public QObject {
         return false;
     }
 
-    CellAction2& operator=(const CellAction2& other) {
+    CellAction& operator=(const CellAction& other) {
         if (this == &other) {
             return *this;
         }
@@ -84,7 +84,7 @@ class CellAction2 : public QObject {
         return *this;
     }
 
-    bool operator==(const CellAction2& other) const {
+    bool operator==(const CellAction& other) const {
         return actions_ == other.actions_ && action_name_ == other.action_name_;
     }
 

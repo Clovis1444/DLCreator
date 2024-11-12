@@ -12,8 +12,9 @@
 #include <utility>
 
 #include "src/mapSaver/mapSaver.h"
-#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellLayer.h"
-#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h"
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellItem/cellItem.h"
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellItem/cellLayer.h"
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/gridManager.h"
 
 namespace MapSaverJsons {
 
@@ -21,7 +22,7 @@ class MapCellObj : public QObject {
     Q_OBJECT
 
    public:
-    explicit MapCellObj(const Cell::CellInfo& ci) {
+    explicit MapCellObj(const CellItem::CellInfo& ci) {
         for (int i{0}; i < CellLayer::Type::kEnumLength; ++i) {
             CellLayer::Type type{static_cast<CellLayer::Type>(i)};
 
@@ -38,8 +39,8 @@ class MapCellObj : public QObject {
         return cell_[CellLayer::jsonName(type)].toString();
     }
 
-    Cell::CellInfo cellInfo() const {
-        Cell::CellInfo ci;
+    CellItem::CellInfo cellInfo() const {
+        CellItem::CellInfo ci;
 
         for (int i{0}; i < CellLayer::Type::kEnumLength; ++i) {
             CellLayer::Type l_type{static_cast<CellLayer::Type>(i)};
@@ -76,10 +77,10 @@ class MapCellsObj : public QObject {
     Q_OBJECT
 
    public:
-    explicit MapCellsObj(const CellCollection* cc) {
-        for (const Cell* i : cc->cellList()) {
-            Cell::CellInfo ci{i->info()};
-            QPoint cpos{i->pos()};
+    explicit MapCellsObj(const GridManager* gm) {
+        for (const CellItem* i : gm->cellList()) {
+            CellItem::CellInfo ci{i->info()};
+            QPoint cpos{i->gridPos()};
 
             MapCellObj cell_obj{ci};
 
@@ -173,7 +174,7 @@ class MapJson : public QObject {
         : cells_{cells}, size_arr_{size_arr} {
         constructorBody();
     }
-    explicit MapJson(const CellCollection* cc)
+    explicit MapJson(const GridManager* cc)
         : cells_{cc}, size_arr_{cc->gridSize()} {
         constructorBody();
     }

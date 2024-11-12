@@ -7,7 +7,7 @@
 #include <qobject.h>
 #include <qtmetamacros.h>
 
-#include "widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellAction.h"
+#include "widgets/tabWidget/stackedContentWidget/contentWidget/cellItem/cellAction.h"
 
 namespace History {
 class History : public QObject {

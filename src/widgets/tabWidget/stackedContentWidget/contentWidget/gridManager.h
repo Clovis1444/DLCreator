@@ -25,26 +25,47 @@ class GridManager : public QGraphicsView {
     Q_OBJECT
 
    public:
-    explicit GridManager(QWidget* parent = nullptr) : QGraphicsView(parent) {
-        auto* sc{new QGraphicsScene{this}};
-        setScene(sc);
-
-        fillScene(100, 100, 50);
-
-        // Enable RubberBandDrag by default
-        setDragMode(RubberBandDrag);
+    explicit GridManager(QWidget* parent, int size)
+        : QGraphicsView{parent}, rows_{size}, cols_{size} {
+        constructorBody(size, size);
+    }
+    explicit GridManager(QWidget* parent, int rows, int cols)
+        : QGraphicsView{parent}, rows_{rows}, cols_{cols} {
+        constructorBody(rows, cols);
     }
 
     // TODO(clovis): add impl for this functions
     // void unselectCells() {}
     // void clearSelectedCells() {}
     // bool hasSelection() { return true; }
-    // // Returns [rows, cols] pair
-    // QPair<int, int> gridSize() const { return {}; }
+    // Returns [rows, cols] pair
+    QPair<int, int> gridSize() const { return {rows_, cols_}; }
     // void resizeGrid(/* ExpandDirection d, */ bool expand = true) {}
     // void switchExpandButtons(bool positive) {}
-    // QList<const Cell*> cellList() const {}
-    // QList<Cell*> cellListMut() {}
+    QList<const CellItem*> cellList() const {
+        QList<const CellItem*> list{};
+
+        for (auto* i : items()) {
+            auto* ci{dynamic_cast<CellItem*>(i)};
+            if (ci) {
+                list.push_back(ci);
+            }
+        }
+
+        return list;
+    }
+    QList<CellItem*> cellListMut() {
+        QList<CellItem*> list{};
+
+        for (auto* i : items()) {
+            auto* ci{dynamic_cast<CellItem*>(i)};
+            if (ci) {
+                list.push_back(ci);
+            }
+        }
+
+        return list;
+    }
 
    private:
     void fillScene(int rows, int cols, qreal rect_size = 100) {
@@ -133,6 +154,26 @@ class GridManager : public QGraphicsView {
 
         QGraphicsView::mouseReleaseEvent(e);
     }
+
+    void constructorBody(int rows, int cols, qreal rect_size = 100) {
+        if (scene() == nullptr) {
+            auto* sc{new QGraphicsScene{this}};
+            setScene(sc);
+        }
+
+        // do nothing if scene is not empty
+        if (!scene()->items().isEmpty()) {
+            return;
+        }
+
+        fillScene(rows, cols, rect_size);
+
+        // Enable RubberBandDrag by default
+        setDragMode(RubberBandDrag);
+    }
+
+    int rows_;
+    int cols_;
 
     // How fast zooming works
     double kZoomFactor_{1.2};

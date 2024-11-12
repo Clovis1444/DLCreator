@@ -7,7 +7,7 @@
 #include <qnamespace.h>
 #include <qtmetamacros.h>
 
-#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellAction.h"
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellItem/cellAction.h"
 
 class CellActionWidget : public QLabel {
     Q_OBJECT

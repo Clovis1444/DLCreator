@@ -6,7 +6,6 @@
 #include <qwidget.h>
 
 #include "contentWidget/contentWidget.h"
-#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h"
 
 class StackedContentWidget : public QStackedWidget {
     Q_OBJECT
@@ -31,9 +30,9 @@ class StackedContentWidget : public QStackedWidget {
 
         return content;
     }
-    ContentWidget* createContent(CellCollection* cc) {
-        auto* content{new ContentWidget{this, cc}};
-        cc->setParent(content);
+    ContentWidget* createContent(GridManager* gm) {
+        auto* content{new ContentWidget{this, gm}};
+        gm->setParent(content);
 
         contents_.push_back(content);
 
@@ -61,8 +60,8 @@ class StackedContentWidget : public QStackedWidget {
         return static_cast<ContentWidget*>(active_widget)->gridSize();
     }
 
-    const CellCollection* cellCollection() {
-        return static_cast<ContentWidget*>(currentWidget())->cellCollection();
+    const GridManager* gridManager() {
+        return static_cast<ContentWidget*>(currentWidget())->gridManager();
     }
 
    protected:

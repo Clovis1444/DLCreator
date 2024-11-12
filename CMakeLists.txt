@@ -38,9 +38,9 @@ set(PROJECT_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/contentWidget.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/expandButton.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellAction.h
+        # ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.h
+        # ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cell.cpp
+        # ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellAction.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedHistoryWidget/stackedHistoryWidget.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedHistoryWidget/historyWidget/historyWidget.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets/tabWidget/stackedHistoryWidget/historyWidget/cellActionWidget.h

@@ -20,8 +20,8 @@
 
 // #include <QGraphicsItem>
 
+#include "cellLayer.h"
 #include "src/settings.h"
-#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellLayer.h"
 
 class CellItem : public QObject, public QGraphicsItem {
     Q_OBJECT

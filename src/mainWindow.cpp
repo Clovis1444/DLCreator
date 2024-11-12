@@ -40,9 +40,9 @@ MainWindow::MainWindow(QWidget* parent)
     ui_->centralwidget->layout()->addWidget(tabWidget_);
 
     // TEST
-    tabWidget_->hide();
-    auto* grid{new GridManager{this}};
-    ui_->centralwidget->layout()->addWidget(grid);
+    // tabWidget_->hide();
+    // auto* grid{new GridManager{this}};
+    // ui_->centralwidget->layout()->addWidget(grid);
     //
 
     initConnect();
@@ -206,7 +206,7 @@ void MainWindow::onActionSave() {
     }
 
     // Create json
-    QJsonDocument json{MapSaver::saveMapToFile(tabWidget_->cellCollection())};
+    QJsonDocument json{MapSaver::saveMapToFile(tabWidget_->gridManager())};
 
     // Push json to the file
     QTextStream file_stream{&save_file};
@@ -257,7 +257,7 @@ void MainWindow::onActionSaveAs() {
     }
 
     // Create json
-    QJsonDocument json{MapSaver::saveMapToFile(tabWidget_->cellCollection())};
+    QJsonDocument json{MapSaver::saveMapToFile(tabWidget_->gridManager())};
 
     // Push json to the file
     QTextStream file_stream{&save_file};
@@ -303,8 +303,8 @@ void MainWindow::onActionLoad() {
     file.close();
 
     // Load map and then create a new tab
-    auto* cc{MapSaver::loadMapFromFile(file_name, file_content)};
+    auto* gm{MapSaver::loadMapFromFile(file_name, file_content)};
     // Check if json was loaded correctly
-    if (cc == nullptr) return;
-    tabWidget_->createTab(cc, QFileInfo{file_name}.baseName(), file_name);
+    if (gm == nullptr) return;
+    tabWidget_->createTab(gm, QFileInfo{file_name}.baseName(), file_name);
 }

@@ -28,7 +28,7 @@
 #include "src/widgets/tabWidget/stackedContentWidget/contentWidget/expandButton.h"
 
 class CellCollection : public QWidget {
-    Q_OBJECT
+    // Q_OBJECT
 
    protected:
     enum ExpandDirection { kUp, kDown, kLeft, kRight, kEnumLength };

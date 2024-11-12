@@ -5,16 +5,16 @@
 #include <qobject.h>
 #include <qtmetamacros.h>
 
-#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h"
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/gridManager.h"
 
 class MapSaver : public QObject {
     Q_OBJECT
 
    public:
-    static QJsonDocument saveMapToFile(const CellCollection* cc);
+    static QJsonDocument saveMapToFile(const GridManager* gm);
 
-    static CellCollection* loadMapFromFile(const QString& file_name,
-                                           const QByteArray& file_content);
+    static GridManager* loadMapFromFile(const QString& file_name,
+                                        const QByteArray& file_content);
 
     static QString getSaveFilePath(const QString& name,
                                    bool add_number = false);

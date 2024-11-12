@@ -68,12 +68,12 @@ class TabWidget : public QWidget {
         QObject::connect(tab_button, &TabButton::closePressed, this,
                          &TabWidget::onTabClose);
     }
-    void createTab(CellCollection* cc, const QString& name = kDefaultNewTabName,
+    void createTab(GridManager* gm, const QString& name = kDefaultNewTabName,
                    const QString& file_path = "") {
-        if (cc == nullptr) return;
+        if (gm == nullptr) return;
 
         auto* tab_button{tabs_widget_->createButton(name)};
-        auto* content{stacked_content_widget_->createContent(cc)};
+        auto* content{stacked_content_widget_->createContent(gm)};
         auto* history{
             stacked_history_widget_->createHistory(content->widget())};
 
@@ -124,8 +124,8 @@ class TabWidget : public QWidget {
 
     QPair<int, int> gridSize() { return stacked_content_widget_->gridSize(); }
 
-    const CellCollection* cellCollection() {
-        return stacked_content_widget_->cellCollection();
+    const GridManager* gridManager() {
+        return stacked_content_widget_->gridManager();
     }
 
     int tabs_count() const { return static_cast<int>(items_.count()); }

@@ -14,3 +14,5 @@
 - cache clang,qt in workflows
 
 - QGraphicsItems does not have proper destructor: they should be deleted manually
+
+- Fix test for the new GridManager class

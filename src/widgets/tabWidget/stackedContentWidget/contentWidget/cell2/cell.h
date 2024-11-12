@@ -12,7 +12,7 @@
 #include "cellLayer.h"
 
 class Cell : public QLabel {
-    Q_OBJECT
+    // Q_OBJECT
 
    public:
     explicit Cell(QWidget* parent, QPoint pos, int cell_size = kCellSize,

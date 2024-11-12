@@ -32,7 +32,7 @@ void CellItem::setLayer(const CellLayer* layer, bool track_history) {
         return;
     }
 
-    CellAction2 a{this};
+    CellAction a{this};
 
     switch (layer->type()) {
         case CellLayer::kBackground:
@@ -64,7 +64,19 @@ void CellItem::setLayer(const CellLayer* layer, bool track_history) {
         // History::History::push(parentWidget(), a);
     }
 };
-// void setLayer(const CellInfo& i);
+void CellItem::setLayer(const CellInfo& i) {
+    if (i == info()) {
+        return;
+    }
+
+    layer_background_ = i.background;
+    layer_liquid_ = i.liquid;
+    layer_gaz_ = i.gaz;
+
+    setSelected(i.selected);
+
+    update();
+}
 // void clearLayers(bool track_history = true);
 CellItem::CellInfo CellItem::info() const {
     return CellInfo{.background = layer_background_,

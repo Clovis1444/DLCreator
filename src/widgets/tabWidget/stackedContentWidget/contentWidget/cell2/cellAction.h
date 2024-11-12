@@ -11,7 +11,7 @@
 #include "cell.h"
 
 class CellAction : public QObject {
-    Q_OBJECT
+    // Q_OBJECT
 
    public:
     explicit CellAction(Cell* cell) {

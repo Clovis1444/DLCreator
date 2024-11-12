@@ -15,70 +15,69 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
-#include "cellCollection.h"
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/gridManager.h"
 
-class ContentWidget : public QScrollArea {
+class ContentWidget : public QWidget {
     Q_OBJECT
 
    public:
     explicit ContentWidget(QWidget* parent,
                            int size = kDefaultContentWidgetSize)
-        : QScrollArea(parent), content_{new CellCollection{this, size}} {
-        setWidgetResizable(true);
-        // CellColection widget alignment
-        setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
-
-        setWidget(content_);
+        : QWidget{parent},
+          layout_{new QGridLayout{this}},
+          content_{new GridManager{this, size}} {
+        setLayout(layout_);
+        layout_->addWidget(content_);
     }
-    ContentWidget(QWidget* parent, CellCollection* cc)
-        : QScrollArea(parent), content_{cc} {
-        setWidgetResizable(true);
-        // CellColection widget alignment
-        setAlignment(Qt::AlignHCenter | Qt::AlignCenter);
-
-        setWidget(content_);
+    ContentWidget(QWidget* parent, GridManager* gm)
+        : QWidget(parent), layout_{new QGridLayout{this}}, content_{gm} {
+        setLayout(layout_);
+        layout_->addWidget(content_);
     }
 
     QPair<int, int> gridSize() const { return content_->gridSize(); }
 
-    const CellCollection* cellCollection() { return content_; };
+    const GridManager* gridManager() { return content_; };
+    QWidget* widget() { return content_; }
 
    protected:
-    void keyPressEvent(QKeyEvent* e) override {
-        switch (e->key()) {
-            case Qt::Key_Escape:
-                if (content_->hasSelection()) {
-                    content_->unselectCells();
-                } else {
-                    Tool::setTool();
-                }
-                break;
-            case Qt::Key_Delete:
-                content_->clearSelectedCells();
-                break;
-            case Qt::Key_Shift:
-                content_->SwitchExpandButtons(false);
-                break;
-            default:
-                break;
-        }
-        if (e->key() == Qt::Key_Escape) {
-            content_->unselectCells();
-        };
-
-        QScrollArea::keyPressEvent(e);
-    }
-
-    void keyReleaseEvent(QKeyEvent* e) override {
-        if (e->key() == Qt::Key_Shift) {
-            content_->SwitchExpandButtons(true);
-        }
-
-        QScrollArea::keyReleaseEvent(e);
-    }
+    // void keyPressEvent(QKeyEvent* e) override {
+    //     switch (e->key()) {
+    //         case Qt::Key_Escape:
+    //             if (content_->hasSelection()) {
+    //                 content_->unselectCells();
+    //             } else {
+    //                 Tool::setTool();
+    //             }
+    //             break;
+    //         case Qt::Key_Delete:
+    //             content_->clearSelectedCells();
+    //             break;
+    //         case Qt::Key_Shift:
+    //             content_->SwitchExpandButtons(false);
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    //     if (e->key() == Qt::Key_Escape) {
+    //         content_->unselectCells();
+    //     };
+    //
+    //     QScrollArea::keyPressEvent(e);
+    // }
+    //
+    // void keyReleaseEvent(QKeyEvent* e) override {
+    //     if (e->key() == Qt::Key_Shift) {
+    //         content_->SwitchExpandButtons(true);
+    //     }
+    //
+    //     QScrollArea::keyReleaseEvent(e);
+    // }
 
    private:
-    CellCollection* content_;
+    QGridLayout* layout_;
+
+    GridManager* content_;
 
     inline static constexpr int kDefaultContentWidgetSize{10};
 };

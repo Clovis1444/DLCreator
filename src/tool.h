@@ -3,7 +3,7 @@
 #include <qobject.h>
 #include <qtmetamacros.h>
 
-#include "widgets/tabWidget/stackedContentWidget/contentWidget/cell/cellLayer.h"
+#include "widgets/tabWidget/stackedContentWidget/contentWidget/cellItem/cellLayer.h"
 
 class Tool : public QObject {
     Q_OBJECT

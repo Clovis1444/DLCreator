@@ -3,16 +3,16 @@
 #include <qlogging.h>
 
 #include "src/mapSaver/mapSaverJsons.h"
-#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellCollection.h"
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/gridManager.h"
 
-QJsonDocument MapSaver::saveMapToFile(const CellCollection* cc) {
-    QJsonDocument json{MapSaverJsons::MapJson{cc}.json()};
+QJsonDocument MapSaver::saveMapToFile(const GridManager* gm) {
+    QJsonDocument json{MapSaverJsons::MapJson{gm}.json()};
 
     return json;
 }
 
-CellCollection* MapSaver::loadMapFromFile(const QString& file_name,
-                                          const QByteArray& file_content) {
+GridManager* MapSaver::loadMapFromFile(const QString& file_name,
+                                       const QByteArray& file_content) {
     QJsonParseError err{};
     QJsonDocument json{QJsonDocument::fromJson(file_content, &err)};
 
@@ -46,11 +46,11 @@ CellCollection* MapSaver::loadMapFromFile(const QString& file_name,
                         .arg(kRootCellsKey);
     }
 
-    CellCollection* cc{new CellCollection{nullptr, map.rows(), map.cols()}};
+    GridManager* cc{new GridManager{nullptr, map.rows(), map.cols()}};
 
     // Load cells
     for (auto* i : cc->cellListMut()) {
-        QPoint c_pos{i->pos()};
+        QPoint c_pos{i->gridPos()};
 
         QString cell_key{QString{"%1_%2"}.arg(c_pos.x()).arg(c_pos.y())};
 
