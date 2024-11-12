@@ -46,10 +46,10 @@ GridManager* MapSaver::loadMapFromFile(const QString& file_name,
                         .arg(kRootCellsKey);
     }
 
-    GridManager* cc{new GridManager{nullptr, map.rows(), map.cols()}};
+    GridManager* gm{new GridManager{nullptr, map.rows(), map.cols()}};
 
     // Load cells
-    for (auto* i : cc->cellListMut()) {
+    for (auto* i : gm->cellListMut()) {
         QPoint c_pos{i->gridPos()};
 
         QString cell_key{QString{"%1_%2"}.arg(c_pos.x()).arg(c_pos.y())};
@@ -66,7 +66,7 @@ GridManager* MapSaver::loadMapFromFile(const QString& file_name,
         i->setLayer(cell_obj.cellInfo());
     }
 
-    return cc;
+    return gm;
 }
 
 // Generates absolute save file path with the file extension

@@ -174,8 +174,8 @@ class MapJson : public QObject {
         : cells_{cells}, size_arr_{size_arr} {
         constructorBody();
     }
-    explicit MapJson(const GridManager* cc)
-        : cells_{cc}, size_arr_{cc->gridSize()} {
+    explicit MapJson(const GridManager* gm)
+        : cells_{gm}, size_arr_{gm->gridSize()} {
         constructorBody();
     }
     explicit MapJson(const QJsonDocument& json)
