@@ -69,8 +69,9 @@ class GridManager : public QGraphicsView {
 
    private:
     void fillScene(int rows, int cols, qreal rect_size = 100) {
-        for (int i{}; i < rows; ++i) {
-            for (int j{}; j < cols; ++j) {
+        // Note: One-based indexing
+        for (int i{1}; i <= rows; ++i) {
+            for (int j{1}; j <= cols; ++j) {
                 auto* cell{new CellItem{rect_size, rect_size, rect_size * j,
                                         rect_size * i}};
                 scene()->addItem(cell);
