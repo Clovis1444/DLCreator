@@ -10,6 +10,7 @@
 #include <qevent.h>
 #include <qgraphicsscene.h>
 #include <qgraphicsview.h>
+#include <qhash.h>
 #include <qlist.h>
 #include <qnamespace.h>
 #include <qobject.h>
@@ -19,6 +20,7 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
+#include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellItem/cellAction.h"
 #include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellItem/cellItem.h"
 
 class GridManager : public QGraphicsView {
@@ -42,7 +44,7 @@ class GridManager : public QGraphicsView {
     QPair<int, int> gridSize() const { return {rows_, cols_}; }
     // void resizeGrid(/* ExpandDirection d, */ bool expand = true) {}
     // void switchExpandButtons(bool positive) {}
-    QList<const CellItem*> cellList() const {
+    QList<const CellItem*> cellItems() const {
         QList<const CellItem*> list{};
 
         for (auto* i : items()) {
@@ -54,7 +56,21 @@ class GridManager : public QGraphicsView {
 
         return list;
     }
-    QList<CellItem*> cellListMut() {
+    QList<const CellItem*> cellItems(
+        const QRect& rect,
+        Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const {
+        QList<const CellItem*> list{};
+
+        for (auto* i : items(rect, mode)) {
+            auto* ci{dynamic_cast<CellItem*>(i)};
+            if (ci) {
+                list.push_back(ci);
+            }
+        }
+
+        return list;
+    }
+    QList<CellItem*> cellItemsMut() {
         QList<CellItem*> list{};
 
         for (auto* i : items()) {
@@ -66,6 +82,37 @@ class GridManager : public QGraphicsView {
 
         return list;
     }
+    QList<CellItem*> cellItemsMut(
+        const QRect& rect,
+        Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) {
+        QList<CellItem*> list{};
+
+        for (auto* i : items(rect, mode)) {
+            auto* ci{dynamic_cast<CellItem*>(i)};
+            if (ci) {
+                list.push_back(ci);
+            }
+        }
+
+        return list;
+    }
+
+   private slots:
+    void onCellItemSetSelection(bool select) {
+        auto* ci{dynamic_cast<CellItem*>(sender())};
+        if (!ci) {
+            return;
+        }
+
+        // On unselect
+        if (!select) {
+            selected_cells_.removeOne(ci);
+        }
+        // On select and cell is not in the list
+        else if (!selected_cells_.contains(ci)) {
+            selected_cells_.push_back(ci);
+        }
+    }
 
    private:
     void fillScene(int rows, int cols, qreal rect_size = 100) {
@@ -74,8 +121,24 @@ class GridManager : public QGraphicsView {
             for (int j{1}; j <= cols; ++j) {
                 auto* cell{new CellItem{rect_size, rect_size, rect_size * j,
                                         rect_size * i}};
+
+                QObject::connect(cell, &CellItem::selected, this,
+                                 [this]() { onCellItemSetSelection(true); });
+                QObject::connect(cell, &CellItem::unselected, this,
+                                 [this]() { onCellItemSetSelection(false); });
+
                 scene()->addItem(cell);
             }
+        }
+    }
+
+    void clearSelection() {
+        // Important: Must copy selected_cells_ container because
+        // CellItem::setSelected() modifies selected_cells_
+        QList<CellItem*> list{selected_cells_};
+
+        for (CellItem* i : list) {
+            i->setSelected(false);
         }
     }
 
@@ -119,6 +182,26 @@ class GridManager : public QGraphicsView {
                     return;
                 }
                 break;
+            // Selection
+            case Qt::RightButton:
+                isSelecting_ = true;
+                curr_selection_buffer_.clear();
+                selection_begin_ = e->pos();
+
+                clearSelection();
+                // TODO(clovis): create extendSelectionModifierKey in settings.h
+                // If shift is pressed - select prev selection
+                if (e->modifiers().testFlag(Qt::ShiftModifier)) {
+                    isExtendingSelection_ = true;
+
+                    for (CellItem* i : prev_selection_) {
+                        i->setSelected(true);
+                    }
+                }
+
+                selection_->setGeometry(QRect{selection_begin_, QSize{}});
+                selection_->show();
+                break;
             default:
                 break;
         }
@@ -139,6 +222,33 @@ class GridManager : public QGraphicsView {
             lastPanningPoint_ = e->pos();
         }
 
+        // Selection
+        if (isSelecting_) {
+            selection_->setGeometry(
+                QRect(selection_begin_, e->pos()).normalized());
+
+            // Revert CellAction
+            for (CellItem* i : curr_selection_buffer_) {
+                // TODO(clovis): implement revert action here
+
+                // If extending selection
+                if (isExtendingSelection_ && prev_selection_.contains(i)) {
+                    continue;
+                }
+
+                i->setSelected(false);
+            }
+
+            // Iterate moved selection
+            for (CellItem* i : cellItemsMut(selection_->geometry())) {
+                if (!curr_selection_buffer_.contains(i)) {
+                    // TODO(clovis): implement action registration here
+                    curr_selection_buffer_.push_back(i);
+                }
+                i->setSelected(true);
+            }
+        }
+
         QGraphicsView::mouseMoveEvent(e);
     }
     void mouseReleaseEvent(QMouseEvent* e) override {
@@ -149,6 +259,28 @@ class GridManager : public QGraphicsView {
                 lastPanningPoint_ = {};
                 setCursor(Qt::ArrowCursor);
                 break;
+            // Selection
+            case Qt::RightButton: {
+                selection_->hide();
+
+                QList<CellItem*> selection{
+                    cellItemsMut(selection_->geometry())};
+
+                // update prev_selection_
+                if (isExtendingSelection_) {
+                    prev_selection_ += selection;
+                } else {
+                    prev_selection_ = selection;
+                }
+                // Select
+                for (CellItem* i : selection) {
+                    i->setSelected(true);
+                }
+
+                isSelecting_ = false;
+                isExtendingSelection_ = false;
+                break;
+            }
             default:
                 break;
         }
@@ -168,9 +300,6 @@ class GridManager : public QGraphicsView {
         }
 
         fillScene(rows, cols, rect_size);
-
-        // Enable RubberBandDrag by default
-        setDragMode(RubberBandDrag);
     }
 
     int rows_;
@@ -182,11 +311,25 @@ class GridManager : public QGraphicsView {
     int kMinZoomStep_{-10};
     int kCurrentZoomStep_{};
 
+    // Panning
     bool isPanning_{};
     QPoint lastPanningPoint_;
     // How fast panning scrolls
     // TODO(clovis): This factor should be 1. Remove this var?
     int kPanningFactor_{1};
+
+    // Selection
+    bool isSelecting_{};
+    bool isExtendingSelection_{};
+    QRubberBand* selection_{new QRubberBand{QRubberBand::Rectangle, this}};
+    QPoint selection_begin_;
+    QList<CellItem*> prev_selection_;
+    // Note: contains ALL CellItems that was touched by current selection
+    QList<CellItem*> curr_selection_buffer_;
+    QHash<CellItem*, CellAction> selection_buffer_;
+    // TODO(clovis): try another approach(without) using signals for
+    // selected_cells_
+    QList<CellItem*> selected_cells_;
 
     // TODO(clovis): deallocate memory in destructor
     // TODO(clovis): add keyboard shortcuts

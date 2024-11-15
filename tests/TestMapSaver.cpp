@@ -179,7 +179,7 @@ class TestMapSaver : public QObject {
             return false;
         }
 
-        for (const auto* i : gm->cellList()) {
+        for (const auto* i : gm->cellItems()) {
             QPoint pos{i->gridPos()};
 
             QJsonObject cell_json{

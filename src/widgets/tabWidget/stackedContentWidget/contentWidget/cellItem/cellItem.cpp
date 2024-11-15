@@ -22,6 +22,22 @@ CellItem::CellItem(QPoint pos, qreal cell_size, QColor background_color)
     constructorBody(pos.x(), pos.y());
 }
 
+bool CellItem::isSelected() const { return selected_; };
+void CellItem::setSelected(bool select) {
+    if (selected_ == select) {
+        return;
+    }
+
+    selected_ = select;
+    update();
+
+    if (select) {
+        emit selected();
+    } else {
+        emit unselected();
+    }
+};
+
 QPoint CellItem::gridPos() const {
     return QPoint{static_cast<int>(pos().x()) / width(),
                   static_cast<int>(pos().y()) / height()};
@@ -99,9 +115,6 @@ CellItem::CellInfo CellItem::info() const {
 
 void CellItem::constructorBody(qreal pos_x, qreal pos_y) {
     setPos(pos_x, pos_y);
-
-    // CellItem should always be selectable
-    setFlags(ItemIsSelectable);
 };
 
 void CellItem::paint(QPainter* pntr, const QStyleOptionGraphicsItem* /*option*/,

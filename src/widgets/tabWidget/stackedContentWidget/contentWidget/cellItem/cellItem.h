@@ -73,6 +73,10 @@ class CellItem : public QObject, public QGraphicsItem {
         inline static QString subscript_operator_overflow_buffer_{};
     };
 
+    // IMPORTANT: function hiding to reimplement selected functionality
+    bool isSelected() const;
+    void setSelected(bool select);
+
     QPoint gridPos() const;
 
     void setLayer(const CellLayer* layer, bool track_history = true);
@@ -87,6 +91,10 @@ class CellItem : public QObject, public QGraphicsItem {
     // TODO(clovis): resolve naming conflict with QGrapgicsItem::(pos/setpos)
     // QPoint pos() const;
     // void setPos(QPoint pos);
+
+   signals:
+    void selected();
+    void unselected();
 
    private:
     // void mousePressEvent(QGraphicsSceneMouseEvent* e) override {
@@ -119,6 +127,8 @@ class CellItem : public QObject, public QGraphicsItem {
 
     qreal width_;
     qreal height_;
+
+    bool selected_{};
 
     QColor background_color_;
     QString layer_background_;

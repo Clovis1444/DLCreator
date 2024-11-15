@@ -79,5 +79,6 @@ class ContentWidget : public QWidget {
 
     GridManager* content_;
 
-    inline static constexpr int kDefaultContentWidgetSize{10};
+    // TODO(clovis): move this var to settings.h GridManager section
+    inline static constexpr int kDefaultContentWidgetSize{100};
 };

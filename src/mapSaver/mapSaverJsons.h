@@ -78,7 +78,7 @@ class MapCellsObj : public QObject {
 
    public:
     explicit MapCellsObj(const GridManager* gm) {
-        for (const CellItem* i : gm->cellList()) {
+        for (const CellItem* i : gm->cellItems()) {
             CellItem::CellInfo ci{i->info()};
             QPoint cpos{i->gridPos()};
 

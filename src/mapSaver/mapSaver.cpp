@@ -49,7 +49,7 @@ GridManager* MapSaver::loadMapFromFile(const QString& file_name,
     GridManager* gm{new GridManager{nullptr, map.rows(), map.cols()}};
 
     // Load cells
-    for (auto* i : gm->cellListMut()) {
+    for (auto* i : gm->cellItemsMut()) {
         QPoint c_pos{i->gridPos()};
 
         QString cell_key{QString{"%1_%2"}.arg(c_pos.x()).arg(c_pos.y())};
