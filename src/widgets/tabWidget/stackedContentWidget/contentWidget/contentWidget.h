@@ -15,14 +15,16 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
+#include "src/settings.h"
 #include "src/widgets/tabWidget/stackedContentWidget/contentWidget/gridManager.h"
 
 class ContentWidget : public QWidget {
     Q_OBJECT
 
    public:
-    explicit ContentWidget(QWidget* parent,
-                           int size = kDefaultContentWidgetSize)
+    explicit ContentWidget(
+        QWidget* parent,
+        int size = Settings::GridManager::kDefaultGridManagerSize)
         : QWidget{parent},
           layout_{new QGridLayout{this}},
           content_{new GridManager{this, size}} {
@@ -78,7 +80,4 @@ class ContentWidget : public QWidget {
     QGridLayout* layout_;
 
     GridManager* content_;
-
-    // TODO(clovis): move this var to settings.h GridManager section
-    inline static constexpr int kDefaultContentWidgetSize{100};
 };

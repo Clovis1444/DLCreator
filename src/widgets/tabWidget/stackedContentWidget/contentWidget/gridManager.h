@@ -20,6 +20,7 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
+#include "src/settings.h"
 #include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellItem/cellAction.h"
 #include "src/widgets/tabWidget/stackedContentWidget/contentWidget/cellItem/cellItem.h"
 
@@ -173,34 +174,14 @@ class GridManager : public QGraphicsView {
         switch (e->button()) {
             case Qt::LeftButton:
                 // Panning
-                if (e->modifiers().testFlag(Qt::ShiftModifier)) {
-                    isPanning_ = true;
-                    lastPanningPoint_ = e->pos();
-                    setCursor(Qt::ClosedHandCursor);
+                panningPress(e);
 
-                    // Do not propogate event
-                    return;
-                }
+                // Do not propogate event
+                return;
                 break;
             // Selection
             case Qt::RightButton:
-                isSelecting_ = true;
-                curr_selection_buffer_.clear();
-                selection_begin_ = e->pos();
-
-                clearSelection();
-                // TODO(clovis): create extendSelectionModifierKey in settings.h
-                // If shift is pressed - select prev selection
-                if (e->modifiers().testFlag(Qt::ShiftModifier)) {
-                    isExtendingSelection_ = true;
-
-                    for (CellItem* i : prev_selection_) {
-                        i->setSelected(true);
-                    }
-                }
-
-                selection_->setGeometry(QRect{selection_begin_, QSize{}});
-                selection_->show();
+                selectionPress(e);
                 break;
             default:
                 break;
@@ -211,42 +192,12 @@ class GridManager : public QGraphicsView {
     void mouseMoveEvent(QMouseEvent* e) override {
         // Panning
         if (isPanning_) {
-            int delta_x{e->pos().x() - lastPanningPoint_.x()};
-            int delta_y{e->pos().y() - lastPanningPoint_.y()};
-
-            horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
-                                            (delta_x * kPanningFactor_));
-            verticalScrollBar()->setValue(verticalScrollBar()->value() -
-                                          (delta_y * kPanningFactor_));
-
-            lastPanningPoint_ = e->pos();
+            panningMove(e);
         }
 
         // Selection
         if (isSelecting_) {
-            selection_->setGeometry(
-                QRect(selection_begin_, e->pos()).normalized());
-
-            // Revert CellAction
-            for (CellItem* i : curr_selection_buffer_) {
-                // TODO(clovis): implement revert action here
-
-                // If extending selection
-                if (isExtendingSelection_ && prev_selection_.contains(i)) {
-                    continue;
-                }
-
-                i->setSelected(false);
-            }
-
-            // Iterate moved selection
-            for (CellItem* i : cellItemsMut(selection_->geometry())) {
-                if (!curr_selection_buffer_.contains(i)) {
-                    // TODO(clovis): implement action registration here
-                    curr_selection_buffer_.push_back(i);
-                }
-                i->setSelected(true);
-            }
+            selectionMove(e);
         }
 
         QGraphicsView::mouseMoveEvent(e);
@@ -255,30 +206,11 @@ class GridManager : public QGraphicsView {
         switch (e->button()) {
             // Panning
             case Qt::LeftButton:
-                isPanning_ = false;
-                lastPanningPoint_ = {};
-                setCursor(Qt::ArrowCursor);
+                panningRelease();
                 break;
             // Selection
             case Qt::RightButton: {
-                selection_->hide();
-
-                QList<CellItem*> selection{
-                    cellItemsMut(selection_->geometry())};
-
-                // update prev_selection_
-                if (isExtendingSelection_) {
-                    prev_selection_ += selection;
-                } else {
-                    prev_selection_ = selection;
-                }
-                // Select
-                for (CellItem* i : selection) {
-                    i->setSelected(true);
-                }
-
-                isSelecting_ = false;
-                isExtendingSelection_ = false;
+                selectionRelease();
                 break;
             }
             default:
@@ -286,6 +218,96 @@ class GridManager : public QGraphicsView {
         }
 
         QGraphicsView::mouseReleaseEvent(e);
+    }
+
+    // Panning implementation
+    void panningPress(QMouseEvent* e) {
+        if (e->modifiers().testFlag(
+                Settings::GridManager::kPanningModifierKey)) {
+            isPanning_ = true;
+            lastPanningPoint_ = e->pos();
+            setCursor(Qt::ClosedHandCursor);
+        }
+    }
+    void panningMove(QMouseEvent* e) {
+        int delta_x{e->pos().x() - lastPanningPoint_.x()};
+        int delta_y{e->pos().y() - lastPanningPoint_.y()};
+
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
+                                        (delta_x * kPanningFactor_));
+        verticalScrollBar()->setValue(verticalScrollBar()->value() -
+                                      (delta_y * kPanningFactor_));
+
+        lastPanningPoint_ = e->pos();
+    }
+    void panningRelease() {
+        isPanning_ = false;
+        lastPanningPoint_ = {};
+        setCursor(Qt::ArrowCursor);
+    }
+
+    // Selection implementation
+    void selectionPress(QMouseEvent* e) {
+        isSelecting_ = true;
+        curr_selection_buffer_.clear();
+        selection_begin_ = e->pos();
+
+        clearSelection();
+        // If shift is pressed - select prev selection
+        if (e->modifiers().testFlag(
+                Settings::GridManager::kExtendSelectionModifierKey)) {
+            isExtendingSelection_ = true;
+
+            for (CellItem* i : prev_selection_) {
+                i->setSelected(true);
+            }
+        }
+
+        selection_->setGeometry(QRect{selection_begin_, QSize{}});
+        selection_->show();
+    }
+    void selectionMove(QMouseEvent* e) {
+        selection_->setGeometry(QRect(selection_begin_, e->pos()).normalized());
+
+        // Revert CellAction
+        for (CellItem* i : curr_selection_buffer_) {
+            // TODO(clovis): implement revert action here
+
+            // If extending selection
+            if (isExtendingSelection_ && prev_selection_.contains(i)) {
+                continue;
+            }
+
+            i->setSelected(false);
+        }
+
+        // Iterate moved selection
+        for (CellItem* i : cellItemsMut(selection_->geometry())) {
+            if (!curr_selection_buffer_.contains(i)) {
+                // TODO(clovis): implement action registration here
+                curr_selection_buffer_.push_back(i);
+            }
+            i->setSelected(true);
+        }
+    }
+    void selectionRelease() {
+        selection_->hide();
+
+        QList<CellItem*> selection{cellItemsMut(selection_->geometry())};
+
+        // update prev_selection_
+        if (isExtendingSelection_) {
+            prev_selection_ += selection;
+        } else {
+            prev_selection_ = selection;
+        }
+        // Select
+        for (CellItem* i : selection) {
+            i->setSelected(true);
+        }
+
+        isSelecting_ = false;
+        isExtendingSelection_ = false;
     }
 
     void constructorBody(int rows, int cols, qreal rect_size = 100) {

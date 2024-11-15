@@ -77,6 +77,16 @@ class Settings {
         inline static const bool kUseToolTip{true};
     };
 
+    class GridManager {
+       public:
+        inline static const int kDefaultGridManagerSize{100};
+
+        inline static const Qt::KeyboardModifier kPanningModifierKey{
+            Qt::ControlModifier};
+        inline static const Qt::KeyboardModifier kExtendSelectionModifierKey{
+            Qt::ShiftModifier};
+    };
+
    protected:
     inline static const QString kCellLayerResourcesFilePath{
         "/resources/cellLayer.json"};
