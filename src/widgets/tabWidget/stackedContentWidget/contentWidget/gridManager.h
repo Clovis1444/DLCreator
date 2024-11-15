@@ -172,8 +172,9 @@ class GridManager : public QGraphicsView {
     // Panning implementation
     void mousePressEvent(QMouseEvent* e) override {
         switch (e->button()) {
-            case Qt::LeftButton:
                 // Panning
+            case Qt::MiddleButton:
+            case Qt::LeftButton:
                 panningPress(e);
 
                 // Do not propogate event
@@ -206,6 +207,7 @@ class GridManager : public QGraphicsView {
         switch (e->button()) {
             // Panning
             case Qt::LeftButton:
+            case Qt::MiddleButton:
                 panningRelease();
                 break;
             // Selection
@@ -222,8 +224,14 @@ class GridManager : public QGraphicsView {
 
     // Panning implementation
     void panningPress(QMouseEvent* e) {
-        if (e->modifiers().testFlag(
-                Settings::GridManager::kPanningModifierKey)) {
+        bool mouse_pan{Settings::GridManager::kUseWheelPanning &&
+                       e->button() == Qt::MiddleButton};
+        bool keyboard_pan{Settings::GridManager::kUseKeyboardPanning &&
+                          e->button() == Qt::LeftButton &&
+                          e->modifiers().testFlag(
+                              Settings::GridManager::kPanningModifierKey)};
+
+        if (mouse_pan || keyboard_pan) {
             isPanning_ = true;
             lastPanningPoint_ = e->pos();
             setCursor(Qt::ClosedHandCursor);
@@ -234,9 +242,8 @@ class GridManager : public QGraphicsView {
         int delta_y{e->pos().y() - lastPanningPoint_.y()};
 
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
-                                        (delta_x * kPanningFactor_));
-        verticalScrollBar()->setValue(verticalScrollBar()->value() -
-                                      (delta_y * kPanningFactor_));
+                                        delta_x);
+        verticalScrollBar()->setValue(verticalScrollBar()->value() - delta_y);
 
         lastPanningPoint_ = e->pos();
     }
@@ -336,9 +343,6 @@ class GridManager : public QGraphicsView {
     // Panning
     bool isPanning_{};
     QPoint lastPanningPoint_;
-    // How fast panning scrolls
-    // TODO(clovis): This factor should be 1. Remove this var?
-    int kPanningFactor_{1};
 
     // Selection
     bool isSelecting_{};

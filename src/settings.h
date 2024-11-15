@@ -81,6 +81,9 @@ class Settings {
        public:
         inline static const int kDefaultGridManagerSize{100};
 
+        inline static const bool kUseWheelPanning{true};
+        inline static const bool kUseKeyboardPanning{true};
+
         inline static const Qt::KeyboardModifier kPanningModifierKey{
             Qt::ControlModifier};
         inline static const Qt::KeyboardModifier kExtendSelectionModifierKey{
