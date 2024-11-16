@@ -123,24 +123,17 @@ class GridManager : public QGraphicsView {
                 auto* cell{new CellItem{rect_size, rect_size, rect_size * j,
                                         rect_size * i}};
 
-                QObject::connect(cell, &CellItem::selected, this,
-                                 [this]() { onCellItemSetSelection(true); });
-                QObject::connect(cell, &CellItem::unselected, this,
-                                 [this]() { onCellItemSetSelection(false); });
-
                 scene()->addItem(cell);
             }
         }
     }
 
     void clearSelection() {
-        // Important: Must copy selected_cells_ container because
-        // CellItem::setSelected() modifies selected_cells_
-        QList<CellItem*> list{selected_cells_};
-
-        for (CellItem* i : list) {
+        for (CellItem* i : selected_cells_) {
             i->setSelected(false);
         }
+
+        selected_cells_.clear();
     }
 
     // Zooming implementation
@@ -258,6 +251,8 @@ class GridManager : public QGraphicsView {
         isSelecting_ = true;
         curr_selection_buffer_.clear();
         selection_begin_ = e->pos();
+        // All items in the scene MUST be CellItem or this line will crash
+        selection_target_ = dynamic_cast<CellItem*>(itemAt(e->pos()));
 
         clearSelection();
         // If shift is pressed - select prev selection
@@ -275,6 +270,16 @@ class GridManager : public QGraphicsView {
     }
     void selectionMove(QMouseEvent* e) {
         selection_->setGeometry(QRect(selection_begin_, e->pos()).normalized());
+
+        // Early return if selection target didnt change
+        if (selection_target_ == itemAt(e->pos())) {
+            return;
+        }
+        // All items in the scene MUST be CellItem or this line will crash
+        selection_target_ = dynamic_cast<CellItem*>(itemAt(e->pos()));
+
+        // Update selected_cells_
+        addSelectedCells(cellItemsMut(selection_->geometry()));
 
         // Revert CellAction
         for (CellItem* i : curr_selection_buffer_) {
@@ -317,6 +322,14 @@ class GridManager : public QGraphicsView {
         isExtendingSelection_ = false;
     }
 
+    void addSelectedCells(const QList<CellItem*>& cl) {
+        for (CellItem* i : cl) {
+            if (!selected_cells_.contains(i)) {
+                selected_cells_.push_back(i);
+            }
+        }
+    }
+
     void constructorBody(int rows, int cols, qreal rect_size = 100) {
         if (scene() == nullptr) {
             auto* sc{new QGraphicsScene{this}};
@@ -356,6 +369,8 @@ class GridManager : public QGraphicsView {
     // TODO(clovis): try another approach(without) using signals for
     // selected_cells_
     QList<CellItem*> selected_cells_;
+    // Current item at what selection is
+    CellItem* selection_target_;
 
     // TODO(clovis): deallocate memory in destructor
     // TODO(clovis): add keyboard shortcuts

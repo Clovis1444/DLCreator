@@ -93,8 +93,6 @@ class CellItem : public QObject, public QGraphicsItem {
     // void setPos(QPoint pos);
 
    signals:
-    void selected();
-    void unselected();
 
    private:
     // void mousePressEvent(QGraphicsSceneMouseEvent* e) override {
@@ -131,7 +129,7 @@ class CellItem : public QObject, public QGraphicsItem {
     bool selected_{};
 
     QColor background_color_;
-    QString layer_background_;
-    QString layer_liquid_{"Water"};
-    QString layer_gaz_{"Smoke"};
+    QString layer_background_{"Dirt"};
+    QString layer_liquid_{""};
+    QString layer_gaz_{""};
 };

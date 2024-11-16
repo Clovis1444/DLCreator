@@ -30,12 +30,6 @@ void CellItem::setSelected(bool select) {
 
     selected_ = select;
     update();
-
-    if (select) {
-        emit selected();
-    } else {
-        emit unselected();
-    }
 };
 
 QPoint CellItem::gridPos() const {
