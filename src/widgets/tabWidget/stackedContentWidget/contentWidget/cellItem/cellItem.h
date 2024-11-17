@@ -92,8 +92,6 @@ class CellItem : public QObject, public QGraphicsItem {
     // QPoint pos() const;
     // void setPos(QPoint pos);
 
-   signals:
-
    private:
     // void mousePressEvent(QGraphicsSceneMouseEvent* e) override {
     //     switch (e->button()) {
