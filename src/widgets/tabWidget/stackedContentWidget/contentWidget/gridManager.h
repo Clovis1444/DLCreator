@@ -243,35 +243,15 @@ class GridManager : public QGraphicsView {
         selection_->setGeometry(QRect{selection_begin_, QSize{}});
         selection_->show();
     }
-    // TODO(clovis): fix left-based selection
     void selectionMove(QMouseEvent* e) {
         selection_->setGeometry(QRect(selection_begin_, e->pos()).normalized());
 
+        QList<CellItem*> intersecting_cells{updateSelectionTarget(e->pos())};
+
         // Early return if selection target didnt change
-        if (selection_target_ == itemAt(e->pos())) {
-            skip_frame_ = true;
+        if (intersecting_cells.isEmpty()) {
             return;
         }
-
-        updateSelectionTarget(e->pos());
-
-        // if (skip_frame_) {
-        //     skip_frame_ = !skip_frame_;
-        //
-        //     return;
-        // }
-
-        // All items in the scene MUST be CellItem or this line will crash
-        selection_target_ = dynamic_cast<CellItem*>(itemAt(e->pos()));
-        if (!selection_target_) {
-            return;
-        }
-
-        QList<CellItem*> cells_in_selection{
-            cellItemsMut(selection_->geometry())};
-
-        // Update selected_cells_
-        // setCellsSelected(cells_in_selection, true);
 
         // Revert CellAction
         for (CellItem* i : curr_selection_buffer_) {
@@ -286,7 +266,7 @@ class GridManager : public QGraphicsView {
         }
 
         // Iterate moved selection
-        for (CellItem* i : cells_in_selection) {
+        for (CellItem* i : intersecting_cells) {
             if (!curr_selection_buffer_.contains(i)) {
                 // TODO(clovis): implement action registration here
                 curr_selection_buffer_.push_back(i);
@@ -305,8 +285,6 @@ class GridManager : public QGraphicsView {
         } else {
             prev_selection_ = selection;
         }
-        // Select
-        // setCellsSelected(selection, true);
 
         isSelecting_ = false;
         isExtendingSelection_ = false;
@@ -344,52 +322,39 @@ class GridManager : public QGraphicsView {
         selected_cells_.clear();
     }
 
-    // Call this function inside mouseMoveEvent to update selection_target_
-    // state. Returns true if selection_target_ was changed.
-    bool updateSelectionTarget(const QPoint& target_pos) {
+    // TODO(clovis): refactor this
+    // Updates selection_target_ depending on the provided new target_pos.
+    // Returns list of CellItems* intersecting with the current selection_ if
+    // selection_target_ was changed. Returns Empty list of target was not
+    // changed.
+    QList<CellItem*> updateSelectionTarget(const QPoint& target_pos) {
         CellItem* new_target{dynamic_cast<CellItem*>(itemAt(target_pos))};
 
-        if (!new_target || !selection_target_) {
-            return false;
+        if (!new_target) {
+            return {};
         }
-
-        QList<CellItem*> cells_in_selection{
-            cellItemsMut(selection_->geometry())};
-
-        // qInfo() << "Items: " << items(selection_->geometry()).count();
-        //
-        // qInfo() << "Geometry: " << selection_->geometry()
-        //         << "| Cells inside: " << cells_in_selection.count();
-        //
-        qInfo() << "Event pos: " << mapToScene(target_pos);
-        // if (selection_target_ != nullptr) {
-        //     qInfo() << "Before: " << selection_target_->sceneBoundingRect();
-        // }
-        //
-        // qInfo() << "After: " << new_target->sceneBoundingRect() << '\n';
+        if (!selection_target_) {
+            selection_target_ = new_target;
+        }
 
         QRectF otr{selection_target_->sceneBoundingRect()};
         QRectF ntr{new_target->sceneBoundingRect()};
 
-        // qInfo() << "SELECTION: " << QRect(selection_begin_, target_pos);
-        qInfo() << "Selection_begin: " << selection_begin_;
-
         Qt::ItemSelectionMode sm{};
 
-        bool move_to_rigth{
+        bool move_to_left{
             (otr.x() > ntr.x() && target_pos.x() > selection_begin_.y())};
-        bool move_to_down{
+        bool move_to_up{
             (otr.y() > ntr.y() && target_pos.y() > selection_begin_.y())};
-        if (move_to_rigth || move_to_down) {
-            qInfo() << "Shape";
+        if (move_to_left || move_to_up) {
             sm = Qt::IntersectsItemShape;
         } else {
             sm = Qt::IntersectsItemBoundingRect;
         }
 
-        qInfo() << cellItemsMut(selection_->geometry(), sm).count();
+        QList<CellItem*> list{cellItemsMut(selection_->geometry(), sm)};
 
-        return true;
+        return list;
     }
 
     void constructorBody(int rows, int cols, qreal rect_size = 100) {
@@ -428,12 +393,9 @@ class GridManager : public QGraphicsView {
     // Note: contains ALL CellItems that was touched by current selection
     QList<CellItem*> curr_selection_buffer_;
     QHash<CellItem*, CellAction> selection_buffer_;
-    // TODO(clovis): try another approach(without) using signals for
-    // selected_cells_
     QList<CellItem*> selected_cells_;
     // Current item at what selection is
     CellItem* selection_target_{};
-    bool skip_frame_{true};
 
     // TODO(clovis): deallocate memory in destructor
     // TODO(clovis): add keyboard shortcuts
